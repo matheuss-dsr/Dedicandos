@@ -1,12 +1,48 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>E-mail não verificado</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-mail Não Verificado - Dedicandos</title>
+    <link rel="stylesheet" href="/static/css/login-cadastro.css">
+    <style>
+        .auth-container {
+            text-align: center;
+            padding: 40px;
+        }
+        .auth-container h2 {
+            color: #e74c3c; /* Vermelho para indicar alerta */
+            margin-bottom: 20px;
+        }
+        .auth-container p {
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            color: #555;
+        }
+        .auth-container .btn-primary {
+            background-color: #3498db; /* Azul para ação */
+        }
+        .auth-container .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .auth-links {
+            margin-top: 30px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Seu e-mail ainda não foi verificado!</h1>
-  <p>Verifique sua caixa de entrada e clique no link enviado para confirmar seu cadastro.</p>
-  <a href="/login">Voltar para login</a>
+    <div class="auth-container">
+        <h2>Seu E-mail Não Foi Verificado!</h2>
+        <p>Para acessar todas as funcionalidades da plataforma, por favor, verifique seu e-mail.</p>
+        <p>Enviamos um link de verificação para <strong><%= user ? user.email : 'seu e-mail' %></strong>.</p>
+        <p>Verifique sua caixa de entrada (e a pasta de spam) e clique no link para ativar sua conta.</p>
+        <form action="/reenviar-verificacao" method="POST">
+            <input type="hidden" name="email" value="<%= user ? user.email : '' %>">
+            <button type="submit" class="btn-primary">Reenviar E-mail de Verificação</button>
+        </form>
+        <div class="auth-links">
+            <a href="/logout">Sair e tentar novamente</a>
+        </div>
+    </div>
 </body>
 </html>

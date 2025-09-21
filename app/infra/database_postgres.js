@@ -1,9 +1,10 @@
 import pg from "pg";
 import dotenv from "dotenv";
+
 dotenv.config();
 const { Pool } = pg;
 
-export class DatabasePostgres {
+  export class DatabasePostgres {
   constructor() {
     this.pool = new Pool({
       connectionString: process.env.DATABASE_URL,
@@ -65,12 +66,37 @@ export class DatabasePostgres {
     async deleteUser(id) {
       await this.query('UPDATE usuarios SET ativo = false WHERE id_usuario = $1', [id]);
     }
-
-
+    
     async reactivateUser(id) {
         const sql = 'UPDATE usuarios SET ativo = true WHERE id_usuario = $1';
         const params = [id];
         await this.query(sql, params);
+    }
+
+    async savePasswordResetToken(email, token, expiresAt) {
+      return this.query(
+        `INSERT INTO password_resets (email, token, expires_at) 
+        VALUES ($1, $2, $3) 
+        ON CONFLICT (email) DO UPDATE 
+        SET token = EXCLUDED.token, expires_at = EXCLUDED.expires_at`,
+        [email, token, expiresAt]
+      );
+    }
+
+    async findPasswordResetByToken(token) {
+      const result = await this.query(
+        `SELECT * FROM password_resets 
+        WHERE token = $1 AND expires_at > NOW()`,
+        [token]
+      );
+      return result.rows[0];
+    }
+
+    async updateUserPassword(email, hashedPassword) {
+      return this.query(
+        `UPDATE usuarios SET senha = $1 WHERE email = $2`,
+        [hashedPassword, email]
+      );
     }
 
   /* ---------------- PROVAS ---------------- */

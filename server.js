@@ -60,7 +60,12 @@ server.addHook('preHandler', async (req, reply) => {
 // ---------------- ROTAS PÚBLICAS ----------------
 server.get('/', async (req, reply) => reply.view('index.ejs'))
 
-server.get('/login', (req, reply) => reply.view('user/login.ejs', { error: null }))
+server.get('/login', (req, reply) => {
+  return reply.view('user/login.ejs', { 
+    error: null, 
+    success: null
+  });
+});
 
 server.post('/login', async (req, reply) => {
   const { email, senha } = req.body
@@ -181,7 +186,6 @@ server.post('/users/:id_usuario/upload-avatar', async (req, reply) => {
 
   await database.updateUser(id_usuario, { avatar_url: fileName });
 
-  // Redireciona para o perfil
   return reply.redirect('/perfil');
 });
 
@@ -189,6 +193,29 @@ server.get('/email-nao-verificado', async (req, reply) => {
   return reply.view('user/email_nao_verificado.ejs');
 });
 
+server.get("/esqueci-senha", async (req, reply) => {
+  return reply.view("user/esqueci_senha.ejs", { error: null, success: null });
+});
+
+server.post("/esqueci-senha", async (req, reply) => {
+  return userController.esqueciSenha(req, reply, database);
+});
+
+
+server.get("/resetar-senha", async (req, reply) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return reply.redirect("/login");
+  }
+
+  return reply.view("user/resetar_senha.ejs", { token, error: null, success: null });
+});
+
+server.post("/resetar-senha", async (req, reply) => {
+  const { token } = req.body;
+  return reply.view("user/resetar_senha.ejs", { token, error: "Token inválido ou expirado", success: null });
+});
 
 // ---------------- START ----------------
 server.listen({

@@ -1,264 +1,163 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Perfil do Usuário</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    /* Reset básico */
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0 1rem;
-      color: #333;
-      line-height: 1.5;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .perfil-container {
-      background-color: #fff;
-      max-width: 600px;
-      width: 100%;
-      padding: 2rem 2.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      box-sizing: border-box;
-    }
-
-    .perfil-avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 1.5rem;
-      border: 4px solid #007bff;
-      background-color: #e9ecef;
-    }
-
-    .perfil-nome {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: #222;
-    }
-
-    .perfil-email {
-      font-size: 1rem;
-      color: #555;
-      margin-bottom: 2rem;
-      word-break: break-word;
-    }
-
-    .perfil-info {
-      text-align: left;
-      margin-top: 1rem;
-      font-size: 1rem;
-      color: #444;
-    }
-
-    .perfil-info p {
-      margin: 0.5rem 0;
-    }
-
-    .perfil-info label {
-      font-weight: 600;
-      display: inline-block;
-      width: 140px;
-      color: #222;
-    }
-
-    .btn-editar,
-    .btn-esqueci,
-    .btn-deletar {
-      display: inline-block;
-      margin-top: 1.5rem;
-      padding: 0.75rem 2rem;
-      border-radius: 6px;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0, 123, 255, 0.4);
-      user-select: none;
-    }
-
-    .btn-editar {
-      background-color: #007bff;
-      color: #fff;
-      margin-right: 0.5rem;
-    }
-    .btn-editar:hover,
-    .btn-editar:focus {
-      background-color: #0056b3;
-      outline: none;
-      box-shadow: 0 0 8px rgba(0, 86, 179, 0.7);
-    }
-
-    .btn-esqueci {
-      background-color: #6c757d;
-      color: #fff;
-      margin-right: 0.5rem;
-      box-shadow: 0 2px 6px rgba(108, 117, 125, 0.4);
-    }
-    .btn-esqueci:hover,
-    .btn-esqueci:focus {
-      background-color: #5a6268;
-      outline: none;
-      box-shadow: 0 0 8px rgba(90, 98, 104, 0.7);
-    }
-
-    .btn-deletar {
-      background-color: #dc3545;
-      color: #fff;
-      box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
-    }
-    .btn-deletar:hover,
-    .btn-deletar:focus {
-      background-color: #b02a37;
-      outline: none;
-      box-shadow: 0 0 8px rgba(176, 42, 55, 0.7);
-    }
-
-    /* Responsividade */
-    @media (max-width: 480px) {
-      .perfil-container {
-        padding: 1.5rem 1.5rem;
-      }
-
-      .perfil-nome {
-        font-size: 1.5rem;
-      }
-
-      .perfil-info label {
-        width: 120px;
-      }
-
-      .btn-editar,
-      .btn-esqueci,
-      .btn-deletar {
-        display: block;
-        width: 100%;
-        margin: 0.75rem 0 0 0;
-      }
-    }
-
-    /* Classe para esconder visualmente mas manter acessível para leitores de tela */
-    .sr-only {
-      position: absolute !important;
-      width: 1px !important;
-      height: 1px !important;
-      padding: 0 !important;
-      margin: -1px !important;
-      overflow: hidden !important;
-      clip: rect(0, 0, 0, 0) !important;
-      white-space: nowrap !important;
-      border: 0 !important;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - Dedicandos</title>
+    <link rel="stylesheet" href="/static/css/dashboardAdmin.css">
+    <style>
+        .profile-container {
+            max-width: 700px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: #333;
+        }
+        .profile-container h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .avatar-section {
+            text-align: center;
+        }
+        .avatar-section img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3fa9f5;
+            margin-bottom: 15px;
+        }
+        .avatar-section form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .avatar-section input[type="file"] {
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 250px;
+        }
+        .avatar-section button {
+            background-color: #3fa9f5;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .avatar-section button:hover {
+            background-color: #337acc;
+        }
+        .user-details {
+            width: 100%;
+            max-width: 400px;
+        }
+        .user-details p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+        .user-details p strong {
+            color: #2c3e50;
+            display: inline-block;
+            width: 120px; /* Alinha os dois pontos */
+        }
+        .user-details .edit-button {
+            display: block;
+            width: fit-content;
+            margin: 20px auto 0;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .user-details .edit-button:hover {
+            background-color: #218838;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
 </head>
 <body>
-  <main class="perfil-container" role="main" aria-label="Perfil do usuário">
-  <form id="form-avatar" action="/users/<%= user.id_usuario %>/upload-avatar" method="POST" enctype="multipart/form-data" style="position: relative;">
-    <div style="position: relative; display: inline-block;">
-      <img
-        class="perfil-avatar"
-        id="perfil-avatar-img"
-        src="<%= user.avatar_url ? '/static/uploads/' + user.avatar_url : '/static/images/user.png' %>"
-        alt="Foto de perfil de <%= user.nome %>"
-        tabindex="0"
-      />
-      <img
-        id="edit-avatar-btn"
-        src="/static/images/edit.png"
-        alt="Editar avatar"
-        style="
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          width: 28px;
-          height: 28px;
-          cursor: pointer;
-        "
-        title="Clique para trocar a foto de perfil"
-      />
+    <nav class="sidebar">
+        <div class="logo">Dedicandos</div>
+        <a href="/home">Início</a>
+        <a href="/perfil" class="active">Meu Perfil</a>
+        <a href="/prova/gerar">Gerar Prova</a>
+        <% if (user && user.role === 'admin') { %>
+            <a href="/users">Gerenciar Usuários</a>
+        <% } %>
+        <a href="/logout" class="logout-btn">Sair</a>
+    </nav>
+
+    <div class="main">
+        <header class="topbar">
+            <span>Bem-vindo, <%= user.nome %>!</span>
+        </header>
+        <main class="dashboard-content">
+            <div class="profile-container">
+                <h1>Meu Perfil</h1>
+
+                <% if (error) { %>
+                    <div class="message error"><%= error %></div>
+                <% } %>
+                <% if (success) { %>
+                    <div class="message success"><%= success %></div>
+                <% } %>
+
+                <div class="profile-info">
+                    <div class="avatar-section">
+                        <img src="/static/uploads/<%= user.avatar_url || 'default-avatar.png' %>" alt="Avatar do Usuário">
+                        <form action="/users/<%= user.id_usuario %>/upload-avatar" method="POST" enctype="multipart/form-data">
+                            <input type="file" name="avatar" accept="image/png, image/jpeg, image/gif">
+                            <button type="submit">Alterar Avatar</button>
+                        </form>
+                    </div>
+
+                    <div class="user-details">
+                        <p><strong>Nome:</strong> <%= user.nome %></p>
+                        <p><strong>E-mail:</strong> <%= user.email %></p>
+                        <p><strong>Data Nasc.:</strong> <%= user.data_nascimento %></p>
+                        <p><strong>Membro Desde:</strong> <%= user.data_cadastro %></p>
+                        <p><strong>Tipo de Conta:</strong> <%= user.role %></p>
+                        <p><strong>E-mail Verificado:</strong> <%= user.email_verificado ? 'Sim' : 'Não' %></p>
+                        <a href="/users/<%= user.id_usuario %>/editar" class="edit-button">Editar Perfil</a>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-
-    <input type="file" id="avatar-input" name="avatar" accept="image/*" style="display:none">
-  </form>
-
-  <h1 class="perfil-nome"><%= user.nome %></h1>
-  <p class="perfil-email" title="Email do usuário"><%= user.email %></p>
-
-  <section class="perfil-info" aria-labelledby="info-title">
-    <h2 id="info-title" class="sr-only">Informações do usuário</h2>
-    <p><label>Data de nascimento:</label> <span><%= user.data_nascimento %></span></p>
-    <p><label>Data de cadastro:</label> <span><%= user.data_cadastro %></span></p>
-  </section>
-
-  <div role="group" aria-label="Ações do perfil" style="margin-top: 2rem;">
-    <div>
-      <a href="/users/<%= user.id_usuario %>/editar" class="btn-editar" aria-label="Editar perfil de <%= user.nome %>">
-        Editar Perfil
-      </a>
-
-      <a href="/esqueci-senha" class="btn-esqueci" aria-label="Trocar senha">
-        Trocar Senha
-      </a>
-    </div>
-
-    <div style="margin-top: 1rem;">
-      <form action="/users/<%= user.id_usuario %>/delete" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar seu perfil? Esta ação não pode ser desfeita.')">
-        <button type="submit" class="btn-deletar" aria-label="Deletar perfil de <%= user.nome %>">
-          Deletar Perfil
-        </button>
-      </form>
-    </div>
-  </div>
-</main>
-
-<script>
-const avatarInput = document.getElementById('avatar-input');
-const avatarImg = document.getElementById('perfil-avatar-img');
-const editBtn = document.getElementById('edit-avatar-btn');
-const formAvatar = document.getElementById('form-avatar');
-
-editBtn.addEventListener('click', () => {
-  const confirmChange = confirm("Deseja realmente trocar a foto de perfil?");
-  if (confirmChange) {
-    avatarInput.click();
-  }
-});
-
-avatarInput.addEventListener('change', () => {
-  if (avatarInput.files && avatarInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => avatarImg.src = e.target.result; // preview instantâneo
-    reader.readAsDataURL(avatarInput.files[0]);
-
-    // Envia o form para atualizar o backend
-    formAvatar.submit();
-  }
-});
-
-avatarImg.addEventListener('keydown', e => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();
-    const confirmChange = confirm("Deseja realmente trocar a foto de perfil?");
-    if (confirmChange) {
-      avatarInput.click();
-    }
-  }
-});
-
-</script>
 </body>
 </html>

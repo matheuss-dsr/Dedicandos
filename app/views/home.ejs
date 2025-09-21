@@ -2,54 +2,41 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 400px;
-            margin: 80px auto;
-            background: #fff;
-            padding: 32px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        h1 {
-            margin-bottom: 24px;
-            color: #333;
-        }
-        .links a {
-            display: block;
-            margin: 12px 0;
-            padding: 12px;
-            background: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        .links a:hover {
-            background: #0056b3;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Dedicandos</title>
+    <link rel="stylesheet" href="/static/css/dashboardAdmin.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Bem-vindo à Home</h1>
-        <div class="links">
-            <a href="/perfil">Ir para Perfil</a>
-            <a href="/dashboard">Ir para Dashboard</a>
-            <a href="/configuracoes">Ir para Configurações</a>
-            <% if (user && user.role === 'admin') { %>
-                <a href="/admin">Administração</a>
-            <% } %>
-            <a href="/logout">Sair</a>
-        </div>
+    <nav class="sidebar">
+        <div class="logo">Dedicandos</div>
+        <a href="/home" class="active">Início</a>
+        <a href="/perfil">Meu Perfil</a>
+        <a href="/prova/gerar">Gerar Prova</a>
+        <% if (user && user.role === 'admin') { %>
+            <a href="/users">Gerenciar Usuários</a>
+        <% } %>
+        <a href="/logout" class="logout-btn">Sair</a>
+    </nav>
+
+    <div class="main">
+        <header class="topbar">
+            <span>Bem-vindo, <%= user.nome %>!</span>
+        </header>
+        <main class="dashboard-content">
+            <h1>Bem-vindo ao Dedicandos!</h1>
+            <p>Este é o seu painel de controle. Aqui você pode gerenciar suas provas, seu perfil e, se for um administrador, os usuários do sistema.</p>
+
+            <section class="quick-actions">
+                <h2>Ações Rápidas</h2>
+                <ul>
+                    <li><a href="/prova/gerar">Gerar uma nova prova</a></li>
+                    <li><a href="/perfil">Visualizar e editar seu perfil</a></li>
+                    <% if (user && user.role === 'admin') { %>
+                        <li><a href="/users">Gerenciar usuários do sistema</a></li>
+                    <% } %>
+                </ul>
+            </section>
+        </main>
     </div>
 </body>
 </html>

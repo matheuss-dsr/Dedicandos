@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários - Dedicandos</title>
+    <link rel="stylesheet" href="/static/css/dashboardAdmin.css">
+    <link rel="stylesheet" href="/static/css/list_prova.css"> <!-- Reutilizando alguns estilos -->
+    <style>
+        .user-list-container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .user-list-container h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        .filter-controls form {
+            display: flex;
+            gap: 10px;
+            flex-grow: 1;
+        }
+        .filter-controls input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .filter-controls button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .filter-controls button:hover {
+            background-color: #2980b9;
+        }
+        .status-filter {
+            display: flex;
+            gap: 10px;
+        }
+        .status-filter a {
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #3498db;
+            border: 1px solid #3498db;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .status-filter a.active, .status-filter a:hover {
+            background-color: #3498db;
+            color: white;
+        }
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .user-table th, .user-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            color: #333;
+        }
+        .user-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #555;
+        }
+        .user-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .user-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .user-table .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .user-table .actions a, .user-table .actions button {
+            padding: 6px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .user-table .actions a.edit {
+            background-color: #28a745;
+            color: white;
+        }
+        .user-table .actions a.edit:hover {
+            background-color: #218838;
+        }
+        .user-table .actions button.delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+        .user-table .actions button.delete:hover {
+            background-color: #c82333;
+        }
+        .user-table .actions button.reactivate {
+            background-color: #ffc107;
+            color: #212529;
+            border: none;
+        }
+        .user-table .actions button.reactivate:hover {
+            background-color: #e0a800;
+        }
+        .no-users {
+            text-align: center;
+            color: #777;
+            margin-top: 30px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">Dedicandos</div>
+        <a href="/home">Início</a>
+        <a href="/perfil">Meu Perfil</a>
+        <a href="/prova/gerar">Gerar Prova</a>
+        <a href="/users" class="active">Gerenciar Usuários</a>
+        <a href="/logout" class="logout-btn">Sair</a>
+    </nav>
+
+    <div class="main">
+        <header class="topbar">
+            <span>Bem-vindo, <%= user.nome %>!</span>
+        </header>
+        <main class="dashboard-content">
+            <div class="user-list-container">
+                <h1>Gerenciar Usuários</h1>
+
+                <div class="filter-controls">
+                    <form action="/users" method="GET">
+                        <input type="text" name="search" placeholder="Buscar por nome ou e-mail" value="<%= search %>">
+                        <button type="submit">Buscar</button>
+                    </form>
+                    <div class="status-filter">
+                        <a href="/users?status=ativos&search=<%= search %>" class="<%= status === 'ativos' ? 'active' : '' %>">Ativos</a>
+                        <a href="/users?status=inativos&search=<%= search %>" class="<%= status === 'inativos' ? 'active' : '' %>">Inativos</a>
+                        <a href="/users?status=todos&search=<%= search %>" class="<%= status === 'todos' ? 'active' : '' %>">Todos</a>
+                    </div>
+                </div>
+
+                <% if (users && users.length > 0) { %>
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(u => { %>
+                                <tr>
+                                    <td><%= u.id_usuario %></td>
+                                    <td><%= u.nome %></td>
+                                    <td><%= u.email %></td>
+                                    <td><%= u.role %></td>
+                                    <td><%= u.ativo ? 'Ativo' : 'Inativo' %></td>
+                                    <td class="actions">
+                                        <a href="/users/<%= u.id_usuario %>/editar" class="edit">Editar</a>
+                                        <% if (u.ativo) { %>
+                                            <form action="/users/<%= u.id_usuario %>/delete" method="POST" style="display:inline;">
+                                                <button type="submit" class="delete" onclick="return confirm('Tem certeza que deseja desativar este usuário?');">Desativar</button>
+                                            </form>
+                                        <% } else { %>
+                                            <form action="/users/<%= u.id_usuario %>/reactivate" method="POST" style="display:inline;">
+                                                <button type="submit" class="reactivate" onclick="return confirm('Tem certeza que deseja reativar este usuário?');">Reativar</button>
+                                            </form>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <p class="no-users">Nenhum usuário encontrado com os critérios de busca.</p>
+                <% } %>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
