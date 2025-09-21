@@ -117,6 +117,12 @@ server.get('/users', { preHandler: [server.authenticate,  server.checkEmailVerif
   return reply.view('partials/list_users.ejs', { search, status, users })
 })
 
+server.get('/verificar-email', async (req, reply) => {
+  return userController.verificarEmail(req, reply, database);
+});
+
+
+
 server.get('/perfil', { preHandler: [server.authenticate, server.checkEmailVerified ] }, async (req, reply) => {
   const formatDate = (date) => {
     if (!date) return 'Não informado';
@@ -178,6 +184,11 @@ server.post('/users/:id_usuario/upload-avatar', async (req, reply) => {
   // Redireciona para o perfil
   return reply.redirect('/perfil');
 });
+
+server.get('/email-nao-verificado', async (req, reply) => {
+  return reply.view('user/email_nao_verificado.ejs');
+});
+
 
 // ---------------- START ----------------
 server.listen({

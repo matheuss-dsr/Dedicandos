@@ -8,7 +8,6 @@ import ejs from 'ejs'
 import path from 'path'
 
 export async function registerPlugins(server) {
-  // Arquivos estáticos
   server.register(fastifyStatic, {
     root: path.join(process.cwd(), 'app', 'static'),
     prefix: '/static/',
