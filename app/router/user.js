@@ -55,6 +55,10 @@ export async function criarUsuario(req, reply, database) {
   }
 }
 
+export async function mostrarFormularioCriarUsuario(req, reply) {
+  return reply.view('user/cadastro.ejs', { error: null });
+}
+
 
 export async function verificarEmail(req, reply, database) {
   const { token } = req.query;
