@@ -44,13 +44,13 @@ export class DatabasePostgres {
         const result = await this.query(sql, params);
         return result.rows;
     }
-    async createUser({ nome, email, senha, role, data_nascimento, email_verificado = false, email_token = null }) {
+    async createUser({ nome, email, senha, role, data_nascimento, email_verificado = false }) {
       const sql = `
-        INSERT INTO usuarios (nome, email, senha, role, data_nascimento, ativo, email_verificado, email_token)
-        VALUES ($1, $2, $3, $4, $5, true, $6, $7)
+        INSERT INTO usuarios (nome, email, senha, role, data_nascimento, ativo, email_verificado)
+        VALUES ($1, $2, $3, $4, $5, true, $6)
         RETURNING *;
       `;
-      const params = [nome, email, senha, role, data_nascimento, email_verificado, email_token];
+      const params = [nome, email, senha, role, data_nascimento, email_verificado];
       const result = await this.query(sql, params);
       return result.rows[0];
     }
