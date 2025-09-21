@@ -1,0 +1,194 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+body {
+  padding: 30px;
+  background: #f9f9f9;
+  line-height: 1.6;
+}
+
+/* Título principal */
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
+  font-size: 2.8rem;
+}
+
+/* Formulário de busca */
+form {
+  max-width: 500px;
+  margin: 0 auto 25px auto;
+  display: flex;
+  gap: 10px;
+}
+
+form input[type="text"] {
+  flex: 1;
+  padding: 10px 15px;
+  border: 2px solid #3498db;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+form input[type="text"]:focus {
+  border-color: #2980b9;
+  outline: none;
+}
+
+form button {
+  padding: 10px 20px;
+  background-color: #3498db;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+form button:hover {
+  background-color: #2980b9;
+}
+
+/* Link para nova prova */
+a[href="/prova/gerar"] {
+  display: block;
+  max-width: 500px;
+  margin: 0 auto 30px auto;
+  text-align: right;
+  font-weight: bold;
+  color: #27ae60;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a[href="/prova/gerar"]:hover {
+  color: #1e8449;
+}
+
+/* Mensagem de nenhuma prova */
+p {
+  max-width: 600px;
+  margin: 20px auto;
+  font-style: italic;
+  color: #7f8c8d;
+  text-align: center;
+}
+
+/* Lista de provas */
+ul {
+  max-width: 700px;
+  margin: 0 auto;
+  list-style: none;
+  padding: 0;
+}
+
+/* Cada prova */
+li {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 25px 30px;
+  margin-bottom: 25px;
+  transition: box-shadow 0.3s;
+}
+
+li:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Título da prova */
+li h2 {
+  color: #34495e;
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+}
+
+/* Descrição e criador */
+li p {
+  margin-bottom: 10px;
+  color: #555;
+}
+
+li p strong {
+  color: #2c3e50;
+}
+
+/* Lista ordenada das questões */
+ol {
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
+
+/* Questões */
+ol > li {
+  margin-bottom: 15px;
+}
+
+/* Alternativas */
+ol > li ul {
+  list-style: disc inside;
+  margin-top: 8px;
+  margin-left: 15px;
+  color: #444;
+}
+
+ol > li ul li {
+  margin-bottom: 6px;
+}
+
+/* Alternativa correta */
+ol > li ul li[style] {
+  font-weight: bold;
+  color: green;
+}
+
+/* Links de ação (Editar e Excluir) */
+li p:last-of-type {
+  margin-top: 15px;
+}
+
+li p:last-of-type a,
+li p:last-of-type button {
+  font-weight: bold;
+  color: #2980b9;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-size: 1rem;
+  margin-right: 15px;
+  transition: color 0.3s;
+}
+
+li p:last-of-type a:hover,
+li p:last-of-type button:hover {
+  color: #1c5980;
+}
+
+/* Botão excluir */
+li p:last-of-type button {
+  color: #c0392b;
+  text-decoration: none;
+}
+
+li p:last-of-type button:hover {
+  color: #7a1f17;
+}
+
+/* Form inline para o botão excluir */
+form[style="display:inline;"] {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}

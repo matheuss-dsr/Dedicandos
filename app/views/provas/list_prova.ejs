@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Provas</title>
+    <link rel="stylesheet" href="/app/static/css/list_prova.css">
+</head>
+<body>
+    <h1>Lista de Provas</h1>
+
+    <form method="GET" action="/prova">
+        <input type="text" name="search" value="<%= search || '' %>" placeholder="Buscar prova...">
+        <button type="submit">Buscar</button>
+    </form>
+
+    <a href="/prova/gerar">Nova Prova</a>
+
+    <% if (provas.length === 0) { %>
+        <p>Nenhuma prova encontrada.</p>
+    <% } else { %>
+        <ul>
+            <% provas.forEach(prova => { %>
+                <li>
+                    <h2><%= prova.titulo %></h2>
+                    <p><%= prova.descricao %></p>
+                    <p><strong>Criador:</strong> <%= prova.username || 'Desconhecido' %></p>
+
+                    <% if (prova.questoes && prova.questoes.length > 0) { %>
+                        <ol>
+                            <% prova.questoes.forEach(questao => { %>
+                                <li>
+                                    <p><%= questao.enunciado %></p>
+                                    <ul>
+                                        <% questao.alternativas.forEach(alt => { %>
+                                            <li<% if (alt.correta) { %> style="font-weight:bold;color:green;"<% } %>>
+                                                <%= alt.texto %>
+                                                <% if (alt.correta) { %> (Correta) <% } %>
+                                            </li>
+                                        <% }); %>
+                                    </ul>
+                                </li>
+                            <% }); %>
+                        </ol>
+                    <% } else { %>
+                        <p><em>Sem questões cadastradas.</em></p>
+                    <% } %>
+
+                    <p>
+                        [<a href="/prova/<%= prova.id_prova %>/editar">Editar</a>]
+                        <form action="/prova/<%= prova.id_prova %>/delete" method="POST" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Tem certeza que deseja excluir esta prova?')">Excluir</button>
+                        </form>
+
+                    </p>
+                </li>
+            <% }); %>
+        </ul>
+    <% } %>
+</body>
+</html>

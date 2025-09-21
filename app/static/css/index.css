@@ -1,0 +1,365 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+html {
+scroll-behavior: smooth;
+}
+
+body {
+  background: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: #222;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  margin-right: 40px;
+  flex: 0 0 auto;
+}
+
+.logo img {
+  height: 75px;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.menu a {
+  color: #fff;
+  margin: 0 15px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.3s;
+}
+
+.menu a:hover {
+  color: #499fb7;
+}
+
+.buttons {
+  margin-left: 40px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.buttons .btn {
+  padding: 8px 15px;
+  margin-left: 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn-login {
+  background: #54559b;
+  color: #fff;
+}
+
+.btn-login:hover {
+  background: #2c55ad;
+}
+
+.btn-register {
+  background: #54559b;
+  color: #fff;
+}
+
+.btn-register:hover {
+  background: #2c55ad;
+}
+
+.btn-logout {
+  background: #54559b;
+  color: #fff;
+}
+
+.btn-logout:hover {
+  background: #2c55ad;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  height: 90vh;
+  background: url("../images/imagem-fundo-index.jpg") center/cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+}
+
+.hero .overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.hero-content {
+  position: relative;
+  max-width: 800px;
+  padding: 20px;
+}
+
+.hero-content h1 {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+}
+
+/* Sobre nós */
+.sobre {
+  padding: 80px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.sobre h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.sobre p {
+  max-width: 800px;
+  margin: auto;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* Planos */
+.planos {
+  padding: 80px 20px;
+  text-align: center;
+  background: #f4f4f4;
+}
+
+.planos h2 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.planos-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+}
+
+.plano-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  width: 280px;
+  transition: transform 0.3s;
+}
+
+.plano-card:hover {
+  transform: translateY(-5px);
+}
+
+.plano-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.plano-card p {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  color: #666;
+}
+
+.preco {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #ff9800;
+}
+
+.plano-card .btn {
+  background: #ff9800;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.plano-card .btn:hover {
+  background: #e68900;
+}
+
+.destaque {
+  border: 2px solid #ff9800;
+  transform: scale(1.05);
+}
+
+/* Contato */
+.contato {
+  padding: 80px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.contato h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.contato form {
+  max-width: 600px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contato input,
+.contato textarea {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.contato textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.contato .btn {
+  background: #ff9800;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.contato .btn:hover {
+  background: #e68900;
+}
+
+/* Footer */
+footer {
+  background: #222;
+  color: #bbb;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+}
+
+footer .socials {
+  margin-top: 10px;
+}
+
+footer .socials a {
+  margin: 0 8px;
+  color: #ff9800;
+  font-size: 1.3rem;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+footer .socials a:hover {
+  color: #fff;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .menu {
+    display: none; /* você pode depois adicionar um menu hamburguer */
+  }
+
+  .planos-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+}
+/* Botão hamburguer */
+.hamburger {
+  display: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Menu mobile */
+@media (max-width: 768px) {
+  .menu {
+    display: none;
+    flex-direction: column;
+    background: #222;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 200px;
+    padding: 20px;
+  }
+
+  .menu a {
+    margin: 10px 0;
+  }
+
+  .menu.active {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+  }
+}
+
+/* Navbar escondida ao descer */
+.navbar.hide {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.navbar.show {
+  transform: translateY(0);
+  transition: transform 0.3s ease-in-out;
+}

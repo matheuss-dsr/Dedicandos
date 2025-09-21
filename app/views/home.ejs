@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 80px auto;
+            background: #fff;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 24px;
+            color: #333;
+        }
+        .links a {
+            display: block;
+            margin: 12px 0;
+            padding: 12px;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .links a:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bem-vindo à Home</h1>
+        <div class="links">
+            <a href="/perfil">Ir para Perfil</a>
+            <a href="/dashboard">Ir para Dashboard</a>
+            <a href="/configuracoes">Ir para Configurações</a>
+            <% if (user && user.role === 'admin') { %>
+                <a href="/admin">Administração</a>
+            <% } %>
+            <a href="/logout">Sair</a>
+        </div>
+    </div>
+</body>
+</html>
