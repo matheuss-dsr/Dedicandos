@@ -81,7 +81,7 @@ export async function verificarEmail(req, reply, database) {
 
 
 export async function mostrarFormularioEditarUsuario(req, reply, database) {
-  const { id } = req.params;
+  const { id_usuario } = req.params;
   try {
     const usuario = await database.getUserById(id_usuario);
     if (!usuario) {
