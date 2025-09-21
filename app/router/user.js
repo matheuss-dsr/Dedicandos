@@ -1,18 +1,21 @@
-import { v4 as uuidv4 } from "uuid";
 import nodemailer from "nodemailer";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
+
+function generateEmailToken(email) {
+  if (!process.env.EMAIL_SECRET) throw new Error("EMAIL_SECRET não definido");
+  return crypto.createHmac("sha256", process.env.EMAIL_SECRET)
+               .update(email)
+               .digest("hex");
+}
 
 export async function criarUsuario(req, reply, database) {
   const { nome, email, senha, data_nascimento } = req.body;
   const role = "usuario";
 
   try {
-    const bcrypt = (await import("bcrypt")).default;
     const hashedPassword = await bcrypt.hash(senha, 12);
 
-    // gera token antes de criar o usuário
-    const token = uuidv4();
-
-    // cria usuário com email_verificado = false e token
     const user = await database.createUser({
       nome,
       email,
@@ -20,10 +23,11 @@ export async function criarUsuario(req, reply, database) {
       role,
       data_nascimento,
       email_verificado: false,
-      email_token: token,
     });
 
-    // envia email
+    const token = generateEmailToken(user.email);
+    const verificationLink = `http://localhost:3333/verificar-email?email=${encodeURIComponent(user.email)}&token=${token}`;
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -32,11 +36,9 @@ export async function criarUsuario(req, reply, database) {
       },
     });
 
-    const verificationLink = `https://dedicandos.onrender.com/verificar-email?token=${token}`;
-
     await transporter.sendMail({
       from: `"Suporte TCC" <${process.env.EMAIL_USER}>`,
-      to: email,
+      to: user.email,
       subject: "Verifique seu e-mail",
       html: `<p>Olá ${nome}, clique no link abaixo para confirmar seu cadastro:</p>
              <a href="${verificationLink}">${verificationLink}</a>`,
@@ -46,34 +48,26 @@ export async function criarUsuario(req, reply, database) {
 
   } catch (err) {
     console.error(err);
-
     if (err.code === "23505") {
       return reply.view("user/cadastro.ejs", { error: "Esse e-mail já está em uso.", success: null });
     }
-
     return reply.view("user/cadastro.ejs", { error: "Erro ao criar usuário", success: null });
   }
 }
 
-export async function mostrarFormularioCriarUsuario(req, reply) {
-  return reply.view('user/cadastro.ejs', { error: null });
-}
-
-
 export async function verificarEmail(req, reply, database) {
-  const { token } = req.query;
+  const { email, token } = req.query;
+
+  if (!email || !token) return reply.status(400).send("Parâmetros inválidos.");
 
   try {
-    // busca usuário pelo token
-    const usuario = await database.getUserByToken(token);
+    const user = await database.getUserByEmail(email);
+    if (!user) return reply.view("user/login.ejs", { error: "Usuário não encontrado." });
 
-    if (!usuario) {
-      return reply.view("user/login.ejs", { error: "Token inválido ou expirado." });
-    }
+    const validToken = generateEmailToken(user.email);
+    if (token !== validToken) return reply.view("user/login.ejs", { error: "Token inválido ou expirado." });
 
-    // marca e-mail como verificado
-    await database.verifyUserEmail(usuario.id_usuario);
-
+    await database.verifyUserEmail(user.id_usuario);
     return reply.view("user/login.ejs", { success: "E-mail verificado com sucesso! Agora você pode logar." });
 
   } catch (err) {
@@ -83,7 +77,12 @@ export async function verificarEmail(req, reply, database) {
 }
 
 
+// Mostra formulário de cadastro
+export async function mostrarFormularioCriarUsuario(req, reply) {
+  return reply.view('user/cadastro.ejs', { error: null });
+}
 
+// Mostra formulário de edição
 export async function mostrarFormularioEditarUsuario(req, reply, database) {
   const { id_usuario } = req.params;
   try {
@@ -98,17 +97,16 @@ export async function mostrarFormularioEditarUsuario(req, reply, database) {
   }
 }
 
+// Edita usuário
 export async function editarUsuario(req, reply, database) {
   const { id_usuario } = req.params;
   const { nome, email, senha, role } = req.body;
 
   try {
     let updateData = { nome, email, role };
-    if (senha) {
-      const bcrypt = (await import("bcrypt")).default;
-      updateData.senha = await bcrypt.hash(senha, 12);
-    }
-    await database.updateUser (id_usuario, updateData);
+    if (senha) updateData.senha = await bcrypt.hash(senha, 12);
+
+    await database.updateUser(id_usuario, updateData);
     return reply.redirect('/');
   } catch (err) {
     console.error(err);
@@ -116,6 +114,7 @@ export async function editarUsuario(req, reply, database) {
   }
 }
 
+// Exclui usuário
 export async function excluirUsuario(req, reply, database) {
   const { id_usuario } = req.params;
   try {
