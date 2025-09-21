@@ -26,7 +26,7 @@ export async function criarUsuario(req, reply, database) {
     });
 
     const token = generateEmailToken(user.email);
-    const verificationLink = `http://localhost:3333/verificar-email?email=${encodeURIComponent(user.email)}&token=${token}`;
+    const verificationLink = `https://dedicandos.onrender.com/verificar-email?email=${encodeURIComponent(user.email)}&token=${token}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
