@@ -104,14 +104,48 @@ server.get('/logout', (req, reply) => {
 })
 
 // ---------------- ROTAS PROVAS ----------------
-server.get('/prova/gerar', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => provaController.mostrarFormularioGerarProva(req, reply))
-server.post('/prova/gerar', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => provaController.gerarQuestoesIA(req, reply, database))
-server.post('/prova/salvar', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => provaController.salvarProva(req, reply, database))
+server.get(
+  '/prova/gerar',
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.listarQuestoesENEM(req, reply)
+);
 
-server.get('/prova/:prova_id', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => provaController.exibirProva(req, reply, database))
-server.get('/prova/:prova_id/editar', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => provaController.mostrarFormularioEditarProva(req, reply, database))
-server.post('/prova/:prova_id', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => provaController.atualizarProva(req, reply, database))
-server.post('/prova/:prova_id/delete', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => provaController.deletarProva(req, reply, database))
+server.get(
+  '/prova/gerar/form',
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.mostrarFormularioGerarProva(req, reply)
+);
+
+server.post(
+  '/prova/salvar',
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.salvarProva(req, reply, database)
+);
+
+server.get(
+  '/prova/:prova_id',
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.exibirProva(req, reply, database)
+);
+
+server.get(
+  '/prova/:prova_id/editar',
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.mostrarFormularioEditarProva(req, reply, database)
+);
+
+server.post(
+  '/prova/:prova_id',
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.atualizarProva(req, reply, database)
+);
+
+server.post(
+  '/prova/:prova_id/delete',
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.deletarProva(req, reply, database)
+);
+
 
 // ---------------- ROTAS USUÁRIOS ----------------
 server.get('/users', { preHandler: [server.authenticate,  server.checkEmailVerified ] }, async (req, reply) => {

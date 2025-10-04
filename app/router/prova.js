@@ -1,121 +1,80 @@
 import fetch from "node-fetch";
 
-// ---------------- IA LOCAL (Ollama) ----------------
-async function gerarQuestoesComIA({ quantidade, area}) {
-  const promingles = `Gere ${quantidade} questões de múltipla escolha sobre a área de ${area}, no estilo de provas para jovens.
-A resposta deve ser em português.
-Cada questão deve conter:
-- Um enunciado
-- 4 alternativas (A, B, C e D), sendo apenas uma correta
-- A letra da alternativa correta (A, B, C, D)
-
-O resultado deve estar em JSON no seguinte formato:
-[
-  {
-    "enunciado": "...",
-    "alternativas": ["...", "...", "...", "..."],
-    "gabarito": "A"
-  }
-]`;
-
-
-  try {
-    const response = await fetch("http://localhost:11434/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "llama3.1", promingles, stream: false }),
-    });
-
-    const result = await response.json();
-    let generatedText = result?.response?.trim();
-    if (!generatedText) return [];
-
-    // Extrai apenas o array JSON do texto
-    const jsonMatch = generatedText.match(/\[.*\]/s);
-    if (!jsonMatch) {
-      console.error("❌ Não foi possível encontrar JSON na resposta da IA.");
-      console.log("🔎 Resposta completa:", generatedText);
-      return [];
-    }
-
-    try {
-      const data = JSON.parse(jsonMatch[0]);
-      // Garantir que cada questão tenha alternativas e gabarito
-      return data.map(q => ({
-        enunciado: q.enunciado || "Sem enunciado",
-        alternativas: q.alternativas || ["A", "B", "C", "D"],
-        gabarito: q.gabarito || "A"
-      }));
-    } catch (err) {
-      console.error("❌ Erro ao converter JSON extraído:", err);
-      console.log("🔎 JSON extraído:", jsonMatch[0]);
-      return [];
-    }
-  } catch (error) {
-    console.error("❌ Erro na chamada IA:", error);
-    return [];
-  }
+// ---------------- Controller de Provas ----------------
+export async function mostrarFormularioGerarProva(req, reply) {
+  return reply.view("provas/gerar_prova", {
+    user: req.user,
+    error: null,
+    year: null,
+    quantity: null,
+    offset: 10,
+    questoesOriginais: [],
+  });
 }
 
-// ---------------- ROTAS ----------------
-export async function gerarQuestoesIA(req, reply, database) {
+// ---------------- Função: Buscar questões do ENEM ----------------
+export async function listarQuestoesENEM(req, reply) {
   try {
-    const { year, quantity, discipline } = req.body;
+    const { year, quantity, offset = 0 } = req.query;
 
-    if (!year || !discipline || !quantity) {
-      return reply.view("provas/gerar_prova", {
+    if (!year || !quantity) {
+      return reply.view("provas/gerar_prova.ejs", {
         user: req.user,
-        error: "Ano, disciplina e quantidade são obrigatórios.",
+        error: "Ano e quantidade são obrigatórios.",
         questoesOriginais: [],
-        questoesIA: [],
+        quantity: null,
+        offset: 0,
       });
     }
 
-    // Chama a API do ENEM
-    const response = await fetch(`https://api.enem.dev/v1/exams/${year}/questions`);
-    const examData = await response.json();
+    const url = `https://api.enem.dev/v1/exams/${year}/questions?limit=${quantity}&offset=${offset}`;
+    console.log("Chamando API ENEM com URL:", url);
 
-    // Filtra questões conforme disciplina e idioma
-    let questoesOriginais = (examData.questions || []).filter(q => {
-      return q.discipline === discipline && q.language === "ingles";
-    });
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("Resposta da API ENEM recebida:", data);
 
+    if (!data.questions || data.questions.length === 0) {
+      console.log("Nenhuma questão encontrada no retorno da API");
+      return reply.view("provas/gerar_prova.ejs", {
+        user: req.user,
+        error: "Nenhuma questão encontrada.",
+        questoesOriginais: [],
+        quantity,
+        offset,
+      });
+    }
 
-    // Limita a quantidade
-    questoesOriginais = questoesOriginais.slice(0, quantity);
-
-    // Se não houver alternativas, preenche com placeholders
-    questoesOriginais = questoesOriginais.map((q, idx) => ({
+    // Normalizar estrutura das questões
+    const questoesOriginais = data.questions.map((q, idx) => ({
       title: q.title || `Questão ${idx + 1}`,
-      alternatives: q.alternatives ? q.alternatives.map(a => a.text) : ["A", "B", "C", "D"],
+      enunciado: q.text || q.context || "Enunciado não disponível",
+      alternatives: q.alternatives
+        ? q.alternatives.map(a => `${a.letter}) ${a.text}`)
+        : ["A", "B", "C", "D"],
       correctAlternative: q.correctAlternative || "Não informado",
-      discipline: q.discipline || "Não informado",
-      language: q.language || "Não informado"
+      language: q.language || "Não informado",
+      year: q.year || year
     }));
 
-    // Gera questões adicionais com IA (Ollama)
-    const questoesIA = await gerarQuestoesComIA({
-      quantidade: quantity,
-      area: discipline,
-      language: "ingles" 
-    });
+    console.log(questoesOriginais);
 
-
-    return reply.view("provas/gerar_prova", {
+    return reply.view("provas/gerar_prova.ejs", {
       user: req.user,
       error: null,
       questoesOriginais,
-      questoesIA,
-      examData
+      quantity,
+      offset,
     });
+
   } catch (err) {
-    console.error("❌ Erro ao gerar questões:", err);
-    return reply.view("provas/gerar_prova", {
+    console.error("Erro ao buscar questões ENEM:", err);
+    return reply.view("provas/gerar_prova.ejs", {
       user: req.user,
-      error: "Erro ao gerar questões.",
+      error: "Erro ao buscar questões.",
       questoesOriginais: [],
-      questoesIA: [],
-      examData: null
+      quantity: null,
+      offset: 10,
     });
   }
 }
