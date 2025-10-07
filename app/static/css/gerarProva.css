@@ -1,0 +1,141 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    color: #333;
+    transition: background 0.3s, color 0.3s;
+}
+
+body.dark {
+    background: #222;
+    color: #f1f1f1;
+}
+
+h1,
+h2 {
+    color: #1a3d7c;
+}
+
+h2 {
+    margin-top: 50px;
+}
+
+.error {
+    color: red;
+    margin-bottom: 15px;
+}
+
+form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s;
+}
+
+body.dark form {
+    background: #333;
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+form button {
+    background: #1a3d7c;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+form button:hover {
+    background: #16305f;
+}
+
+.questao {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s;
+}
+
+body.dark .questao {
+    background: #333;
+}
+
+.questao h3 {
+    margin: 0 0 10px;
+    font-size: 1.1em;
+}
+
+.alternativas {
+    margin-left: 20px;
+}
+
+.alternativa {
+    margin: 5px 0;
+}
+
+.gabarito {
+    font-weight: bold;
+    color: #1a7c3c;
+    margin-top: 10px;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 8px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.topbar span {
+    font-size: 1em; 
+}
+
+.topbar .avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-left: 75%;
+    border: 2px solid #1a3d7c;
+}
+
+.toggle-theme {
+    margin-bottom: 20px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #1a3d7c;
+    color: #fff;
+}
+
+.toggle-theme:hover {
+    background: #16305f;
+}

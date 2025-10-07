@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const { Pool } = pg;
 
-  export class DatabasePostgres {
+export class DatabasePostgres {
   constructor() {
     this.pool = new Pool({
       connectionString: process.env.DATABASE_URL,
@@ -21,6 +21,23 @@ const { Pool } = pg;
   }
 
   /* USERS */
+
+  async listarUsuarios(search = '', status = 'ativos') {
+    const ativo = status === 'ativos';
+
+    const sql = `
+    SELECT *
+    FROM usuarios
+    WHERE (nome ILIKE $1 OR email ILIKE $1)
+      AND ativo = $2
+    ORDER BY id_usuario ASC
+  `;
+    const params = [`%${search}%`, ativo];
+
+    const result = await this.query(sql, params);
+    return result.rows;
+  }
+
   async createUser({ nome, email, senha, role, data_nascimento, email_verificado = false }) {
     const sql = `
       INSERT INTO usuarios (nome, email, senha, role, data_nascimento, ativo, email_verificado)
@@ -34,6 +51,16 @@ const { Pool } = pg;
   async getUserByEmail(email) {
     const result = await this.query('SELECT * FROM usuarios WHERE email = $1', [email]);
     return result.rows[0];
+  }
+  
+  async getUserById(id) {
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) return null;
+    const result = await this.query(
+      `SELECT * FROM usuarios WHERE id_usuario = $1`,
+      [userId]
+    );
+    return result.rows[0] || null;
   }
 
   async verifyUserEmail(userId) {
@@ -62,41 +89,41 @@ const { Pool } = pg;
     await this.query(sql, params);
   }
 
-    async deleteUser(id) {
-      await this.query('UPDATE usuarios SET ativo = false WHERE id_usuario = $1', [id]);
-    }
-    
-    async reactivateUser(id) {
-        const sql = 'UPDATE usuarios SET ativo = true WHERE id_usuario = $1';
-        const params = [id];
-        await this.query(sql, params);
-    }
+  async deleteUser(id) {
+    await this.query('UPDATE usuarios SET ativo = false WHERE id_usuario = $1', [id]);
+  }
 
-    async savePasswordResetToken(email, token, expiresAt) {
-      return this.query(
-        `INSERT INTO password_resets (email, token, expires_at) 
+  async reactivateUser(id) {
+    const sql = 'UPDATE usuarios SET ativo = true WHERE id_usuario = $1';
+    const params = [id];
+    await this.query(sql, params);
+  }
+
+  async savePasswordResetToken(email, token, expiresAt) {
+    return this.query(
+      `INSERT INTO password_resets (email, token, expires_at) 
         VALUES ($1, $2, $3) 
         ON CONFLICT (email) DO UPDATE 
         SET token = EXCLUDED.token, expires_at = EXCLUDED.expires_at`,
-        [email, token, expiresAt]
-      );
-    }
+      [email, token, expiresAt]
+    );
+  }
 
-    async findPasswordResetByToken(token) {
-      const result = await this.query(
-        `SELECT * FROM password_resets 
+  async findPasswordResetByToken(token) {
+    const result = await this.query(
+      `SELECT * FROM password_resets 
         WHERE token = $1 AND expires_at > NOW()`,
-        [token]
-      );
-      return result.rows[0];
-    }
+      [token]
+    );
+    return result.rows[0];
+  }
 
-    async updateUserPassword(email, hashedPassword) {
-      return this.query(
-        `UPDATE usuarios SET senha = $1 WHERE email = $2`,
-        [hashedPassword, email]
-      );
-    }
+  async updateUserPassword(email, hashedPassword) {
+    return this.query(
+      `UPDATE usuarios SET senha = $1 WHERE email = $2`,
+      [hashedPassword, email]
+    );
+  }
 
   /* ---------------- PROVAS ---------------- */
   async listarProvas() {
@@ -113,10 +140,10 @@ const { Pool } = pg;
   }
 
   async createQuestao({ id_prova, enunciado }) {
-  const result = await this.query(
-    `INSERT INTO questoes (id_prova, enunciado) VALUES ($1, $2) RETURNING id_questao`,
-    [id_prova, enunciado]
-  );
+    const result = await this.query(
+      `INSERT INTO questoes (id_prova, enunciado) VALUES ($1, $2) RETURNING id_questao`,
+      [id_prova, enunciado]
+    );
     return result.rows[0].id_questao;
   }
 

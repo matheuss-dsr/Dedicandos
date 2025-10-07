@@ -1,78 +1,83 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Gerar Prova ENEM</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f7fb; color: #333; transition: background 0.3s, color 0.3s; }
-    body.dark { background: #222; color: #f1f1f1; }
-    h1, h2 { color: #1a3d7c; }
-    h2 { margin-top: 50px; }
-    .error { color: red; margin-bottom: 15px; }
-    form { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: background 0.3s; }
-    body.dark form { background: #333; }
-    form label { display: block; margin-bottom: 8px; font-weight: bold; }
-    form input, form select { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; }
-    form button { background: #1a3d7c; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1em; }
-    form button:hover { background: #16305f; }
-    .questao { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: background 0.3s; }
-    body.dark .questao { background: #333; }
-    .questao h3 { margin: 0 0 10px; font-size: 1.1em; }
-    .alternativas { margin-left: 20px; }
-    .alternativa { margin: 5px 0; }
-    .gabarito { font-weight: bold; color: #1a7c3c; margin-top: 10px; }
-    .section { margin-bottom: 40px; }
-    .toggle-theme { margin-bottom: 20px; padding: 5px 10px; border: none; border-radius: 6px; cursor: pointer; background: #1a3d7c; color: #fff; }
-    .toggle-theme:hover { background: #16305f; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Prova - Dedicandos</title>
+    <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/gerarProva.css">
 </head>
+
 <body>
-  <h1>Gerar Prova ENEM</h1>
+    <nav class="sidebar">
+        <div class="logo">Dedicandos</div>
+        <a href="/home">Início</a>
+        <a href="/perfil">Meu Perfil</a>
+        <a href="/prova/gerar/form" class="active">Gerar Prova</a>
+        <% if (user && user.role === 'admin') { %>
+            <a href="/users">Gerenciar Usuários</a>
+        <% } %>
+        <a href="/logout" class="logout-btn">Sair</a>
+    </nav>
 
-  <button class="toggle-theme" onclick="document.body.classList.toggle('dark')">🌙 Alternar Tema</button>
+    <div class="main">
+        <header class="topbar">
+            <span class="welcome-text">Bem-vindo, <%= user.nome %>!</span>
+            <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar">
+        </header>
 
-  <% if (error) { %>
-    <p class="error"><%= error %></p>
-  <% } %>
+        <main class="dashboard-content">
+            <h1>Gerar Prova ENEM</h1>
 
-  <form method="GET" action="/prova/gerar">
-    <label for="year">Ano da Prova</label>
-    <select id="year" name="year" required>
-      <% const anos = [2023,2022,2021,2020,2019,2018,2017,2016,2015,2014,2013,2012,2011,2010,2009]; %>
-      <% anos.forEach(ano => { %>
-        <option value="<%= ano %>" <%= (typeof year !== "undefined" && year == ano ? "selected" : "") %>><%= ano %></option>
-      <% }) %>
-    </select>
+            <% if (error) { %>
+                <p class="error"><%= error %></p>
+            <% } %>
 
-    <label for="offset">Offset (posição inicial)</label>
-    <input type="number" id="offset" name="offset" min="0" value="<%= offset || 0 %>" required>
+            <form method="GET" action="/prova/gerar">
+                <label for="year">Ano da Prova</label>
+                <select id="year" name="year" required>
+                    <% const anos = [2023,2022,2021,2020,2019,2018,2017,2016,2015,2014,2013,2012,2011,2010,2009]; %>
+                    <% anos.forEach(ano => { %>
+                        <option value="<%= ano %>" <%=(typeof year !== "undefined" && year == ano ? "selected" : "") %>><%= ano %></option>
+                    <% }) %>
+                </select>
 
-    <label for="quantity">Quantidade de Questões</label>
-    <input type="number" id="quantity" name="quantity" min="1" max="180" value="<%= quantity || '' %>" required>
+                <label for="offset">Offset (posição inicial)</label>
+                <input type="number" id="offset" name="offset" min="0" value="<%= offset || 0 %>" required>
 
-    <button type="submit">Gerar Prova</button>
-  </form>
+                <label for="quantity">Quantidade de Questões</label>
+                <input type="number" id="quantity" name="quantity" min="1" max="180" value="<%= quantity || '' %>" required>
 
-  <!-- Questões Originais do ENEM -->
-  <div class="section">
-    <h2>📘 Questões Originais do ENEM</h2>
-    <% if (questoesOriginais && questoesOriginais.length > 0) { %>
-      <% questoesOriginais.forEach((q, idx) => { %>
-        <div class="questao">
-          <h3><%= idx + 1 %>. <%= q.title %></h3>
-          <p><strong>Disciplina:</strong> <%= q.discipline %> | <strong>Idioma:</strong> <%= q.language %></p>
-          <p><%= q.enunciado %></p>
-          <div class="alternativas">
-            <% q.alternatives.forEach((alt) => { %>
-              <div class="alternativa"><%= alt %></div>
-            <% }) %>
-          </div>
-          <p class="gabarito">✅ Resposta correta: <%= q.correctAlternative %></p>
-        </div>
-      <% }) %>
-    <% } else { %>
-      <p>Nenhuma questão do ENEM encontrada.</p>
-    <% } %>
-  </div>
+                <button type="submit">Gerar Prova</button>
+            </form>
+
+            <div class="section">
+                <h2>📘 Questões Originais do ENEM</h2>
+                <% if (questoesOriginais && questoesOriginais.length > 0) { %>
+                    <% questoesOriginais.forEach((q, idx) => { %>
+                        <div class="questao">
+                            <h4><%= q.title %></h4>
+                            <p><%= q.enunciado %></p>
+                            <% if (q.imageHTML) { %>
+                                <div class="questao-imagem">
+                                    <%- q.imageHTML %>
+                                </div>
+                            <% } %>
+                            <ul>
+                                <% q.alternatives.forEach(a => { %>
+                                    <li><%= a %></li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>Nenhuma questão do ENEM encontrada.</p>
+                <% } %>
+            </div>
+        </main>
+    </div>
 </body>
+
 </html>

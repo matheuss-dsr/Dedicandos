@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Dedicandos</title>
-    <link rel="stylesheet" href="/static/css/dashboardAdmin.css">
+    <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
 </head>
 <body>
     <nav class="sidebar">
@@ -20,21 +21,26 @@
 
     <div class="main">
         <header class="topbar">
-            <span>Bem-vindo, <%= user.nome %>!</span>
+            <span class="welcome-text">Bem-vindo, <%= user.nome %>!</span>
+            <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar">
         </header>
-        <main class="dashboard-content">
-            <h1>Bem-vindo ao Dedicandos!</h1>
-            <p>Este é o seu painel de controle. Aqui você pode gerenciar suas provas, seu perfil e, se for um administrador, os usuários do sistema.</p>
 
-            <section class="quick-actions">
-                <h2>Ações Rápidas</h2>
-                <ul>
-                    <li><a href="/prova/gerar">Gerar uma nova prova</a></li>
-                    <li><a href="/perfil">Visualizar e editar seu perfil</a></li>
-                    <% if (user && user.role === 'admin') { %>
-                        <li><a href="/users">Gerenciar usuários do sistema</a></li>
-                    <% } %>
-                </ul>
+        <main class="dashboard-content">
+            <h1>Suas Provas Salvas</h1>
+
+            <section class="saved-tests">
+                <% if (provas && provas.length > 0) { %>
+                    <ul>
+                        <% provas.forEach(prova => { %>
+                            <li>
+                                <a href="/prova/<%= prova.id_prova %>"><%= prova.titulo %></a>
+                                <span class="date">(<%= new Intl.DateTimeFormat('pt-BR').format(new Date(prova.data_criacao)) %>)</span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p>Você ainda não salvou nenhuma prova.</p>
+                <% } %>
             </section>
         </main>
     </div>

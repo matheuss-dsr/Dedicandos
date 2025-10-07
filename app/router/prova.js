@@ -46,16 +46,34 @@ export async function listarQuestoesENEM(req, reply) {
     }
 
     // Normalizar estrutura das questões
-    const questoesOriginais = data.questions.map((q, idx) => ({
-      title: q.title || `Questão ${idx + 1}`,
-      enunciado: q.text || q.context || "Enunciado não disponível",
-      alternatives: q.alternatives
-        ? q.alternatives.map(a => `${a.letter}) ${a.text}`)
-        : ["A", "B", "C", "D"],
-      correctAlternative: q.correctAlternative || "Não informado",
-      language: q.language || "Não informado",
-      year: q.year || year
-    }));
+    const questoesOriginais = data.questions.map((q, idx) => {
+      let imageHTML = null;
+
+      // Regex simples para detectar links de imagem
+      const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif))/i;
+      const match = q.text?.match(urlRegex) || q.context?.match(urlRegex);
+
+      if (match) {
+        const imageUrl = match[0];
+        imageHTML = `<img src="${imageUrl}" alt="Imagem da Questão ${idx + 1}" style="max-width:100%; margin-top:10px;">`;
+      }
+
+      // Remover o link de imagem do enunciado para não aparecer junto
+      const enunciado = (q.text || q.context || "Enunciado não disponível").replace(urlRegex, '').trim();
+
+      return {
+        title: q.title || `Questão ${idx + 1}`,
+        enunciado,
+        alternatives: q.alternatives
+          ? q.alternatives.map(a => `${a.letter}) ${a.text}`)
+          : ["A", "B", "C", "D"],
+        correctAlternative: q.correctAlternative || "Não informado",
+        language: q.language || "Não informado",
+        year: q.year || year,
+        imageHTML
+      };
+    });
+
 
     console.log(questoesOriginais);
 

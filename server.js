@@ -16,46 +16,34 @@ await registerPlugins(server)
 
 // ---------------- MIDDLEWARES ----------------
 server.decorate("authenticate", async (req, reply) => {
-  try {
-    await req.jwtVerify()
-  } catch {
-    return reply.redirect('/login')
-  }
-})
-
-server.decorate("checkEmailVerified", async (req, reply) => {
-  try {
-    if (!req.user) {
-      return reply.redirect('/login');
-    }
-
-    // Busca o usuário no banco
-    const userFromDb = await database.getUserByEmail(req.user.email);
-    if (!userFromDb) return reply.redirect('/login');
-
-    if (!userFromDb.email_verificado) {
-      return reply.redirect('/email-nao-verificado');
-    }
-
-    req.user = userFromDb;
-  } catch (err) {
-    console.error(err);
-    return reply.redirect('/login');
-  }
+  if (!req.user) return reply.redirect('/login');
 });
 
+// Middleware para checar se o email está verificado
+server.decorate("checkEmailVerified", async (req, reply) => {
+  if (!req.user) return reply.redirect('/login');
+
+  const userFromDb = await database.getUserByEmail(req.user.email);
+  if (!userFromDb) return reply.redirect('/login');
+
+  if (!userFromDb.email_verificado) return reply.redirect('/email-nao-verificado');
+
+  req.user = userFromDb;
+});
 
 server.addHook('preHandler', async (req, reply) => {
   try {
     if (req.cookies.token) {
-      const decoded = await req.jwtVerify()
-      req.user = decoded
-    } else req.user = null
+      const decoded = await req.jwtVerify();
+      req.user = decoded;
+    } else {
+      req.user = null;
+    }
   } catch {
-    req.user = null
+    req.user = null;
   }
-  reply.locals.user = req.user
-})
+  reply.locals.user = req.user;
+});
 
 // ---------------- ROTAS PÚBLICAS ----------------
 server.get('/', async (req, reply) => reply.view('index.ejs'))
@@ -68,35 +56,48 @@ server.get('/login', (req, reply) => {
 });
 
 server.post('/login', async (req, reply) => {
-  const { email, senha } = req.body
-  const user = await database.getUserByEmail(email)
-  if (!user) return reply.view('user/login.ejs', { error: 'O usuário ou a senha não estão corretos' })
+  const { email, senha } = req.body;
+  const user = await database.getUserByEmail(email);
 
-  const senhaValida = await bcrypt.compare(senha, user.senha)
-  if (!senhaValida) return reply.view('user/login.ejs', { error: 'O usuário ou a senha não estão corretos' })
+  if (!user) return reply.view('user/login.ejs', { error: 'Usuário ou senha incorretos', success: null });
+
+  const senhaValida = await bcrypt.compare(senha, user.senha);
+  if (!senhaValida) return reply.view('user/login.ejs', { error: 'Usuário ou senha incorretos', success: null });
 
   const token = reply.server.jwt.sign(
-    { id: user.id, email: user.email, nome: user.nome, role: user.role },
+    { id_usuario: user.id_usuario, email: user.email, nome: user.nome, role: user.role },
     { expiresIn: '6h' }
-  )
+  );
 
   reply.setCookie('token', token, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     path: '/',
-    maxAge: 60 * 60
-  })
+    maxAge: 60 * 60 * 6
+  });
 
-  // Redireciona para /home para todos os usuários
-  return reply.redirect('/home')
-})
+  return reply.redirect('/home');
+});
+
 
 // ---------------- ROTAS DE USUÁRIOS ----------------
 server.get('/cadastro', (req, reply) => userController.mostrarFormularioCriarUsuario(req, reply))
 server.post('/cadastro', (req, reply) => userController.criarUsuario(req, reply, database))
 server.get('/home', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {
-  return reply.view('home.ejs', { user: req.user })
-})
+  try {
+    // Busca as provas do usuário logado
+    const provas = await database.query(
+      'SELECT * FROM provas WHERE id_usuario = $1 AND ativo = true ORDER BY id_prova DESC',
+      [req.user.id_usuario]
+    );
+
+    return reply.view('home.ejs', { user: req.user, provas: provas.rows });
+  } catch (err) {
+    console.error(err);
+    return reply.status(500).send('Erro ao carregar a página inicial');
+  }
+});
+
 
 server.get('/logout', (req, reply) => {
   reply.clearCookie('token', { path: '/' })
@@ -148,13 +149,14 @@ server.post(
 
 
 // ---------------- ROTAS USUÁRIOS ----------------
-server.get('/users', { preHandler: [server.authenticate,  server.checkEmailVerified ] }, async (req, reply) => {
+server.get('/users', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {
   const search = req.query.search || ''
   const status = req.query.status || 'ativos'
-  const users = await database.listarUsers(search, status)
+  const users = await database.listarUsuarios(search, status)
 
-  return reply.view('partials/list_users.ejs', { search, status, users })
+  return reply.view('user/list_users.ejs', { search, status, users, user: req.user })
 })
+
 
 server.get('/verificar-email', async (req, reply) => {
   return userController.verificarEmail(req, reply, database);
@@ -162,36 +164,29 @@ server.get('/verificar-email', async (req, reply) => {
 
 
 
-server.get('/perfil', { preHandler: [server.authenticate, server.checkEmailVerified ] }, async (req, reply) => {
-  const formatDate = (date) => {
-    if (!date) return 'Não informado';
-    return new Intl.DateTimeFormat('pt-BR').format(new Date(date));
-  };
-
+server.get('/perfil', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {
   try {
-    const userFromDb = await database.getUserByEmail(req.user.email);
+    const formatDate = (date) => date ? new Intl.DateTimeFormat('pt-BR').format(new Date(date)) : 'Não informado';
 
-    if (!userFromDb) {
-      return reply.status(404).send('Usuário não encontrado');
-    }
-
+    // req.user já vem do middleware atualizado
     const user = {
-      id_usuario: userFromDb.id_usuario,
-      nome: userFromDb.nome,
-      email: userFromDb.email,
-      avatar_url: userFromDb.avatar_url,
-      data_nascimento: formatDate(userFromDb.data_nascimento),
-      data_cadastro: formatDate(userFromDb.data_cadastro),
-      role: userFromDb.role
+      id_usuario: req.user.id_usuario,
+      nome: req.user.nome,
+      email: req.user.email,
+      avatar_url: req.user.avatar_url || 'default-avatar.png',
+      data_nascimento: formatDate(req.user.data_nascimento),
+      data_cadastro: formatDate(req.user.data_cadastro),
+      role: req.user.role,
+      email_verificado: req.user.email_verificado
     };
 
-
-    return reply.view('user/perfil.ejs', { user });
+    return reply.view('user/perfil.ejs', { user, error: null, success: null });
   } catch (err) {
-    console.error(err);
-    return reply.status(500).send('Erro ao carregar perfil');
+    console.error("Erro ao carregar perfil:", err);
+    return reply.status(500).send('Erro ao carregar perfil do usuário');
   }
 });
+
 
 
 server.get('/users/:id_usuario/editar', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => {

@@ -9,7 +9,6 @@
   <script defer src="../static/js/script.js"></script>
 </head>
 <body>
-  <!-- Navbar -->
   <header class="navbar" id="navbar">
     <div class="logo">
       <img src="../static/images/logo.png" alt="Logo">
@@ -20,9 +19,22 @@
       <a href="#planos">Planos</a>
       <a href="#contato">Contato</a>
     </nav>
+
     <div class="buttons"<% if (!user) { %> style="margin-left: -97px;"<% } %>>
       <% if (user) { %>
-      <a href="/logout" class="btn btn-logout">Sair</a>
+      <img 
+        src="/static/uploads/<%= user.avatar_url || 'user.png' %>" 
+        alt="Avatar do Usuário" 
+        class="avatar" 
+        id="avatarBtn">
+      
+      <!-- Menu de usuário -->
+      <div class="user-menu" id="userMenu">
+        <a href="/perfil">Meu Perfil</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Sair</a>
+        <button class="theme-toggle">Mudar Tema</button>
+      </div>
       <% } else { %>
       <a href="/login" class="btn btn-login">Entrar</a>
       <a href="/cadastro" class="btn btn-register">Cadastre-se</a>
@@ -90,7 +102,7 @@
   </section>
 
   <footer>
-    <p>MR</p>
+    <p>MR&GG</p>
     <div class="socials">
       <a href="#">Twitter</a>
       <a href="#">Instagram</a>

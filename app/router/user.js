@@ -133,7 +133,7 @@ export async function verificarEmail(req, reply, database) {
     if (token !== validToken) {
       return reply.view("user/login.ejs", { 
         error: "Token de verificação inválido ou expirado.", 
-        success: null  // Sempre passa success: null
+        success: null // Sempre passa success: null
       });
     }
 
@@ -235,15 +235,13 @@ export async function mostrarPerfil(req, reply, database) {
   }
 }
 
-// Mostra formulário de edição de usuário (para admin ou o próprio usuário)
 export async function mostrarFormularioEditarUsuario(req, reply, database) {
-  const { id_usuario } = req.params;
+  const id_usuario = parseInt(req.params.id_usuario, 10);
   try {
     const usuario = await database.getUserById(id_usuario);
     if (!usuario) {
       return reply.status(404).view("user/edit_user.ejs", { error: "Usuário não encontrado.", usuario: null });
     }
-    // Formata a data de nascimento para o formato YYYY-MM-DD para preencher o input date
     if (usuario.data_nascimento) {
       usuario.data_nascimento = new Date(usuario.data_nascimento).toISOString().split('T')[0];
     }
@@ -348,7 +346,7 @@ export async function uploadAvatar(req, reply, database) {
 
     // Remove o avatar antigo se existir
     const user = await database.getUserById(id_usuario);
-    if (user && user.avatar_url && user.avatar_url !== 'default-avatar.png') { // Assumindo um avatar padrão
+    if (user && user.avatar_url && user.avatar_url !== 'default-avatar.png') {
       const oldAvatarPath = path.join(uploadDir, user.avatar_url);
       try {
         await fs.unlink(oldAvatarPath);

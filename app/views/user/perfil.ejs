@@ -1,163 +1,84 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Perfil - Dedicandos</title>
-    <link rel="stylesheet" href="/static/css/dashboardAdmin.css">
-    <style>
-        .profile-container {
-            max-width: 700px;
-            margin: 30px auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            color: #333;
-        }
-        .profile-container h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        .avatar-section {
-            text-align: center;
-        }
-        .avatar-section img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #3fa9f5;
-            margin-bottom: 15px;
-        }
-        .avatar-section form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        .avatar-section input[type="file"] {
-            border: 1px solid #ccc;
-            padding: 8px;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 250px;
-        }
-        .avatar-section button {
-            background-color: #3fa9f5;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .avatar-section button:hover {
-            background-color: #337acc;
-        }
-        .user-details {
-            width: 100%;
-            max-width: 400px;
-        }
-        .user-details p {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            line-height: 1.5;
-        }
-        .user-details p strong {
-            color: #2c3e50;
-            display: inline-block;
-            width: 120px; /* Alinha os dois pontos */
-        }
-        .user-details .edit-button {
-            display: block;
-            width: fit-content;
-            margin: 20px auto 0;
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            text-align: center;
-            transition: background-color 0.3s;
-        }
-        .user-details .edit-button:hover {
-            background-color: #218838;
-        }
-        .message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - Dedicandos</title>
+  <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/perfil.css">
 </head>
+
 <body>
-    <nav class="sidebar">
-        <div class="logo">Dedicandos</div>
-        <a href="/home">Início</a>
-        <a href="/perfil" class="active">Meu Perfil</a>
-        <a href="/prova/gerar">Gerar Prova</a>
-        <% if (user && user.role === 'admin') { %>
-            <a href="/users">Gerenciar Usuários</a>
-        <% } %>
+  <nav class="sidebar">
+    <div class="logo">Dedicandos</div>
+    <a href="/home">Início</a>
+    <a href="/perfil" class="active">Meu Perfil</a>
+    <a href="/prova/gerar">Gerar Prova</a>
+    <% if (user && user.role==='admin' ) { %>
+      <a href="/users">Gerenciar Usuários</a>
+      <% } %>
         <a href="/logout" class="logout-btn">Sair</a>
-    </nav>
+  </nav>
 
-    <div class="main">
-        <header class="topbar">
-            <span>Bem-vindo, <%= user.nome %>!</span>
-        </header>
-        <main class="dashboard-content">
-            <div class="profile-container">
-                <h1>Meu Perfil</h1>
+  <div class="main">
+    <main class="dashboard-content">
+      <div class="profile-container">
+        <h1>Meu Perfil</h1>
 
-                <% if (error) { %>
-                    <div class="message error"><%= error %></div>
-                <% } %>
-                <% if (success) { %>
-                    <div class="message success"><%= success %></div>
-                <% } %>
+        <% if (typeof error !=='undefined' && error !==null && error) { %>
+          <div class="message error">
+            <%= error %>
+          </div>
+          <% } %>
+            <% if (typeof success !=='undefined' && success !==null && success) { %>
+              <div class="message success">
+                <%= success %>
+              </div>
+              <% } %>
 
                 <div class="profile-info">
-                    <div class="avatar-section">
-                        <img src="/static/uploads/<%= user.avatar_url || 'default-avatar.png' %>" alt="Avatar do Usuário">
-                        <form action="/users/<%= user.id_usuario %>/upload-avatar" method="POST" enctype="multipart/form-data">
-                            <input type="file" name="avatar" accept="image/png, image/jpeg, image/gif">
-                            <button type="submit">Alterar Avatar</button>
-                        </form>
-                    </div>
+                  <!-- Avatar com overlay -->
+                  <div class="avatar-section">
+                    <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário">
+                    <div class="overlay">Alterar Foto</div>
+                    <form action="/users/<%= user.id_usuario %>/upload-avatar" method="POST"
+                      enctype="multipart/form-data">
+                      <input type="file" id="avatarInput" name="avatar" accept="image/png, image/jpeg, image/gif"
+                        hidden>
+                    </form>
+                  </div>
 
-                    <div class="user-details">
-                        <p><strong>Nome:</strong> <%= user.nome %></p>
-                        <p><strong>E-mail:</strong> <%= user.email %></p>
-                        <p><strong>Data Nasc.:</strong> <%= user.data_nascimento %></p>
-                        <p><strong>Membro Desde:</strong> <%= user.data_cadastro %></p>
-                        <p><strong>Tipo de Conta:</strong> <%= user.role %></p>
-                        <p><strong>E-mail Verificado:</strong> <%= user.email_verificado ? 'Sim' : 'Não' %></p>
-                        <a href="/users/<%= user.id_usuario %>/editar" class="edit-button">Editar Perfil</a>
-                    </div>
+
+                  <!-- Detalhes do usuário -->
+                  <div class="user-details">
+                    <p><strong>Nome:</strong>
+                      <%= user.nome %>
+                    </p>
+                    <p><strong>E-mail:</strong>
+                      <%= user.email %>
+                    </p>
+                    <p><strong>Data Nasc.:</strong>
+                      <%= user.data_nascimento %>
+                    </p>
+                    <p><strong>Membro Desde:</strong>
+                      <%= user.data_cadastro %>
+                    </p>
+                    <p><strong>Tipo de Conta:</strong>
+                      <%= user.role %>
+                    </p>
+                    <p><strong>E-mail Verificado:</strong>
+                      <%= user.email_verificado ? 'Sim' : 'Não' %>
+                    </p>
+                    <a href="/users/<%= user.id_usuario %>/editar" class="edit-button">Editar Perfil</a>
+                  </div>
                 </div>
-            </div>
-        </main>
-    </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/js/script.js"></script>
 </body>
+
 </html>

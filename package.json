@@ -6,8 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch --no-warnings server.js",
-    "lint": "echo \"(Opcional) adicione ESLint/Prettier\""
+    "dev": "node --watch --no-warnings server.js"
   },
   "license": "ISC",
   "dependencies": {
