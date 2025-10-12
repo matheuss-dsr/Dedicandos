@@ -139,3 +139,15 @@ body.dark .questao {
 .toggle-theme:hover {
     background: #16305f;
 }
+
+.alternativa {
+    margin: 5px 0;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+.alternativa.correta {
+    background-color: #e0f7e9;
+    font-weight: bold;
+    border-left: 4px solid #1a7c3c;
+}

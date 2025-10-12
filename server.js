@@ -1,4 +1,4 @@
-import { DatabasePostgres } from './app/infra/database_postgres.js'
+import { DatabasePostgres} from './app/infra/database_postgres.js'
 import { fastify } from 'fastify'
 import { registerPlugins } from './config/fastify.js'
 import * as userController from './app/router/user.js'
@@ -85,7 +85,6 @@ server.get('/cadastro', (req, reply) => userController.mostrarFormularioCriarUsu
 server.post('/cadastro', (req, reply) => userController.criarUsuario(req, reply, database))
 server.get('/home', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {
   try {
-    // Busca as provas do usuário logado
     const provas = await database.query(
       'SELECT * FROM provas WHERE id_usuario = $1 AND ativo = true ORDER BY id_prova DESC',
       [req.user.id_usuario]

@@ -1,5 +1,8 @@
 import pg from "pg";
 import dotenv from "dotenv";
+import fetch from "node-fetch";
+import showdown from "showdown";
+
 dotenv.config();
 const { Pool } = pg;
 
@@ -20,20 +23,17 @@ export class DatabasePostgres {
     }
   }
 
-  /* USERS */
-
-  async listarUsuarios(search = '', status = 'ativos') {
-    const ativo = status === 'ativos';
-
+  /* ---------------- USUÁRIOS ---------------- */
+  async listarUsuarios(search = "", status = "ativos") {
+    const ativo = status === "ativos";
     const sql = `
-    SELECT *
-    FROM usuarios
-    WHERE (nome ILIKE $1 OR email ILIKE $1)
-      AND ativo = $2
-    ORDER BY id_usuario ASC
-  `;
+      SELECT *
+      FROM usuarios
+      WHERE (nome ILIKE $1 OR email ILIKE $1)
+        AND ativo = $2
+      ORDER BY id_usuario ASC
+    `;
     const params = [`%${search}%`, ativo];
-
     const result = await this.query(sql, params);
     return result.rows;
   }
@@ -49,23 +49,20 @@ export class DatabasePostgres {
   }
 
   async getUserByEmail(email) {
-    const result = await this.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    const result = await this.query("SELECT * FROM usuarios WHERE email = $1", [email]);
     return result.rows[0];
   }
-  
+
   async getUserById(id) {
     const userId = parseInt(id, 10);
     if (isNaN(userId)) return null;
-    const result = await this.query(
-      `SELECT * FROM usuarios WHERE id_usuario = $1`,
-      [userId]
-    );
+    const result = await this.query("SELECT * FROM usuarios WHERE id_usuario = $1", [userId]);
     return result.rows[0] || null;
   }
 
   async verifyUserEmail(userId) {
     const result = await this.query(
-      'UPDATE usuarios SET email_verificado = true WHERE id_usuario = $1 RETURNING *',
+      "UPDATE usuarios SET email_verificado = true WHERE id_usuario = $1 RETURNING *",
       [userId]
     );
     return result.rows[0];
@@ -90,94 +87,136 @@ export class DatabasePostgres {
   }
 
   async deleteUser(id) {
-    await this.query('UPDATE usuarios SET ativo = false WHERE id_usuario = $1', [id]);
+    await this.query("UPDATE usuarios SET ativo = false WHERE id_usuario = $1", [id]);
   }
 
   async reactivateUser(id) {
-    const sql = 'UPDATE usuarios SET ativo = true WHERE id_usuario = $1';
-    const params = [id];
-    await this.query(sql, params);
+    await this.query("UPDATE usuarios SET ativo = true WHERE id_usuario = $1", [id]);
   }
 
   async savePasswordResetToken(email, token, expiresAt) {
     return this.query(
-      `INSERT INTO password_resets (email, token, expires_at) 
-        VALUES ($1, $2, $3) 
-        ON CONFLICT (email) DO UPDATE 
-        SET token = EXCLUDED.token, expires_at = EXCLUDED.expires_at`,
+      `INSERT INTO password_resets (email, token, expires_at)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (email) DO UPDATE
+       SET token = EXCLUDED.token, expires_at = EXCLUDED.expires_at`,
       [email, token, expiresAt]
     );
   }
 
   async findPasswordResetByToken(token) {
     const result = await this.query(
-      `SELECT * FROM password_resets 
-        WHERE token = $1 AND expires_at > NOW()`,
+      `SELECT * FROM password_resets
+       WHERE token = $1 AND expires_at > NOW()`,
       [token]
     );
     return result.rows[0];
   }
 
   async updateUserPassword(email, hashedPassword) {
-    return this.query(
-      `UPDATE usuarios SET senha = $1 WHERE email = $2`,
-      [hashedPassword, email]
-    );
+    return this.query(`UPDATE usuarios SET senha = $1 WHERE email = $2`, [hashedPassword, email]);
   }
 
   /* ---------------- PROVAS ---------------- */
   async listarProvas() {
-    const result = await this.query(`SELECT * FROM provas WHERE ativo = true ORDER BY id_prova ASC`)
-    return result.rows
+    const result = await this.query("SELECT * FROM provas WHERE ativo = true ORDER BY id_prova ASC");
+    return result.rows;
   }
 
-  async prova_create({ titulo, descricao, id_usuario }) {
-    const result = await this.query(
-      `INSERT INTO provas (titulo, descricao, id_usuario, ativo) VALUES ($1, $2, $3, true) RETURNING id_prova`,
-      [titulo, descricao, id_usuario]
-    )
-    return result.rows[0].id_prova
+  async salvarProva({ titulo, id_usuario, ano, disciplina, questoes_selecionadas }) {
+    const indicesSelecionados = Array.isArray(questoes_selecionadas)
+      ? questoes_selecionadas.map(Number)
+      : questoes_selecionadas
+      ? [Number(questoes_selecionadas)]
+      : [];
+
+    if (!titulo || indicesSelecionados.length === 0) {
+      throw new Error("Título e pelo menos uma questão são obrigatórios.");
+    }
+
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+
+      const insertProvaQuery = `
+        INSERT INTO provas
+          (titulo, id_usuario, ano, quantidade_questoes, disciplina)
+        VALUES
+          ($1, $2, $3, $4, $5)
+        RETURNING id_prova;
+      `;
+      const resultProva = await client.query(insertProvaQuery, [
+        titulo,
+        id_usuario,
+        parseInt(ano),
+        indicesSelecionados.length,
+        disciplina || "Todas",
+      ]);
+      const id_prova = resultProva.rows[0].id_prova;
+
+      const insertQuestaoQuery = `
+        INSERT INTO questoes_prova
+          (id_prova, enem_year, enem_index)
+        VALUES
+          ($1, $2, $3);
+      `;
+
+      const inserts = indicesSelecionados.map((index) =>
+        client.query(insertQuestaoQuery, [id_prova, parseInt(ano), index])
+      );
+
+      await Promise.all(inserts);
+      await client.query("COMMIT");
+
+      return id_prova;
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
-  async createQuestao({ id_prova, enunciado }) {
-    const result = await this.query(
-      `INSERT INTO questoes (id_prova, enunciado) VALUES ($1, $2) RETURNING id_questao`,
-      [id_prova, enunciado]
+  async getProvaComQuestoes(id_prova) {
+    const resultProva = await this.query("SELECT * FROM provas WHERE id_prova = $1", [id_prova]);
+    const resultQuestoes = await this.query(
+      "SELECT enem_year, enem_index FROM questoes_prova WHERE id_prova = $1",
+      [id_prova]
     );
-    return result.rows[0].id_questao;
+
+    return {
+      metadata: resultProva.rows[0],
+      questoes: resultQuestoes.rows,
+    };
   }
+  async buscarQuestaoENEMPorIndex(year, index) {
+    const url = `https://api.enem.dev/v1/exams/${year}/questions/${index}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Erro ao buscar questão ${index} do ENEM ${year}: HTTP ${response.status}`);
+    
+    const q = await response.json();
+    if (!q || (!q.text && !q.context)) return null;
 
-  async createAlternativa({ id_questao, texto, correta }) {
-    await this.query(
-      `INSERT INTO alternativas (id_questao, texto, correta) VALUES ($1, $2, $3)`,
-      [id_questao, texto, correta]
-    );
-  }
+    const converter = new showdown.Converter();
+    let enunciado = converter.makeHtml((q.text || q.context).trim());
 
+    const validAlternatives = q.alternatives.filter(a => a && a.text && a.letter);
+    const alternativas = validAlternatives.map(a => ({ letra: a.letter, texto: a.text }));
 
-  async questao_create({ id_prova, enunciado }) {
-    const result = await this.query(
-      `INSERT INTO questoes (id_prova, enunciado, ativo) VALUES ($1, $2, true) RETURNING id_prova`,
-      [id_prova, enunciado]
-    )
-    return result.rows[0].id
-  }
+    let imageHTML = null;
+    if (q.files && q.files.length > 0) {
+      imageHTML = `<img src="${q.files[0]}" alt="Imagem da Questão" style="max-width:100%; margin-top:10px;">`;
+    }
 
-  async alternativa_create({ id_questao, texto, correta }) {
-    await this.query(
-      `INSERT INTO alternativas (id_questao, texto, correta) VALUES ($1, $2, $3)`,
-      [id_questao, texto, correta]
-    )
-  }
-
-  async updateProva(id, { titulo, descricao, ativo }) {
-    await this.query(
-      `UPDATE provas SET titulo = $1, descricao = $2, ativo = $3 WHERE id_prova = $4`,
-      [titulo, descricao, ativo, id]
-    )
-  }
-
-  async deleteProva(id) {
-    await this.query(`UPDATE provas SET ativo = false WHERE id_prova = $1`, [id_prova])
+    return {
+      title: q.title || `Questão ${index}`,
+      enunciado,
+      alternativas,
+      alternativaCorreta: q.correctAlternative,
+      imageHTML,
+      ano: year,
+      disciplina: q.discipline,
+      numero: q.number
+    };
   }
 }

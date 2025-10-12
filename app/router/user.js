@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { generateEmailToken, generatePasswordResetToken, validatePasswordResetToken, sendVerificationEmail, sendPasswordResetEmail } from "../utils/authUtils.js";
 import path from "path";
 import crypto from "crypto";
-import fs from "fs/promises"; // Para upload de avatar
+import fs from "fs/promises"; 
 
 // Mostra formulário de cadastro
 export async function mostrarFormularioCriarUsuario(req, reply) {
