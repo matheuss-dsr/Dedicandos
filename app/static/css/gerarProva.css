@@ -123,7 +123,7 @@ body.dark .questao {
     border-radius: 50%;
     object-fit: cover;
     margin-left: 75%;
-    border: 2px solid #1a3d7c;
+    border: #2c3e50 5px solid;
 }
 
 .toggle-theme {
@@ -140,14 +140,36 @@ body.dark .questao {
     background: #16305f;
 }
 
+.alternativas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .alternativa {
-    margin: 5px 0;
-    padding: 5px;
-    border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.alternativa .letra {
+    display: flex;
+    align-items: center;
+  font-weight: bold;
+  color: #000000;
+  flex-shrink: 0;
+  min-width: 20px;
+}
+
+.alternativa .texto {
+  flex: 1;
 }
 
 .alternativa.correta {
-    background-color: #e0f7e9;
-    font-weight: bold;
-    border-left: 4px solid #1a7c3c;
+  background-color: #e0f7e9;
+  border-left: 4px solid #1a7c3c;
+  font-weight: bold;
 }

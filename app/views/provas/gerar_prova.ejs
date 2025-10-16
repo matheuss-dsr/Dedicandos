@@ -93,16 +93,13 @@
                           <%= q.idioma %>
                       </p>
                       <p><%- q.enunciado %></p>
-                      <% if (q.imageHTML) { %>
-                        <div class="questao-imagem"><%- q.imageHTML %></div>
-                        <% } %>
-                          <ul class="alternativas">
+                          <div class="alternativas">
                             <% q.alternativas.forEach(a=> { %>
-                              <li class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
-                                <%= a.letra %>) <%= a.texto %>
-                              </li>
+                              <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
+                                <%= a.letra %>) <%- a.texto %>
+                              </div>
                               <% }) %>
-                          </ul>
+                            </div>
                     </div>
                     <% }) %>
 

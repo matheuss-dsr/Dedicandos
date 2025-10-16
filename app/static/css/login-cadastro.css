@@ -6,83 +6,62 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Centraliza o login perfeitamente */
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh; /* altura total da tela */
   background: linear-gradient(135deg, #4a90e2, #6a1b9a); /* azul para roxo */
 }
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff;
-    padding: 8px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border-radius: 12px;
-    margin-bottom: 20px;
-}
-
-.topbar span {
-    font-size: 1em; 
-}
-
-.topbar .avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-left: 75%;
-    border: #2c3e50 5px solid;
-}
-
 
 /* Container principal */
 .auth-container {
   background: #f5f7ff; /* tom claro azulado */
   padding: 2.5rem;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3); /* sombra azul escura */
+  box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
   width: 100%;
   max-width: 400px;
   animation: fadeIn 0.6s ease-in-out;
+  text-align: center;
 }
 
+/* Título */
 .auth-container h2 {
   font-size: 2rem;
   margin-bottom: 1.5rem;
-  color: #2c387e; /* azul escuro */
+  color: #2c387e;
 }
 
 /* Formulário */
 .form-group {
   margin-bottom: 1.2rem;
+  text-align: left;
 }
 
 label {
   display: block;
   font-weight: bold;
   margin-bottom: 0.4rem;
-  color: #3f51b5; /* azul médio */
+  color: #3f51b5;
 }
 
 input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #9fa8da; /* azul claro */
+  border: 1px solid #9fa8da;
   border-radius: 8px;
   font-size: 1rem;
   transition: border 0.3s;
-  background: #e8eaf6; /* fundo azul muito claro */
-  color: #1a237e; /* texto azul escuro */
+  background: #e8eaf6;
+  color: #1a237e;
 }
 
 input:focus {
-  border-color: #512da8; /* roxo escuro */
+  border-color: #512da8;
   outline: none;
-  background: #d1c4e9; /* fundo roxo claro */
+  background: #d1c4e9;
   color: #311b92;
 }
 
@@ -91,7 +70,7 @@ input:focus {
   width: 100%;
   padding: 12px;
   border: none;
-  background: #512da8; /* roxo escuro */
+  background: #512da8;
   color: #fff;
   font-weight: bold;
   border-radius: 8px;
@@ -101,39 +80,46 @@ input:focus {
 }
 
 .btn-primary:hover {
-  background: #311b92; /* roxo mais escuro */
+  background: #311b92;
 }
 
-/* Mensagem de erro */
+/* Mensagens */
 .error {
-  background: #f8bbd0; /* rosa claro */
-  color: #880e4f; /* rosa escuro */
+  background: #f8bbd0;
+  color: #880e4f;
   border: 1px solid #880e4f;
   padding: 10px;
   border-radius: 6px;
   margin-bottom: 1rem;
-  text-align: center;
-  font-size: 0.95rem;
 }
 
-/* Links abaixo */
+.success {
+  background: #c8e6c9;
+  color: #1b5e20;
+  border: 1px solid #1b5e20;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+/* Links */
 .auth-links {
   margin-top: 1.5rem;
   text-align: center;
 }
 
 .auth-links a {
-  color: #536dfe; /* azul vibrante */
+  color: #536dfe;
   text-decoration: none;
   font-weight: bold;
   transition: color 0.3s;
 }
 
 .auth-links a:hover {
-  color: #304ffe; /* azul mais escuro */
+  color: #304ffe;
 }
 
-/* Animação suave */
+/* Animação */
 @keyframes fadeIn {
   from {
     opacity: 0;
