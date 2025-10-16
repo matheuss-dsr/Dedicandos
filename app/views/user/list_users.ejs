@@ -6,11 +6,281 @@
     <title>Gerenciar Usuários - Dedicandos</title>
     <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="/static/css/dashboard.css">
-    <link rel="stylesheet" href="/static/css/list_users.css">
+    <style>
+        /* --- Reset básico --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: #e2e5f9;
+  color: #333;
+}
+
+/* --- Sidebar já existente --- */
+nav.sidebar {
+  background-color: #0b0c17;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px 20px;
+}
+
+nav.sidebar .logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+nav.sidebar .logo img {
+  width: 140px;
+  object-fit: contain;
+}
+
+nav.sidebar a {
+  color: #bbb;
+  text-decoration: none;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  display: block;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+nav.sidebar a:hover,
+nav.sidebar a.active {
+  background-color: #191b31;
+  color: #3fa9f5;
+  font-weight: 600;
+}
+
+nav.sidebar .logout-btn {
+  margin-top: auto;
+  background-color: #3fa9f5;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+nav.sidebar .logout-btn:hover {
+  background-color: #337acc;
+}
+
+/* --- Topbar --- */
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: #fff;
+  padding: 10px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.topbar span {
+  font-weight: 600;
+}
+
+.topbar .avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #2c3e50;
+  margin-left: 10px;
+}
+
+/* --- Main content --- */
+.main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 40px;
+  overflow: auto;
+}
+
+.dashboard-content {
+  background-color: #fff;
+  border-radius: 0 0 20px 20px;
+  padding: 40px;
+  width: 100%;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
+}
+
+/* --- User List --- */
+.user-list-container h1 {
+  text-align: center;
+  color: #3fa9f5;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+/* --- Filtros --- */
+.filter-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-controls form {
+  display: flex;
+  flex-grow: 1;
+  gap: 10px;
+}
+
+.filter-controls input[type="text"] {
+  flex-grow: 1;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.filter-controls button {
+  padding: 10px 20px;
+  background-color: #3fa9f5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.filter-controls button:hover {
+  background-color: #337acc;
+}
+
+.status-filter a {
+  padding: 8px 14px;
+  margin-right: 5px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.status-filter a.active,
+.status-filter a:hover {
+  background-color: #3fa9f5;
+  color: white;
+}
+
+/* --- Tabela de usuários --- */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.user-table th, .user-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.user-table th {
+  background-color: #f4f7fb;
+  color: #3fa9f5;
+  font-weight: 600;
+}
+
+.user-table tbody tr:hover {
+  background-color: #f1f5ff;
+}
+
+/* --- Botões de ação --- */
+.actions a.edit,
+.actions button.delete,
+.actions button.reactivate {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  margin-right: 5px;
+  transition: all 0.3s;
+}
+
+.actions a.edit {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.actions a.edit:hover {
+  background-color: #e0a800;
+}
+
+.actions button.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.actions button.delete:hover {
+  background-color: #c82333;
+}
+
+.actions button.reactivate {
+  background-color: #28a745;
+  color: white;
+}
+
+.actions button.reactivate:hover {
+  background-color: #218838;
+}
+
+/* --- Nenhum usuário --- */
+.no-users {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* --- Responsivo --- */
+@media (max-width: 768px) {
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .status-filter {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .dashboard-content {
+    padding: 20px;
+    height: auto;
+  }
+}
+
+    </style>
 </head>
 <body>
     <nav class="sidebar">
-        <div class="logo">Dedicandos</div>
+        <a href="/" class="logo">
+            <img src="../static/images/logo.png" alt="Logo">
+        </a>
         <a href="/home">Início</a>
         <a href="/perfil">Meu Perfil</a>
         <a href="/prova/gerar">Gerar Prova</a>

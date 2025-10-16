@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,19 @@
     <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="/static/css/dashboard.css">
 </head>
+
 <body>
     <nav class="sidebar">
-        <div class="logo">Dedicandos</div>
+        <a href="/" class="logo">
+            <img src="../static/images/logo.png" alt="Logo">
+        </a>
         <a href="/home" class="active">Início</a>
         <a href="/perfil">Meu Perfil</a>
         <a href="/prova/gerar/form">Gerar Prova</a>
-        <% if (user && user.role === 'admin') { %>
+        <% if (user && user.role==='admin' ) { %>
             <a href="/users">Gerenciar Usuários</a>
-        <% } %>
-        <a href="/logout" class="logout-btn">Sair</a>
+            <% } %>
+                <a href="/logout" class="logout-btn">Sair</a>
     </nav>
 
     <div class="main">
@@ -29,20 +33,24 @@
             <h1>Suas Provas Salvas</h1>
 
             <section class="saved-tests">
-                <% if (provas && provas.length > 0) { %>
+                <% if (provas && provas.length> 0) { %>
                     <ul>
-                        <% provas.forEach(prova => { %>
+                        <% provas.forEach(prova=> { %>
                             <li>
-                                <a href="/prova/<%= prova.id_prova %>"><%= prova.titulo %></a>
-                                <span class="date">(<%= new Intl.DateTimeFormat('pt-BR').format(new Date(prova.data_criacao)) %>)</span>
+                                <a href="/prova/<%= prova.id_prova %>">
+                                    <%= prova.titulo %>
+                                </a>
+                                <span class="date">(<%= new Intl.DateTimeFormat('pt-BR').format(new
+                                        Date(prova.data_criacao)) %>)</span>
                             </li>
-                        <% }) %>
+                            <% }) %>
                     </ul>
-                <% } else { %>
-                    <p>Você ainda não salvou nenhuma prova.</p>
-                <% } %>
+                    <% } else { %>
+                        <p>Você ainda não salvou nenhuma prova.</p>
+                        <% } %>
             </section>
         </main>
     </div>
 </body>
+
 </html>
