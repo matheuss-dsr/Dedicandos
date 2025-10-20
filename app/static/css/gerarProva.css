@@ -1,143 +1,163 @@
+:root {
+  --color-bg: #f4f7fb;
+  --color-text: #333;
+  --color-primary: #1a3d7c;
+  --color-primary-dark: #16305f;
+  --color-error: red;
+  --color-success: #1a7c3c;
+  --color-form-bg: #fff;
+  --color-form-border: #ccc;
+  --color-form-shadow: rgba(0, 0, 0, 0.1);
+  --color-questao-bg: #fff;
+  --color-alternativa-bg: #f9f9f9;
+  --color-alternativa-correta-bg: #e0f7e9;
+  --color-topbar-bg: #fff;
+  --color-topbar-border: #2c3e50;
+  --color-dark-bg: #222;
+  --color-dark-text: #f1f1f1;
+  --color-dark-card-bg: #333;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f7fb;
-    color: #333;
-    transition: background 0.3s, color 0.3s;
+  font-family: Arial, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: background 0.3s, color 0.3s;
 }
 
 body.dark {
-    background: #222;
-    color: #f1f1f1;
+  background: var(--color-dark-bg);
+  color: var(--color-dark-text);
 }
 
 h1,
 h2 {
-    color: #1a3d7c;
+  color: var(--color-primary);
 }
 
 h2 {
-    margin-top: 50px;
+  margin-top: 50px;
 }
 
 .error {
-    color: red;
-    margin-bottom: 15px;
+  color: var(--color-error);
+  margin-bottom: 15px;
 }
 
 form {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s;
+  background: var(--color-form-bg);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 6px var(--color-form-shadow);
+  transition: background 0.3s;
 }
 
 body.dark form {
-    background: #333;
+  background: var(--color-dark-card-bg);
 }
 
 form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
 }
 
 form input,
 form select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid var(--color-form-border);
+  border-radius: 8px;
 }
 
 form button {
-    background: #1a3d7c;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
 }
 
 form button:hover {
-    background: #16305f;
+  background: var(--color-primary-dark);
 }
 
 .questao {
-    background: #fff;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s;
+  background: var(--color-questao-bg);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px var(--color-form-shadow);
+  transition: background 0.3s;
 }
 
 body.dark .questao {
-    background: #333;
+  background: var(--color-dark-card-bg);
 }
 
 .questao h3 {
-    margin: 0 0 10px;
-    font-size: 1.1em;
+  margin: 0 0 10px;
+  font-size: 1.1em;
 }
 
 .alternativas {
-    margin-left: 20px;
+  margin-left: 20px;
 }
 
 .alternativa {
-    margin: 5px 0;
+  margin: 5px 0;
 }
 
 .gabarito {
-    font-weight: bold;
-    color: #1a7c3c;
-    margin-top: 10px;
+  font-weight: bold;
+  color: var(--color-success);
+  margin-top: 10px;
 }
 
 .section {
-    margin-bottom: 40px;
+  margin-bottom: 40px;
 }
 
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff;
-    padding: 8px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border-radius: 12px;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-topbar-bg);
+  padding: 8px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin-bottom: 20px;
 }
 
 .topbar span {
-    font-size: 1em; 
+  font-size: 1em;
 }
 
 .topbar .avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-left: 75%;
-    border: #2c3e50 5px solid;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 75%;
+  border: var(--color-topbar-border) 5px solid;
 }
 
 .toggle-theme {
-    margin-bottom: 20px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    background: #1a3d7c;
-    color: #fff;
+  margin-bottom: 20px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--color-primary);
+  color: #fff;
 }
 
 .toggle-theme:hover {
-    background: #16305f;
+  background: var(--color-primary-dark);
 }
 
 .alternativas {
@@ -152,12 +172,12 @@ body.dark .questao {
   gap: 8px;
   padding: 6px 10px;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: var(--color-alternativa-bg);
 }
 
 .alternativa .letra {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
   font-weight: bold;
   color: #000000;
   flex-shrink: 0;
@@ -169,7 +189,7 @@ body.dark .questao {
 }
 
 .alternativa.correta {
-  background-color: #e0f7e9;
-  border-left: 4px solid #1a7c3c;
+  background-color: var(--color-alternativa-correta-bg);
+  border-left: 4px solid var(--color-success);
   font-weight: bold;
 }

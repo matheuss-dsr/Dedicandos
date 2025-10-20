@@ -1,19 +1,69 @@
+/* ============================== */
+/* 🎨 Tema Principal (Default) */
+/* ============================== */
+:root {
+  /* Cores gerais */
+  --color-bg-body: #e2e5f9;
+  --color-text: #333;
+  --color-text-light: #bbb;
+  --color-text-strong: #111;
+
+  /* Sidebar */
+  --color-sidebar-bg: #0b0c17;
+  --color-sidebar-hover-bg: #191b31;
+  --color-sidebar-hover-text: #3fa9f5;
+
+  /* Botão de logout */
+  --color-logout-bg: #3fa9f5;
+  --color-logout-hover-bg: #337acc;
+  --color-logout-text: #ffffff;
+
+  /* Topbar */
+  --color-topbar-bg: #ffffff;
+  --color-topbar-shadow: rgba(0, 0, 0, 0.1);
+  --color-avatar-border: #2c3e50;
+
+  /* Dashboard / Conteúdo principal */
+  --color-main-bg: #ffffff;
+  --color-main-text: #111;
+  --color-main-shadow: rgba(255, 255, 255, 0.1);
+
+  /* Layout e espaçamentos */
+  --sidebar-width: 250px;
+  --sidebar-padding: 25px 20px;
+  --main-padding: 20px 40px;
+  --dashboard-padding: 50px;
+  --border-radius-default: 10px;
+  --border-radius-large: 20px;
+
+  /* Tipografia */
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ============================== */
+/* 🧱 Estilos gerais */
+/* ============================== */
+
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #e2e5f9;
+  font-family: var(--font-family);
+  background: var(--color-bg-body);
   display: flex;
   height: 100vh;
-  color: #333;
+  color: var(--color-text);
   overflow: hidden;
 }
 
+/* ============================== */
+/* 🧭 Sidebar */
+/* ============================== */
+
 nav.sidebar {
-  background-color: #0b0c17;
-  width: 250px;
+  background-color: var(--color-sidebar-bg);
+  width: var(--sidebar-width);
   display: flex;
   flex-direction: column;
-  padding: 25px 20px;
+  padding: var(--sidebar-padding);
   box-sizing: border-box;
 }
 
@@ -25,19 +75,17 @@ nav.sidebar .logo {
 }
 
 nav.sidebar .logo img {
-  width: 140px;         /* tamanho ideal para sidebar */
+  width: 140px;
   height: auto;
   object-fit: contain;
-  border-radius: 12px;  /* opcional, deixa o logo levemente arredondado */
+  border-radius: 12px; /* leve arredondamento opcional */
 }
 
-
-
 nav.sidebar a {
-  color: #bbb;
+  color: var(--color-text-light);
   text-decoration: none;
   padding: 14px 18px;
-  border-radius: 10px;
+  border-radius: var(--border-radius-default);
   margin-bottom: 15px;
   display: block;
   font-size: 0.95rem;
@@ -46,17 +94,17 @@ nav.sidebar a {
 
 nav.sidebar a:hover,
 nav.sidebar a.active {
-  background-color: #191b31;
-  color: #3fa9f5;
+  background-color: var(--color-sidebar-hover-bg);
+  color: var(--color-sidebar-hover-text);
   font-weight: 600;
 }
 
 nav.sidebar .logout-btn {
   margin-top: auto;
-  background-color: #3fa9f5;
-  color: white;
+  background-color: var(--color-logout-bg);
+  color: var(--color-logout-text);
   padding: 14px 18px;
-  border-radius: 10px;
+  border-radius: var(--border-radius-default);
   text-align: center;
   font-weight: 600;
   cursor: pointer;
@@ -64,49 +112,56 @@ nav.sidebar .logout-btn {
 }
 
 nav.sidebar .logout-btn:hover {
-  background-color: #337acc;
+  background-color: var(--color-logout-hover-bg);
 }
 
+/* ============================== */
+/* 📊 Topbar */
+/* ============================== */
+
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff;
-    padding: 8px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border-radius: 12px;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-topbar-bg);
+  padding: 8px 20px;
+  box-shadow: 0 1px 3px var(--color-topbar-shadow);
+  border-radius: 12px;
+  margin-bottom: 20px;
 }
 
 .topbar span {
-    font-size: 1em; 
+  font-size: 1em;
 }
 
 .topbar .avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-left: 75%;
-    border: #2c3e50 5px solid;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 75%;
+  border: 5px solid var(--color-avatar-border);
 }
 
+/* ============================== */
+/* 🧩 Main / Dashboard */
+/* ============================== */
 
 .main {
-  flex-grow: 1; /* garante que ocupe todo o espaço restante */
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px 40px; /* mais espaçamento interno */
+  padding: var(--main-padding);
   overflow: hidden;
 }
 
 main.dashboard-content {
-  background-color: white;
-  border-radius: 0 0 20px 20px;
-  padding: 50px; /* aumentar padding para dar mais área visível */
+  background-color: var(--color-main-bg);
+  border-radius: 0 0 var(--border-radius-large) var(--border-radius-large);
+  padding: var(--dashboard-padding);
   width: 100%;
-  height: calc(100vh - 65px); /* ocupa toda a altura menos o topbar */
-  color: #111;
+  height: calc(100vh - 65px);
+  color: var(--color-main-text);
   overflow-y: auto;
-  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 6px var(--color-main-shadow);
 }

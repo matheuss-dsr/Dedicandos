@@ -1,4 +1,26 @@
-/* Reset básico */
+:root {
+  /* Cores Base Fornecidas */
+  --color-gray-blue: #91A3AD; /* Azul Acinzentado - Neutro/Secundário */
+  --color-dark-red: #8C1843; /* Bordô/Vinho - Fundo Escuro Principal */
+  --color-light-gray: #F2F2F2; /* Cinza Claro - Fundo Claro/Geral */
+  --color-black: #17181B; /* Preto - Texto Principal */
+  --color-magenta: #ED145B; /* Magenta/Rosa Shock - Ação/Destaque */
+
+  /* Mapeamento das Variáveis de Uso */
+  --color-bg-dark: var(--color-black); /* Navbar, Seção Planos */
+  --color-bg-light: var(--color-black); /* Fundo Claro */
+  --color-text-dark: var(--color-light-gray); /* Texto Principal */
+  --color-text-light: #fff; /* Texto em Fundo Escuro */
+  --color-accent: var(--color-magenta); /* Links, Hover, Botões de Destaque */
+  --color-button-primary: var(--color-dark-red); /* Botões Principais */
+  --color-button-hover: #630C2E; /* Versão mais escura do Bordô */
+  --color-highlight: var(--color-magenta); /* Preços, Borda de Destaque */
+
+  /* Cores de Status (mantidas para funcionalidade) */
+  --color-success: #4CAF50;
+  --color-danger: #D32F2F;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,14 +28,16 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   scroll-behavior: smooth;
 }
+
 html {
-scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: #f8f9fa;
-  color: #333;
+  color: var(--color-text-dark);
+  background-color: var(--color-black);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 .navbar {
@@ -21,8 +45,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 15px 40px;
-  background: #222;
-  color: #fff;
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -46,7 +70,7 @@ body {
 }
 
 .menu a {
-  color: #fff;
+  color: var(--color-text-light);
   margin: 0 15px;
   text-decoration: none;
   font-weight: 700;
@@ -54,7 +78,7 @@ body {
 }
 
 .menu a:hover {
-  color: #499fb7;
+  color: var(--color-accent);
 }
 
 .buttons {
@@ -74,30 +98,38 @@ body {
 }
 
 .btn-login {
-  background: #54559b;
-  color: #fff;
+  background: var(--color-button-primary);
+  color: var(--color-text-light);
 }
 
 .btn-login:hover {
-  background: #2c55ad;
+  background: var(--color-button-hover);
 }
 
 .btn-register {
-  background: #54559b;
-  color: #fff;
+  background: var(--color-button-primary);
+  color: var(--color-text-light);
 }
 
 .btn-register:hover {
-  background: #2c55ad;
+  background: var(--color-button-hover); /* Usando cor derivada de para hover */
 }
 
 .btn-logout {
-  background: #54559b;
-  color: #fff;
+  background: var(--color-button-primary);
+  color: var(--color-text-light);
 }
 
 .btn-logout:hover {
-  background: #2c55ad;
+  background: var(--color-button-hover);
+}
+
+/* Botão hamburguer */
+.hamburger {
+  display: none; /* Oculto por padrão */
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--color-text-light);
 }
 
 /* Hero */
@@ -109,13 +141,15 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  color: #fff;
+  color: var(--color-text-light);
 }
 
 .hero .overlay {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.6);
 }
 
@@ -139,30 +173,31 @@ body {
 .sobre {
   padding: 80px 20px;
   text-align: center;
-  background: #fff;
+  background: var(--color-bg-light); /* Usando cor */
 }
 
 .sobre h2 {
   font-size: 2.5rem;
   margin-bottom: 20px;
-  color: #222;
+  color: var(--color-text-dark);
 }
 
 .sobre p {
   max-width: 800px;
   margin: auto;
   font-size: 1.1rem;
-  color: #555;
+  color: var(--color-gray-blue); /* Usando cor para texto secundário */
 }
 
 /* Planos */
 .planos {
   padding: 80px 20px;
   text-align: center;
-  background: #f4f4f4;
+  background: var(--color-bg-dark);
 }
 
 .planos h2 {
+  color: var(--color-text-light);
   font-size: 2.5rem;
   margin-bottom: 40px;
 }
@@ -175,11 +210,12 @@ body {
 }
 
 .plano-card {
-  background: #fff;
+  background: var(--color-bg-light);
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   width: 280px;
+  height: 300px;
   transition: transform 0.3s;
 }
 
@@ -190,13 +226,13 @@ body {
 .plano-card h3 {
   font-size: 1.5rem;
   margin-bottom: 10px;
-  color: #222;
+  color: var(--color-text-dark);
 }
 
 .plano-card p {
   font-size: 1rem;
   margin-bottom: 15px;
-  color: #666;
+  color: var(--color-gray-blue); /* Usando cor para texto secundário */
 }
 
 .preco {
@@ -204,12 +240,12 @@ body {
   font-size: 1.3rem;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #ff9800;
+  color: var(--color-highlight);
 }
 
 .plano-card .btn {
-  background: #ff9800;
-  color: #fff;
+  background: var(--color-highlight);
+  color: var(--color-text-light);
   border: none;
   padding: 10px 15px;
   border-radius: 6px;
@@ -219,67 +255,80 @@ body {
 }
 
 .plano-card .btn:hover {
-  background: #e68900;
+  background: var(--color-button-hover);
 }
 
 .destaque {
-  border: 2px solid #ff9800;
+  border: 2px solid var(--color-highlight);
   transform: scale(1.05);
 }
 
-/* Contato */
-.contato {
+.equipe {
   padding: 80px 20px;
   text-align: center;
-  background: #fff;
+  background-color: var(--bg-section);
 }
 
-.contato h2 {
+.equipe h2 {
   font-size: 2.5rem;
-  margin-bottom: 20px;
-  color: #222;
+  margin-bottom: 40px;
+  color: var(--primary-color);
 }
 
-.contato form {
-  max-width: 600px;
-  margin: auto;
+.team-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.team-member {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 15px;
 }
 
-.contato input,
-.contato textarea {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+.team-member img {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--primary-color);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.team-member img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.team-member .name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.team-member .role {
   font-size: 1rem;
+  color: #555;
 }
 
-.contato textarea {
-  min-height: 120px;
-  resize: vertical;
+.team-member .github {
+  font-size: 0.85rem;
+  color: #3fa9f5;
+  text-decoration: none;
+  word-break: break-all;
 }
 
-.contato .btn {
-  background: #ff9800;
-  color: #fff;
-  border: none;
-  padding: 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
-}
-
-.contato .btn:hover {
-  background: #e68900;
+.team-member .github:hover {
+  text-decoration: underline;
 }
 
 /* Footer */
 footer {
-  background: #222;
-  color: #bbb;
+  background: var(--color-bg-dark);
+  color: var(--color-gray-blue);
   text-align: center;
   padding: 20px;
   margin-top: 40px;
@@ -291,112 +340,86 @@ footer .socials {
 
 footer .socials a {
   margin: 0 8px;
-  color: #ff9800;
+  color: var(--color-accent);
   font-size: 1.3rem;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 footer .socials a:hover {
-  color: #fff;
+  color: var(--color-text-light);
 }
 
 .avatar {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid #3fa9f5;
-      object-fit: cover;
-      transition: transform 0.2s;
-    }
-
-    .avatar:hover {
-      transform: scale(1.05);
-    }
-
-    .user-menu {
-      position: absolute;
-      top: 70px;
-      right: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      padding: 10px 0;
-      display: none;
-      flex-direction: column;
-      min-width: 160px;
-      z-index: 1000;
-    }
-
-    .user-menu a {
-      text-decoration: none;
-      color: #333;
-      padding: 10px 15px;
-      display: block;
-      transition: background-color 0.2s;
-    }
-
-    .user-menu a:hover {
-      background-color: #f0f0f0;
-    }
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .menu {
-    display: none; /* você pode depois adicionar um menu hamburguer */
-  }
-
-  .planos-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .hero-content h1 {
-    font-size: 2.2rem;
-  }
-
-  .hero-content p {
-    font-size: 1rem;
-  }
-}
-/* Botão hamburguer */
-.hamburger {
-  display: none;
-  font-size: 2rem;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
   cursor: pointer;
-  color: #fff;
+  border: 2px solid var(--color-accent);
+  object-fit: cover;
+  transition: transform 0.2s;
 }
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.user-menu {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background: var(--color-bg-light); /* Usando cor */
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  padding: 10px 0;
+  display: none;
+  flex-direction: column;
+  min-width: 160px;
+  z-index: 1000;
+}
+
+.user-menu a {
+  text-decoration: none;
+  color: var(--color-text-dark); /* Usando cor */
+  padding: 10px 15px;
+  display: block;
+  transition: background-color 0.2s;
+}
+
+.user-menu a:hover {
+  background-color: var(--color-light-gray); /* Usando cor */
+}
+
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff;
-    padding: 8px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border-radius: 12px;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg-light);
+  padding: 8px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin-bottom: 20px;
 }
 
 .topbar span {
-    font-size: 1em; 
+  font-size: 1em;
 }
 
 .topbar .avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-left: 75%;
-    border: #2c3e50 5px solid;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 50%; /* Ajustado para evitar overflow em mobile */
+  border: 5px solid var(--color-bg-dark);
 }
 
-/* Menu mobile */
+/* Responsividade e Menu Mobile */
 @media (max-width: 768px) {
   .menu {
     display: none;
     flex-direction: column;
-    background: #222;
+    background: var(--color-bg-dark);
     position: absolute;
     top: 60px;
     right: 0;
@@ -413,7 +436,24 @@ footer .socials a:hover {
   }
 
   .hamburger {
-    display: block;
+    display: block; /* Mostra o hambúrguer em mobile */
+  }
+
+  .planos-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .topbar .avatar {
+    margin-left: 20%; /* Ajuste adicional para mobile */
   }
 }
 

@@ -1,123 +1,136 @@
-/* Geral */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #eef0f8;
-    color: #333;
-    display: flex;
+:root {
+  --color-bg: #eef0f8;
+  --color-text: #333;
+  --color-sidebar-bg: #0f123d;
+  --color-sidebar-text: #fff;
+  --color-sidebar-active: #1a3d7c;
+  --color-sidebar-hover: #162d5f;
+  --color-logout-btn: #1da1f2;
+  --color-topbar-bg: #fff;
+  --color-topbar-shadow: rgba(0, 0, 0, 0.1);
+  --color-avatar-border: #2c3e50;
+  --color-card-bg: #fff;
+  --color-card-shadow: rgba(0, 0, 0, 0.1);
+  --color-section-bg: #f4f7fb;
+  --color-section-hover: #e2e6f0;
+  --color-primary: #1a3d7c;
 }
 
-/* Sidebar */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+}
+
 .sidebar {
-    width: 220px;
-    background-color: #0f123d;
-    color: #fff;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding-top: 20px;
-    position: fixed;
+  width: 220px;
+  background-color: var(--color-sidebar-bg);
+  color: var(--color-sidebar-text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  position: fixed;
 }
 
 .sidebar .logo {
-    font-weight: bold;
-    font-size: 1.5em;
-    text-align: center;
-    margin-bottom: 30px;
+  font-weight: bold;
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 .sidebar a {
-    color: #fff;
-    text-decoration: none;
-    padding: 12px 20px;
-    display: block;
-    border-radius: 8px;
-    margin: 5px 10px;
+  color: var(--color-sidebar-text);
+  text-decoration: none;
+  padding: 12px 20px;
+  display: block;
+  border-radius: 8px;
+  margin: 5px 10px;
 }
 
 .sidebar a.active {
-    background-color: #1a3d7c;
+  background-color: var(--color-sidebar-active);
 }
 
 .sidebar a:hover {
-    background-color: #162d5f;
+  background-color: var(--color-sidebar-hover);
 }
 
 .logout-btn {
-    margin-top: auto;
-    margin-bottom: 20px;
-    background-color: #1da1f2;
-    text-align: center;
-    padding: 10px;
-    border-radius: 8px;
+  margin-top: auto;
+  margin-bottom: 20px;
+  background-color: var(--color-logout-btn);
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
 }
 
-/* Main Content */
 .main {
-    margin-left: 220px; /* espaço da sidebar */
-    width: calc(100% - 220px);
-    padding: 20px 40px;
+  margin-left: 220px;
+  width: calc(100% - 220px);
+  padding: 20px 40px;
 }
 
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff;
-    padding: 8px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border-radius: 12px;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-topbar-bg);
+  padding: 8px 20px;
+  box-shadow: 0 1px 3px var(--color-topbar-shadow);
+  border-radius: 12px;
+  margin-bottom: 20px;
 }
 
 .topbar span {
-    font-size: 1em; 
+  font-size: 1em;
 }
 
 .topbar .avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-left: 75%;
-    border: #2c3e50 5px solid;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 75%;
+  border: var(--color-avatar-border) 5px solid;
 }
 
-/* Conteúdo */
 .dashboard-content h1 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
+  font-size: 1.5em;
+  margin-bottom: 10px;
 }
 
 .dashboard-content p {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
-/* Provas salvas */
 .saved-tests {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background-color: var(--color-card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px var(--color-card-shadow);
 }
 
 .saved-tests h2 {
-    color: #1a3d7c;
-    margin-bottom: 15px;
+  color: var(--color-primary);
+  margin-bottom: 15px;
 }
 
 .saved-tests ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .saved-tests ul li {
-    padding: 10px 15px;
-    background-color: #f4f7fb;
-    border-radius: 8px;
-    margin-bottom: 10px;
+  padding: 10px 15px;
+  background-color: var(--color-section-bg);
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
 .saved-tests ul li:hover {
-    background-color: #e2e6f0;
+  background-color: var(--color-section-hover);
 }

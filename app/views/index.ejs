@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
   <script defer src="../static/js/script.js"></script>
 </head>
+
 <body>
   <header class="navbar" id="navbar">
     <div class="logo">
@@ -20,29 +22,25 @@
       <a href="#contato">Contato</a>
     </nav>
 
-    <div class="buttons"<% if (!user) { %> style="margin-left: -97px;"<% } %>>
-      <% if (user) { %>
-      <img 
-        src="/static/uploads/<%= user.avatar_url || 'user.png' %>" 
-        alt="Avatar do Usuário" 
-        class="avatar" 
-        id="avatarBtn">
-      
-      <!-- Menu de usuário -->
-      <div class="user-menu" id="userMenu">
-        <a href="/perfil">Meu Perfil</a>
-        <a href="/Home">Dashboard</a>
-        <a href="/logout">Sair</a>
-        <button class="theme-toggle">Mudar Tema</button>
-      </div>
-      <% } else { %>
-      <a href="/login" class="btn btn-login">Entrar</a>
-      <a href="/cadastro" class="btn btn-register">Cadastre-se</a>
-      <% } %>
+    <div class="buttons" <% if (!user) { %> style="margin-left: -97px;"<% } %>>
+        <% if (user) { %>
+          <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar"
+            id="avatarBtn">
+
+          <!-- Menu de usuário -->
+          <div class="user-menu" id="userMenu">
+            <a href="/perfil">Meu Perfil</a>
+            <a href="/home">Dashboard</a>
+            <a href="/logout">Sair</a>
+          </div>
+          <% } else { %>
+            <a href="/login" class="btn btn-login">Entrar</a>
+            <a href="/cadastro" class="btn btn-register">Cadastre-se</a>
+            <% } %>
     </div>
 
     <!-- Botão hamburguer -->
-    <div class="hamburger" id="hamburger">
+    <div class="hamburger hidden" id="hamburger">
       ☰
     </div>
   </header>
@@ -51,26 +49,33 @@
   <section class="hero" id="home">
     <div class="overlay"></div>
     <div class="hero-content">
-        <h1>Bem-vindo!</h1>
-        <p>
-          At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium
-          voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati
-          cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi,
-          id est laborum et dolorum fuga.
-        </p>
+      <h1>Bem-vindo!</h1>
+      <p>
+        Dedicandos é uma poderosa ferramenta para desenvolvedores projetada para construir plataformas escaláveis de exames online. 
+      Com tecnologia de ponta, oferecemos uma variadade de anos de exames do ENEM disponíveis via API. Uma solução eficiente e fácil de criar provas e simulados para testar seus conhecimentos.
+      </p>
     </div>
   </section>
 
   <!-- Outras seções -->
   <section id="sobre" class="sobre">
-    <h2>Sobre Nós</h2>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum, iste, nihil reiciendis fugiat itaque sequi cupiditate maiores ullam quod commodi voluptatibus perferendis consectetur quis. Harum sapiente tempore laborum dolore aliquid!</p>
-  </section>
+  <h2>Por que usar o Dedicandos?</h2>
+  <p>
+    Este projeto simplifica o desenvolvimento de sistemas de avaliação online com recursos como:
+  </p>
+  <ul style="display: flex; flex-direction: column; gap: 10px; text-align: left; margin-left: 20%; margin-top: 1%;">
+    <li><strong>Busca por ano e disciplina:</strong> Permite que os usuários filtrem exames com base no ano e na disciplina desejada.</li>
+    <li><strong>Armazenamento de questões selecionadas:</strong> Os usuários podem salvar questões de interesse para revisões futuras.</li>
+    <li><strong>Alternativas corretas de fácil acesso:</strong> As alternativas corretas são armazenadas de forma que os usuários possam acessá-las rapidamente durante a resolução de questões.</li>
+    <li><strong>Resolução de forma acessível:</strong> Em desenvolvimento.</li>
+    <li><strong>Busca por temas específicos:</strong> Em desenvolvimento.</li>
+  </ul>
+</section>
 
   <section id="planos" class="planos">
     <h2>Planos</h2>
     <div class="planos-container">
-      <div class="plano-card">
+      <div class="plano-card destaque">
         <h3>Básico</h3>
         <p>Ideal para começar</p>
         <span class="preco">R$19/mês</span>
@@ -82,7 +87,7 @@
         <span class="preco">R$49/mês</span>
         <button class="btn">Assinar</button>
       </div>
-      <div class="plano-card">
+      <div class="plano-card destaque">
         <h3>Empresarial</h3>
         <p>Para grandes equipes</p>
         <span class="preco">R$99/mês</span>
@@ -91,15 +96,24 @@
     </div>
   </section>
 
-  <section id="contato" class="contato">
-    <h2>Contato</h2>
-    <form>
-      <input type="text" placeholder="Seu nome">
-      <input type="email" placeholder="Seu email">
-      <textarea placeholder="Sua mensagem"></textarea>
-      <button class="btn">Enviar</button>
-    </form>
+  <section id="equipe" class="equipe">
+    <h2>Equipe</h2>
+    <div class="team-container">
+      <div class="team-member">
+        <img src="../static/images/93685b3e-44bf-40e7-9b1c-b07f4b772022.jpg" alt="Membro 1">
+        <p class="name">Matheus Dos Santos Reis</p>
+        <p class="role">Desenvolvedor </p>
+        <a class="github" href="https://github.com/matheuss-dsr">https://github.com/matheuss-dsr</a>
+      </div>
+      <div class="team-member">
+        <img src="../static/images/93685b3e-44bf-40e7-9b1c-b07f4b772022.jpg" alt="Membro 2">
+        <p class="name">Matheus Dos Santos Reis</p>
+        <p class="role">Desenvolvedor </p>
+        <a class="github" href="https://github.com/matheuss-dsr">https://github.com/matheuss-dsr</a>
+      </div>
+    </div>
   </section>
+
 
   <footer>
     <p>MR&GG</p>
@@ -110,4 +124,5 @@
     </div>
   </footer>
 </body>
+
 </html>

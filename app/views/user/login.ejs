@@ -7,6 +7,7 @@
     <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="/static/css/login-cadastro.css">
     <style>
+        /* Mensagens de erro e sucesso */
         .error, .success {
             padding: 10px;
             margin-bottom: 15px;
@@ -24,17 +25,21 @@
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
+        /* Ajuste do container para ficar acima do dragão */
+        .auth-container {
+            position: relative;
+            z-index: 2;
+        }
     </style>
 </head>
 <body>
     <div class="auth-container">
         <h2 class="login">Login</h2>
-
-        <!-- Verificação defensiva: só renderiza se error existir e não for null/undefined -->
+        <!-- Mensagens de erro ou sucesso -->
         <% if (typeof error !== 'undefined' && error !== null && error) { %>
             <div class="error"><%= error %></div>
         <% } %>
-        <!-- Verificação defensiva: só renderiza se success existir e não for null/undefined -->
         <% if (typeof success !== 'undefined' && success !== null && success) { %>
             <div class="success"><%= success %></div>
         <% } %>

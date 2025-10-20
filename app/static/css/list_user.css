@@ -1,3 +1,45 @@
+/* 🎨 Tema principal */
+:root {
+  /* Paleta Water & Rust */
+  --color-dark: #151F30;
+  --color-primary-dark: #103778;
+  --color-primary: #0593A2;
+  --color-accent: #FF7A48;
+  --color-alert: #E3371E;
+
+  /* Cores gerais */
+  --color-bg: #e2e5f9;
+  --color-bg-card: #fff;
+  --color-text: #333;
+  --color-text-light: #bbb;
+  --color-border: #ccc;
+
+  /* Específicas da interface */
+  --sidebar-bg: var(--color-dark);
+  --sidebar-hover: var(--color-primary-dark);
+  --sidebar-active: var(--color-primary);
+  --sidebar-text: var(--color-text-light);
+  --sidebar-logout-bg: var(--color-primary);
+  --sidebar-logout-hover: var(--color-primary-dark);
+
+  --topbar-bg: var(--color-bg-card);
+  --topbar-border: #2c3e50;
+
+  --button-primary: var(--color-primary);
+  --button-primary-hover: var(--color-primary-dark);
+
+  --table-header-bg: #f4f7fb;
+  --table-header-text: var(--color-primary);
+  --table-row-hover: #f1f5ff;
+
+  --edit-bg: #ffc107;
+  --edit-hover: #e0a800;
+  --delete-bg: #dc3545;
+  --delete-hover: #c82333;
+  --reactivate-bg: #28a745;
+  --reactivate-hover: #218838;
+}
+
 /* --- Reset básico --- */
 * {
   margin: 0;
@@ -7,13 +49,13 @@
 }
 
 body {
-  background: #e2e5f9;
-  color: #333;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
-/* --- Sidebar já existente --- */
+/* --- Sidebar --- */
 nav.sidebar {
-  background-color: #0b0c17;
+  background-color: var(--sidebar-bg);
   width: 250px;
   display: flex;
   flex-direction: column;
@@ -32,7 +74,7 @@ nav.sidebar .logo img {
 }
 
 nav.sidebar a {
-  color: #bbb;
+  color: var(--sidebar-text);
   text-decoration: none;
   padding: 14px 18px;
   border-radius: 10px;
@@ -44,14 +86,14 @@ nav.sidebar a {
 
 nav.sidebar a:hover,
 nav.sidebar a.active {
-  background-color: #191b31;
-  color: #3fa9f5;
+  background-color: var(--sidebar-hover);
+  color: var(--sidebar-active);
   font-weight: 600;
 }
 
 nav.sidebar .logout-btn {
   margin-top: auto;
-  background-color: #3fa9f5;
+  background-color: var(--sidebar-logout-bg);
   color: white;
   padding: 14px 18px;
   border-radius: 10px;
@@ -62,7 +104,7 @@ nav.sidebar .logout-btn {
 }
 
 nav.sidebar .logout-btn:hover {
-  background-color: #337acc;
+  background-color: var(--sidebar-logout-hover);
 }
 
 /* --- Topbar --- */
@@ -70,7 +112,7 @@ nav.sidebar .logout-btn:hover {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background-color: #fff;
+  background-color: var(--topbar-bg);
   padding: 10px 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   border-radius: 12px;
@@ -86,7 +128,7 @@ nav.sidebar .logout-btn:hover {
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #2c3e50;
+  border: 2px solid var(--topbar-border);
   margin-left: 10px;
 }
 
@@ -100,7 +142,7 @@ nav.sidebar .logout-btn:hover {
 }
 
 .dashboard-content {
-  background-color: #fff;
+  background-color: var(--color-bg-card);
   border-radius: 0 0 20px 20px;
   padding: 40px;
   width: 100%;
@@ -112,7 +154,7 @@ nav.sidebar .logout-btn:hover {
 /* --- User List --- */
 .user-list-container h1 {
   text-align: center;
-  color: #3fa9f5;
+  color: var(--color-primary);
   margin-bottom: 30px;
   font-size: 2rem;
 }
@@ -136,13 +178,13 @@ nav.sidebar .logout-btn:hover {
 .filter-controls input[type="text"] {
   flex-grow: 1;
   padding: 10px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
 }
 
 .filter-controls button {
   padding: 10px 20px;
-  background-color: #3fa9f5;
+  background-color: var(--button-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -151,7 +193,7 @@ nav.sidebar .logout-btn:hover {
 }
 
 .filter-controls button:hover {
-  background-color: #337acc;
+  background-color: var(--button-primary-hover);
 }
 
 .status-filter a {
@@ -166,11 +208,11 @@ nav.sidebar .logout-btn:hover {
 
 .status-filter a.active,
 .status-filter a:hover {
-  background-color: #3fa9f5;
+  background-color: var(--button-primary);
   color: white;
 }
 
-/* --- Tabela de usuários --- */
+/* --- Tabela --- */
 .user-table {
   width: 100%;
   border-collapse: collapse;
@@ -184,16 +226,16 @@ nav.sidebar .logout-btn:hover {
 }
 
 .user-table th {
-  background-color: #f4f7fb;
-  color: #3fa9f5;
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
   font-weight: 600;
 }
 
 .user-table tbody tr:hover {
-  background-color: #f1f5ff;
+  background-color: var(--table-row-hover);
 }
 
-/* --- Botões de ação --- */
+/* --- Ações --- */
 .actions a.edit,
 .actions button.delete,
 .actions button.reactivate {
@@ -209,30 +251,30 @@ nav.sidebar .logout-btn:hover {
 }
 
 .actions a.edit {
-  background-color: #ffc107;
+  background-color: var(--edit-bg);
   color: #333;
 }
 
 .actions a.edit:hover {
-  background-color: #e0a800;
+  background-color: var(--edit-hover);
 }
 
 .actions button.delete {
-  background-color: #dc3545;
+  background-color: var(--delete-bg);
   color: white;
 }
 
 .actions button.delete:hover {
-  background-color: #c82333;
+  background-color: var(--delete-hover);
 }
 
 .actions button.reactivate {
-  background-color: #28a745;
+  background-color: var(--reactivate-bg);
   color: white;
 }
 
 .actions button.reactivate:hover {
-  background-color: #218838;
+  background-color: var(--reactivate-hover);
 }
 
 /* --- Nenhum usuário --- */

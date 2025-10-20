@@ -1,4 +1,59 @@
-/* Reset básico */
+:root {
+  /* Cores Base */
+  --color-gray-blue: #91A3AD;
+  /* Neutro Secundário (Bordas, Textos Fracos) */
+  --color-dark-red: #8C1843;
+  /* Bordô - Primário / Fundo Escuro Secundário */
+  --color-light-gray: #F2F2F2;
+  /* Cinza Claro - Texto Claro Principal */
+  --color-black: #17181B;
+  /* Preto - Fundo Principal do Body (Dark) */
+  --color-magenta: #ED145B;
+  /* Magenta - Ação / Destaque / Highlight */
+
+  /* --- Mapeamento Geral do Tema (Dark Mode) --- */
+  --color-bg-body: var(--color-black);
+  /* Fundo da Página: Preto */
+  --color-bg-section: var(--color-dark-red);
+  /* Seções de Destaque (Planos): Bordô */
+  --color-bg-card: var(--color-black);
+  /* Fundo de Cards: Preto */
+
+  --color-text-primary: var(--color-light-gray);
+  /* Texto Principal: Cinza Claro */
+  --color-text-secondary: var(--color-gray-blue);
+  /* Texto Secundário: Azul Acinzentado */
+
+  --color-accent: var(--color-magenta);
+  /* Destaque / Links Hover */
+  --color-button-primary: var(--color-magenta);
+  /* Botão: Magenta */
+  --color-button-hover: #C51147;
+  /* Magenta mais escuro */
+
+  /* --- Cores para Formulário de Auth (Container Claro) --- */
+  --color-auth-bg: #fff;
+  /* Fundo do Container Auth */
+  --color-auth-text: var(--color-black);
+  /* Texto no Auth */
+  --color-auth-label: var(--color-dark-red);
+  /* Label no Auth */
+  --color-auth-input-bg: var(--color-light-gray);
+  /* Fundo do Input no Auth */
+  --color-auth-input-border: var(--color-gray-blue);
+  /* Borda do Input no Auth */
+
+  /* Gradiente para o Auth Body (Usa as cores escuras) */
+  --color-bg-gradient-start: var(--color-black);
+  --color-bg-gradient-end: #630C2E;
+
+  /* Cores de Status */
+  --color-success: #4CAF50;
+  --color-success-bg: #D4EDDA;
+  --color-danger: #D32F2F;
+  --color-danger-bg: #F8D7DA;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,35 +61,31 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Centraliza o login perfeitamente */
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* altura total da tela */
-  background: linear-gradient(135deg, #4a90e2, #6a1b9a); /* azul para roxo */
+  height: 100vh;
+  background: linear-gradient(135deg, var(--color-bg-gradient-start), var(--color-bg-gradient-end));
 }
 
-/* Container principal */
 .auth-container {
-  background: #f5f7ff; /* tom claro azulado */
+  background: var(--color-auth-bg);
   padding: 2.5rem;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
+  box-shadow: 0 6px 20px rgba(23, 24, 27, 0.4);
   width: 100%;
   max-width: 400px;
   animation: fadeIn 0.6s ease-in-out;
   text-align: center;
 }
 
-/* Título */
 .auth-container h2 {
   font-size: 2rem;
   margin-bottom: 1.5rem;
-  color: #2c387e;
+  color: var(--color-auth-text);
 }
 
-/* Formulário */
 .form-group {
   margin-bottom: 1.2rem;
   text-align: left;
@@ -44,33 +95,32 @@ label {
   display: block;
   font-weight: bold;
   margin-bottom: 0.4rem;
-  color: #3f51b5;
+  color: var(--color-auth-label);
 }
 
 input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #9fa8da;
+  border: 1px solid var(--color-auth-input-border);
   border-radius: 8px;
   font-size: 1rem;
-  transition: border 0.3s;
-  background: #e8eaf6;
-  color: #1a237e;
+  transition: border 0.3s, background 0.3s;
+  background: var(--color-auth-input-bg);
+  color: var(--color-auth-text);
 }
 
 input:focus {
-  border-color: #512da8;
+  border-color: var(--color-accent);
   outline: none;
-  background: #d1c4e9;
-  color: #311b92;
+  background: #fff;
+  color: var(--color-auth-text);
 }
 
-/* Botão */
 .btn-primary {
   width: 100%;
   padding: 12px;
   border: none;
-  background: #512da8;
+  background: var(--color-accent);
   color: #fff;
   font-weight: bold;
   border-radius: 8px;
@@ -80,46 +130,43 @@ input:focus {
 }
 
 .btn-primary:hover {
-  background: #311b92;
+  background: var(--color-button-hover);
 }
 
-/* Mensagens */
 .error {
-  background: #f8bbd0;
-  color: #880e4f;
-  border: 1px solid #880e4f;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
   padding: 10px;
   border-radius: 6px;
   margin-bottom: 1rem;
 }
 
 .success {
-  background: #c8e6c9;
-  color: #1b5e20;
-  border: 1px solid #1b5e20;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
   padding: 10px;
   border-radius: 6px;
   margin-bottom: 1rem;
 }
 
-/* Links */
 .auth-links {
   margin-top: 1.5rem;
   text-align: center;
 }
 
 .auth-links a {
-  color: #536dfe;
+  color: var(--color-auth-label);
   text-decoration: none;
   font-weight: bold;
   transition: color 0.3s;
 }
 
 .auth-links a:hover {
-  color: #304ffe;
+  color: var(--color-accent);
 }
 
-/* Animação */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -128,5 +175,12 @@ input:focus {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 2rem;
+    max-width: 90%;
   }
 }

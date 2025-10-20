@@ -1,45 +1,56 @@
 import bcrypt from "bcrypt";
-import { generateEmailToken, generatePasswordResetToken, validatePasswordResetToken, sendVerificationEmail, sendPasswordResetEmail } from "../utils/authUtils.js";
+import { 
+  generateEmailToken, 
+  generatePasswordResetToken, 
+  validatePasswordResetToken, 
+  sendVerificationEmail, 
+  sendPasswordResetEmail 
+} from "../utils/authUtils.js";
+import { encrypt, decrypt } from "../utils/cryptoUtils.js";
 import path from "path";
 import crypto from "crypto";
-import fs from "fs/promises"; 
+import fs from "fs/promises";
 
-// Mostra formulário de cadastro
 export async function mostrarFormularioCriarUsuario(req, reply) {
-  return reply.view('user/cadastro.ejs', { error: null, success: null });
+  return reply.view("user/cadastro.ejs", { error: null, success: null });
 }
 
-// Cria um novo usuário
 export async function criarUsuario(req, reply, database) {
   const { nome, email, senha, data_nascimento } = req.body;
-  const role = "usuario"; // Define o papel padrão como 'usuario'
+  const role = "usuario";
 
   try {
     const hashedPassword = await bcrypt.hash(senha, 12);
 
-    const user = await database.createUser ({
-      nome,
-      email,
+    // Criptografa os dados sensíveis
+    const encryptedNome = encrypt(nome);
+    const encryptedEmail = encrypt(email);
+    const encryptedNascimento = encrypt(data_nascimento);
+
+    const user = await database.createUser({
+      nome: encryptedNome,
+      email: encryptedEmail,
       senha: hashedPassword,
       role,
-      data_nascimento,
+      data_nascimento: encryptedNascimento,
       email_verificado: false,
     });
 
-    const token = generateEmailToken(user.email);
-    const verificationLink = `${process.env.APP_URL}/verificar-email?email=${encodeURIComponent(user.email)}&token=${token}`;
+    // Gera token de verificação
+    const token = generateEmailToken(email);
+    const verificationLink = `${process.env.APP_URL}/verificar-email?email=${encodeURIComponent(email)}&token=${token}`;
+    await sendVerificationEmail(email, nome, verificationLink);
 
-    // Usa a função helper para enviar o e-mail
-    await sendVerificationEmail(user.email, nome, verificationLink);
-
-    return reply.view("user/cadastro.ejs", { success: "Cadastro realizado! Verifique seu e-mail para ativar sua conta.", error: null });
+    return reply.view("user/cadastro.ejs", { 
+      success: "Cadastro realizado! Verifique seu e-mail para ativar sua conta.", 
+      error: null 
+    });
 
   } catch (err) {
     console.error("Erro ao criar usuário:", err);
-    if (err.code === "23505") { // Código de erro para violação de chave única (e-mail duplicado)
+    if (err.code === "23505") {
       return reply.view("user/cadastro.ejs", { error: "Esse e-mail já está em uso.", success: null });
     }
-    // Se o erro for relacionado a e-mail, captura e exibe mensagem amigável
     if (err.message.includes("Falha ao enviar e-mail")) {
       return reply.view("user/cadastro.ejs", { 
         success: "Cadastro realizado, mas houve um problema ao enviar o e-mail de verificação. Tente reenviar após o login.", 
@@ -54,7 +65,6 @@ export async function mostrarFormularioEsqueciSenha(req, reply) {
   return reply.view("user/esqueci_senha.ejs", { error: null, success: null });
 }
 
-// Envia e-mail de redefinição de senha
 export async function esqueciSenha(req, reply, database) {
   const { email } = req.body;
 
@@ -63,7 +73,9 @@ export async function esqueciSenha(req, reply, database) {
   }
 
   try {
-    const user = await database.getUserByEmail(email);
+    const encryptedEmail = encrypt(email);
+    const user = await database.getUserByEmail(encryptedEmail);
+
     if (!user) {
       return reply.view("user/esqueci_senha.ejs", {
         success: "Se o e-mail informado estiver em nosso sistema, você receberá instruções para redefinir sua senha.",
@@ -73,10 +85,9 @@ export async function esqueciSenha(req, reply, database) {
 
     const token = generatePasswordResetToken(email);
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
-    await database.savePasswordResetToken(email, token, expiresAt);
+    await database.savePasswordResetToken(encryptedEmail, token, expiresAt);
 
     const resetLink = `${process.env.APP_URL}/resetar-senha?token=${token}`;
-
     await sendPasswordResetEmail(email, resetLink);
 
     return reply.view("user/esqueci_senha.ejs", {
@@ -98,7 +109,6 @@ export async function esqueciSenha(req, reply, database) {
   }
 }
 
-// Mostra formulário de redefinição de senha
 export async function mostrarFormularioResetarSenha(req, reply) {
   const { token } = req.query;
 
@@ -106,7 +116,6 @@ export async function mostrarFormularioResetarSenha(req, reply) {
     return reply.redirect("/esqueci-senha");
   }
 
-  // O token será validado novamente no POST
   return reply.view("user/resetar_senha.ejs", { token, error: null, success: null });
 }
 
@@ -116,43 +125,44 @@ export async function verificarEmail(req, reply, database) {
   if (!email || !token) {
     return reply.status(400).view("user/login.ejs", { 
       error: "Parâmetros de verificação inválidos.", 
-      success: null  // Sempre passa success: null
+      success: null
     });
   }
 
   try {
-    const user = await database.getUserByEmail(email);
+    const encryptedEmail = encrypt(email);
+    const user = await database.getUserByEmail(encryptedEmail);
+
     if (!user) {
       return reply.view("user/login.ejs", { 
         error: "Usuário não encontrado.", 
-        success: null  // Sempre passa success: null
+        success: null 
       });
     }
 
-    const validToken = generateEmailToken(user.email);
+    const validToken = generateEmailToken(email);
     if (token !== validToken) {
       return reply.view("user/login.ejs", { 
         error: "Token de verificação inválido ou expirado.", 
-        success: null // Sempre passa success: null
+        success: null
       });
     }
 
     await database.verifyUserEmail(user.id_usuario);
     return reply.view("user/login.ejs", { 
       success: "E-mail verificado com sucesso! Agora você pode logar.", 
-      error: null  // Sempre passa error: null
+      error: null 
     });
 
   } catch (err) {
     console.error("Erro ao verificar e-mail:", err);
     return reply.view("user/login.ejs", { 
       error: "Erro ao verificar e-mail. Tente novamente mais tarde.", 
-      success: null  // Sempre passa success: null
+      success: null 
     });
   }
 }
 
-// Redefine a senha do usuário (atualizado)
 export async function resetarSenha(req, reply, database) {
   const { token, senha } = req.body;
 
@@ -160,78 +170,77 @@ export async function resetarSenha(req, reply, database) {
     return reply.view("user/resetar_senha.ejs", { 
       token, 
       error: "Informe o token e a nova senha.", 
-      success: null  // Adicione aqui também para consistência
+      success: null
     });
   }
 
   const email = validatePasswordResetToken(token);
-
   if (!email) {
     return reply.view("user/resetar_senha.ejs", { 
       token, 
       error: "Link de redefinição inválido ou expirado. Por favor, solicite um novo.", 
-      success: null  // Adicione aqui também
+      success: null
     });
   }
 
   try {
-    // Verifica se o token existe e é válido no banco de dados
+    const encryptedEmail = encrypt(email);
     const dbToken = await database.findPasswordResetByToken(token);
-    if (!dbToken || dbToken.email !== email) {
+
+    if (!dbToken || dbToken.email !== encryptedEmail) {
       return reply.view("user/resetar_senha.ejs", { 
         token, 
         error: "Link de redefinição inválido ou já utilizado. Por favor, solicite um novo.", 
-        success: null  // Adicione aqui também
+        success: null
       });
     }
 
     const hashedPassword = await bcrypt.hash(senha, 12);
-    await database.updateUserPassword(email, hashedPassword);
+    await database.updateUserPassword(encryptedEmail, hashedPassword);
 
     return reply.view("user/login.ejs", {
       success: "Senha redefinida com sucesso! Agora você pode logar com sua nova senha.",
-      error: null  // Sempre passa error: null
+      error: null 
     });
   } catch (err) {
     console.error("Erro ao redefinir a senha:", err);
     return reply.view("user/resetar_senha.ejs", { 
       token, 
       error: "Erro ao redefinir a senha. Tente novamente mais tarde.", 
-      success: null  // Adicione aqui também
+      success: null  
     });
   }
 }
 
-// Mostra o perfil do usuário logado
 export async function mostrarPerfil(req, reply, database) {
   const formatDate = (date) => {
-    if (!date) return 'Não informado';
-    return new Intl.DateTimeFormat('pt-BR').format(new Date(date));
+    if (!date) return "Não informado";
+    return new Intl.DateTimeFormat("pt-BR").format(new Date(date));
   };
 
   try {
-    // req.user já deve estar populado pelo middleware de autenticação
-    const userFromDb = await database.getUserByEmail(req.user.email);
+    const encryptedEmail = encrypt(req.user.email);
+    const userFromDb = await database.getUserByEmail(encryptedEmail);
 
     if (!userFromDb) {
-      return reply.status(404).send('Usuário não encontrado.');
+      return reply.status(404).send("Usuário não encontrado.");
     }
 
     const user = {
       id_usuario: userFromDb.id_usuario,
-      nome: userFromDb.nome,
-      email: userFromDb.email,
+      nome: decrypt(userFromDb.nome),
+      email: decrypt(userFromDb.email),
       avatar_url: userFromDb.avatar_url,
-      data_nascimento: formatDate(userFromDb.data_nascimento),
+      data_nascimento: decrypt(userFromDb.data_nascimento),
       data_cadastro: formatDate(userFromDb.data_cadastro),
       role: userFromDb.role,
-      email_verificado: userFromDb.email_verificado
+      email_verificado: userFromDb.email_verificado,
     };
 
-    return reply.view('user/perfil.ejs', { user, error: null, success: null });
+    return reply.view("user/perfil.ejs", { user, error: null, success: null });
   } catch (err) {
     req.log.error("Erro ao carregar perfil:", err);
-    return reply.status(500).send('Erro ao carregar o perfil do usuário.');
+    return reply.status(500).send("Erro ao carregar o perfil do usuário.");
   }
 }
 
@@ -242,9 +251,14 @@ export async function mostrarFormularioEditarUsuario(req, reply, database) {
     if (!usuario) {
       return reply.status(404).view("user/edit_user.ejs", { error: "Usuário não encontrado.", usuario: null });
     }
+    usuario.nome = decrypt(usuario.nome);
+    usuario.email = decrypt(usuario.email);
+    usuario.data_nascimento = decrypt(usuario.data_nascimento);
+
     if (usuario.data_nascimento) {
-      usuario.data_nascimento = new Date(usuario.data_nascimento).toISOString().split('T')[0];
+      usuario.data_nascimento = new Date(usuario.data_nascimento).toISOString().split("T")[0];
     }
+
     return reply.view("user/edit_user.ejs", { error: null, success: null, usuario });
   } catch (err) {
     req.log.error("Erro ao buscar usuário para edição:", err);
@@ -252,35 +266,34 @@ export async function mostrarFormularioEditarUsuario(req, reply, database) {
   }
 }
 
-// Edita usuário
 export async function editarUsuario(req, reply, database) {
   const { id_usuario } = req.params;
   const { nome, email, senha, role, data_nascimento } = req.body;
 
   try {
     let updateData = {};
-    if (nome) updateData.nome = nome;
-    if (email) updateData.email = email;
+    if (nome) updateData.nome = encrypt(nome);
+    if (email) updateData.email = encrypt(email);
+    if (data_nascimento) updateData.data_nascimento = encrypt(data_nascimento);
     if (role) updateData.role = role;
-    if (data_nascimento) updateData.data_nascimento = data_nascimento;
     if (senha) updateData.senha = await bcrypt.hash(senha, 12);
 
-    await database.updateUser (id_usuario, updateData);
-    // Se o próprio usuário estiver editando, atualiza o token JWT
-    if (req.user && req.user.id_usuario === parseInt(id_usuario)) {  // ParseInt para comparar string com number
-      const updatedUser  = await database.getUserById(id_usuario);
+    await database.updateUser(id_usuario, updateData);
+
+    if (req.user && req.user.id_usuario === parseInt(id_usuario)) { 
+      const updatedUser = await database.getUserById(id_usuario);
       const newToken = reply.server.jwt.sign(
-        { id_usuario: updatedUser .id_usuario, email: updatedUser .email, nome: updatedUser .nome, role: updatedUser .role },
-        { expiresIn: '6h' }
+        { id_usuario: updatedUser.id_usuario, email: decrypt(updatedUser.email), nome: decrypt(updatedUser.nome), role: updatedUser.role },
+        { expiresIn: "6h" }
       );
-      reply.setCookie('token', newToken, {
+      reply.setCookie("token", newToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        path: '/',
-        maxAge: 60 * 60 * 6 // 6 horas
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 6,
       });
     }
-    return reply.redirect('/perfil'); // Redireciona para o perfil após a edição
+    return reply.redirect("/perfil");
   } catch (err) {
     req.log.error("Erro ao editar usuário:", err);
     if (err.code === "23505") {
@@ -290,49 +303,45 @@ export async function editarUsuario(req, reply, database) {
   }
 }
 
-// Exclui usuário (marca como inativo)
 export async function excluirUsuario(req, reply, database) {
   const { id_usuario } = req.params;
   try {
-    await database.deleteUser (id_usuario);
-    // Se o usuário logado se excluiu, faz logout
+    await database.deleteUser(id_usuario);
     if (req.user && req.user.id_usuario === parseInt(id_usuario)) {
-      reply.clearCookie('token', { path: '/' });
-      return reply.redirect('/');
+      reply.clearCookie("token", { path: "/" });
+      return reply.redirect("/");
     }
-    return reply.redirect('/users'); // Redireciona para a lista de usuários (admin)
+    return reply.redirect("/users");
   } catch (err) {
     req.log.error("Erro ao excluir usuário:", err);
     return reply.status(500).send("Erro ao excluir usuário.");
   }
 }
 
-// Reativa usuário (marca como ativo)
 export async function reativarUsuario(req, reply, database) {
   const { id_usuario } = req.params;
   try {
-    await database.reactivateUser (id_usuario);
-    return reply.redirect('/users?status=inativos'); // Redireciona para a lista de usuários inativos
+    await database.reactivateUser(id_usuario);
+    return reply.redirect("/users?status=inativos");
   } catch (err) {
     req.log.error("Erro ao reativar usuário:", err);
     return reply.status(500).send("Erro ao reativar usuário.");
   }
 }
 
-// Upload de avatar
 export async function uploadAvatar(req, reply, database) {
   const { id_usuario } = req.params;
   
   try {
-    const file = await req.file({ fieldName: 'avatar' });
+    const file = await req.file({ fieldName: "avatar" });
     if (!file) {
-      return reply.status(400).view('user/perfil.ejs', { user: req.user, error: "Nenhuma imagem enviada.", success: null });
+      return reply.status(400).view("user/perfil.ejs", { user: req.user, error: "Nenhuma imagem enviada.", success: null });
     }
 
     const ext = path.extname(file.filename).toLowerCase();
-    const allowedExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
+    const allowedExtensions = [".png", ".jpg", ".jpeg", ".gif"];
     if (!allowedExtensions.includes(ext)) {
-      return reply.status(400).view('user/perfil.ejs', { user: req.user, error: "Formato de arquivo inválido. Apenas PNG, JPG, JPEG e GIF são permitidos.", success: null });
+      return reply.status(400).view("user/perfil.ejs", { user: req.user, error: "Formato de arquivo inválido. Apenas PNG, JPG, JPEG e GIF são permitidos.", success: null });
     }
 
     const fileName = crypto.randomBytes(16).toString("hex") + ext;
@@ -340,13 +349,11 @@ export async function uploadAvatar(req, reply, database) {
     const uploadPath = path.join(uploadDir, fileName);
 
     await fs.mkdir(uploadDir, { recursive: true });
-
     const buffer = await file.toBuffer();
     await fs.writeFile(uploadPath, buffer);
 
-    // Remove o avatar antigo se existir
     const user = await database.getUserById(id_usuario);
-    if (user && user.avatar_url && user.avatar_url !== 'default-avatar.png') {
+    if (user && user.avatar_url && user.avatar_url !== "default-avatar.png") {
       const oldAvatarPath = path.join(uploadDir, user.avatar_url);
       try {
         await fs.unlink(oldAvatarPath);
@@ -355,38 +362,42 @@ export async function uploadAvatar(req, reply, database) {
       }
     }
 
-    await database.updateUser (id_usuario, { avatar_url: fileName });
+    await database.updateUser(id_usuario, { avatar_url: fileName });
 
-    // Atualiza o token JWT se for o usuário logado
     if (req.user && req.user.id_usuario === parseInt(id_usuario)) {
-      const updatedUser  = await database.getUserById(id_usuario);
+      const updatedUser = await database.getUserById(id_usuario);
       const newToken = reply.server.jwt.sign(
-        { id_usuario: updatedUser .id_usuario, email: updatedUser .email, nome: updatedUser .nome, role: updatedUser .role },
-        { expiresIn: '6h' }
+        { id_usuario: updatedUser.id_usuario, email: decrypt(updatedUser.email), nome: decrypt(updatedUser.nome), role: updatedUser.role },
+        { expiresIn: "6h" }
       );
-      reply.setCookie('token', newToken, {
+      reply.setCookie("token", newToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        path: '/',
-        maxAge: 60 * 60 * 6 // 6 horas
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 6,
       });
     }
 
-    return reply.redirect('/perfil');
+    return reply.redirect("/perfil");
   } catch (err) {
     req.log.error("Erro ao fazer upload do avatar:", err);
-    return reply.status(500).view('user/perfil.ejs', { user: req.user, error: "Erro ao fazer upload do avatar. Tente novamente mais tarde.", success: null });
+    return reply.status(500).view("user/perfil.ejs", { user: req.user, error: "Erro ao fazer upload do avatar. Tente novamente mais tarde.", success: null });
   }
 }
 
-// Lista usuários (apenas para admin)
 export async function listarUsuarios(req, reply, database) {
-  const search = req.query.search || '';
-  const status = req.query.status || 'ativos'; // 'ativos' ou 'inativos'
+  const search = req.query.search || "";
+  const status = req.query.status || "ativos";
 
   try {
-    const users = await database.listarUsers(search, status);
-    return reply.view('user/list_users.ejs', { search, status, users, user: req.user });
+    const users = (await database.listarUsers(search, status)).map(u => ({
+      ...u,
+      nome: decrypt(u.nome),
+      email: decrypt(u.email),
+      data_nascimento: decrypt(u.data_nascimento),
+    }));
+
+    return reply.view("user/list_users.ejs", { search, status, users, user: req.user });
   } catch (err) {
     req.log.error("Erro ao listar usuários:", err);
     return reply.status(500).send("Erro ao carregar a lista de usuários.");
