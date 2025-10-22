@@ -2,28 +2,39 @@ import fetch from "node-fetch";
 import showdown from "showdown";
 
 const disciplineMapping = {
-  linguagens: 'linguagens',
-  humanas: 'ciencias-humanas',
-  natureza: 'ciencias-natureza',
-  matematica: 'matematica',
+  linguagens: "linguagens",
+  humanas: "ciencias-humanas",
+  natureza: "ciencias-natureza",
+  matematica: "matematica",
 };
 
-// Objeto global para rastrear o último tempo de busca por ID de usuário
-const lastSearchTimes = {};  // { userId: timestamp }
+const lastSearchTimes = {}; // controle de cooldown por usuário
 
-// Função para processar questões (mantida igual)
-function processarQuestao(q, converter) {
+// 🔹 Função auxiliar para gerar anos válidos
+function getValidYears() {
+  const years = [];
+  for (let i = 2023; i >= 2009; i--) years.push(i);
+  return years;
+}
+
+// 🔹 Função para processar questão
+function processQuestion(q, converter) {
   const enunciadoOriginal = q.context || q.text || "";
   const enunciadoHTML = converter.makeHtml(enunciadoOriginal);
-  
+
   const alternativas = q.alternatives.map((alt) => ({
     letra: alt.letter,
     texto: converter.makeHtml(alt.text),
     correta: alt.isCorrect,
-    imageHTML: alt.file ? `<img src="${alt.file}" alt="Imagem da Alternativa" style="max-width:100%; margin-top:10px;">` : null,
+    imageHTML: alt.file
+      ? `<img src="${alt.file}" alt="Imagem da Alternativa" style="max-width:100%; margin-top:10px;">`
+      : null,
   }));
 
-  const imageHTML = q.files?.length ? `<img src="${q.files[0]}" alt="Imagem da Questão" style="max-width:100%; margin-top:10px;">` : null;
+  const imageHTML =
+    q.files?.length > 0
+      ? `<img src="${q.files[0]}" alt="Imagem da Questão" style="max-width:100%; margin-top:10px;">`
+      : null;
 
   return {
     title: q.title || "Questão",
@@ -37,22 +48,42 @@ function processarQuestao(q, converter) {
   };
 }
 
-/**
- * Função para listar questões de um ano específico com cooldown.
- */
+/* ============================================================
+   🔸 MOSTRAR FORMULÁRIO DE GERAÇÃO DE PROVA
+============================================================ */
+export async function mostrarFormularioGerarProva(req, reply) {
+  const years = getValidYears();
+  return reply.view("provas/gerar_prova.ejs", {
+    user: req.user,
+    years,
+    year, 
+    error: null,
+    questoesOriginais: [],
+    quantity: null,
+    disciplina: null,
+  });
+}
+
+/* ============================================================
+   🔸 LISTAR QUESTÕES DO ENEM (UM ANO)
+============================================================ */
 export async function listarQuestoesENEM(req, reply) {
+  const years = getValidYears();
+
   if (req.user && req.user.id) {
     const now = Date.now();
-    if (lastSearchTimes[req.user.id] && (now - lastSearchTimes[req.user.id] < 60000)) {  // 60000 ms = 1 minuto
+    if (lastSearchTimes[req.user.id] && now - lastSearchTimes[req.user.id] < 60000) {
       return reply.view("provas/gerar_prova.ejs", {
         user: req.user,
-        error: "Aguarde 1 minuto para buscar mais questões.",
-        questoesOriginais: [],
-        quantity: null,
-        disciplina: null,
+        years,         
+        year,
+        questoesOriginais,
+        quantity,
+        disciplina,
+        error: null,
       });
+
     }
-    // Atualiza o timestamp após a verificação (será sobrescrito no final se a busca for bem-sucedida)
     lastSearchTimes[req.user.id] = now;
   }
 
@@ -62,28 +93,34 @@ export async function listarQuestoesENEM(req, reply) {
     quantity = parseInt(quantity);
 
     const disciplinasSelect = ["linguagens", "humanas", "natureza", "matematica"];
-    if (!year || isNaN(year) || year < 2009) {
+    if (!year || isNaN(year) || year < 2009 || year > 2023) {
       return reply.view("provas/gerar_prova.ejs", {
         user: req.user,
-        error: "Ano inválido. Deve ser um número maior ou igual a 2009.",
+        years,
+        error: "Ano inválido. Escolha um entre 2009 e 2023.",
         questoesOriginais: [],
         quantity: null,
         disciplina: null,
       });
     }
+
     if (!quantity || isNaN(quantity) || quantity <= 0) {
       return reply.view("provas/gerar_prova.ejs", {
         user: req.user,
+        years,
         error: "Quantidade deve ser um número positivo.",
         questoesOriginais: [],
         quantity: null,
         disciplina: null,
       });
     }
+
     if (disciplina && !disciplinasSelect.includes(disciplina)) {
       return reply.view("provas/gerar_prova.ejs", {
         user: req.user,
-        error: "Disciplina inválida. Opções: linguagens, humanas, natureza, matematica.",
+        years,
+        year,
+        error: "Disciplina inválida.",
         questoesOriginais: [],
         quantity: null,
         disciplina: null,
@@ -103,53 +140,36 @@ export async function listarQuestoesENEM(req, reply) {
     let mappedDiscipline = disciplina ? disciplineMapping[disciplina] : null;
     let offset = mappedDiscipline ? disciplinaOffsetMap[mappedDiscipline] : 0;
 
-    let hasMore = true;
+    const url = `${baseUrl}?limit=${quantity}&offset=${offset}`;
+    console.log(`Buscando questões: ${url}`);
 
-    while (questoesOriginais.length < quantity && hasMore) {
-      const url = `${baseUrl}?limit=${quantity}&offset=${offset}`;
-      console.log(`Buscando questões: ${url}`);
-      const response = await fetch(url);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
 
-      if (!response.ok) {
-        throw new Error(`Erro HTTP ${response.status}: ${await response.text()}`);
-      }
+    const data = await response.json();
+    const questoes = data.questions || [];
 
-      const data = await response.json();
-      hasMore = data.metadata?.hasMore || false;
-      const questoes = data.questions || [];
-
-      for (const q of questoes) {
-        if (mappedDiscipline && q.discipline !== mappedDiscipline) {
-          console.log(`Ignorando questão ${q.index}: disciplina não corresponde (${q.discipline})`);
-          continue;
-        }
-
-        const questaoProcessada = processarQuestao(q, converter);
-        questoesOriginais.push(questaoProcessada);
-
-        if (questoesOriginais.length >= quantity) break;
-      }
-
-      offset += questoes.length;
+    for (const q of questoes) {
+      if (mappedDiscipline && q.discipline !== mappedDiscipline) continue;
+      questoesOriginais.push(processQuestion(q, converter));
     }
 
-    if (req.user && req.user.id) {
-      lastSearchTimes[req.user.id] = Date.now();
-    }
-
-    if (questoesOriginais.length < quantity) {
-      const errorMsg = `Apenas ${questoesOriginais.length} questões encontradas para os filtros.`;
+    if (questoesOriginais.length === 0) {
       return reply.view("provas/gerar_prova.ejs", {
         user: req.user,
-        questoesOriginais,
+        years,
+        year,
+        questoesOriginais: [],
         quantity,
         disciplina,
-        error: errorMsg,
+        error: `Nenhuma questão encontrada para o ENEM ${year}.`,
       });
     }
 
     return reply.view("provas/gerar_prova.ejs", {
       user: req.user,
+      years,
+      year,
       questoesOriginais,
       quantity,
       disciplina,
@@ -159,6 +179,8 @@ export async function listarQuestoesENEM(req, reply) {
     console.error("🚨 Erro ao buscar questões ENEM:", err);
     return reply.view("provas/gerar_prova.ejs", {
       user: req.user,
+      years,
+      year,
       questoesOriginais: [],
       error: `Erro ao buscar questões do ENEM: ${err.message}`,
       quantity: null,
@@ -167,114 +189,97 @@ export async function listarQuestoesENEM(req, reply) {
   }
 }
 
-/**
- * Função para buscar 10 questões de anos diferentes com cooldown.
- */
-export async function listarQuestoesDisciplinaVariosAnos(req, reply) {
-  if (req.user && req.user.id) {
-    const now = Date.now();
-    if (lastSearchTimes[req.user.id] && (now - lastSearchTimes[req.user.id] < 60000)) {  // 60000 ms = 1 minuto
-      return reply.view("provas/gerar_prova.ejs", {
-        user: req.user,
-        error: "Aguarde 1 minuto para buscar mais questões.",
-        questoesOriginais: [],
-        quantity: null,
-        disciplina: null,
-      });
-    }
-    // Atualiza o timestamp após a verificação
-    lastSearchTimes[req.user.id] = now;
-  }
-
+/* ============================================================
+   🔸 SALVAR PROVA
+============================================================ */
+export async function salvarProva(req, reply, database) {
   try {
-    let { disciplina } = req.query;
-    const disciplinasSelect = ["linguagens", "humanas", "natureza", "matematica"];
-    if (!disciplina || !disciplinasSelect.includes(disciplina)) {
-      return reply.view("provas/gerar_prova.ejs", {
-        user: req.user,
-        error: "Disciplina inválida ou não fornecida. Opções: linguagens, humanas, natureza, matematica.",
-        questoesOriginais: [],
-        quantity: null,
-        disciplina: null,
+    const { titulo, ano, disciplina, questoes_selecionadas } = req.body;
+    const id_usuario = req.user?.id_usuario;
+
+    console.log("🟡 salvarProva - body recebido:", req.body);
+
+    if (!titulo || !ano) {
+      return reply.code(400).send({ error: "Título e ano são obrigatórios." });
+    }
+
+    const anoNumerico = Number(ano);
+    if (isNaN(anoNumerico) || anoNumerico < 2009 || anoNumerico > 2023) {
+      console.error("🚨 Ano inválido recebido:", ano);
+      return reply.code(400).send({
+        error: "Ano inválido. Deve ser um número entre 2009 e 2023.",
       });
     }
 
-    const mappedDiscipline = disciplineMapping[disciplina];
-    const disciplinaOffsetMap = {
-      linguagens: 0,
-      "ciencias-humanas": 45,
-      "ciencias-natureza": 90,
-      matematica: 135,
-    };
-    const years = [2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009];
-    const converter = new showdown.Converter();
-    const questoesOriginais = [];
-    const totalQuestioesDesejadas = 10;
-
-    for (const year of years) {
-      if (questoesOriginais.length >= totalQuestioesDesejadas) break;
-      const baseUrl = `https://api.enem.dev/v1/exams/${year}/questions?limit=10&offset=${disciplinaOffsetMap[mappedDiscipline] || 0}`;
-      console.log(`Buscando questões para o ano ${year}: ${baseUrl}`);
-      const response = await fetch(baseUrl);
-      
-      if (!response.ok) {
-        console.error(`Erro ao buscar questões do ano ${year}: ${response.status}`);
-        continue;
-      }
-
-      const data = await response.json();
-      const questoes = data.questions || [];
-
-      for (const q of questoes) {
-        if (q.discipline === mappedDiscipline && questoesOriginais.length < totalQuestioesDesejadas) {
-          const questaoProcessada = processarQuestao(q, converter);
-          questaoProcessada.ano = year;
-          questoesOriginais.push(questaoProcessada);
-          if (questoesOriginais.length >= totalQuestioesDesejadas) break;
-        }
-      }
+    let questoesArray = [];
+    if (Array.isArray(questoes_selecionadas)) {
+      questoesArray = questoes_selecionadas.map(Number).filter((n) => !isNaN(n));
+    } else if (
+      typeof questoes_selecionadas === "string" &&
+      questoes_selecionadas.trim() !== ""
+    ) {
+      questoesArray = [Number(questoes_selecionadas)].filter((n) => !isNaN(n));
     }
 
-    if (req.user && req.user.id) {
-      lastSearchTimes[req.user.id] = Date.now(); 
+    if (questoesArray.length === 0) {
+      return reply.code(400).send({ error: "Nenhuma questão válida selecionada." });
     }
 
-    if (questoesOriginais.length < totalQuestioesDesejadas) {
-      const errorMsg = `Apenas ${questoesOriginais.length} questões encontradas de anos diferentes para a disciplina ${disciplina}.`;
-      return reply.view("provas/gerar_prova.ejs", {
-        user: req.user,
-        questoesOriginais,
-        quantity: totalQuestioesDesejadas,
-        disciplina,
-        error: errorMsg,
-      });
-    }
-
-    return reply.view("provas/gerar_prova.ejs", {
-      user: req.user,
-      questoesOriginais,
-      quantity: totalQuestioesDesejadas,
+    const id_prova = await database.salvarProva({
+      titulo,
+      id_usuario,
+      ano: anoNumerico,
       disciplina,
-      error: null,
+      questoes_selecionadas: questoesArray,
     });
+
+    console.log(`✅ Prova salva com sucesso. ID: ${id_prova}`);
+    return reply.redirect(`/prova/${id_prova}`);
   } catch (err) {
-    console.error("🚨 Erro ao buscar questões de anos diferentes:", err);
-    return reply.view("provas/gerar_prova.ejs", {
-      user: req.user,
-      questoesOriginais: [],
-      error: `Erro ao buscar questões: ${err.message}`,
-      quantity: null,
-      disciplina: null,
-    });
+    console.error("🚨 Erro ao salvar prova:", err);
+    return reply.code(500).send({ error: "Erro interno ao salvar a prova." });
   }
 }
 
-export async function mostrarFormularioGerarProva(req, reply) {
-  return reply.view("provas/gerar_prova.ejs", {
-    user: req.user,
-    error: null,
-    questoesOriginais: [],
-    quantity: null,
-    disciplina: null,
-  });
+/* ============================================================
+   🔸 EXIBIR PROVA
+============================================================ */
+export async function exibirProva(req, reply, database) {
+  const id_prova = req.params.prova_id;
+  const user = req.user;
+
+  if (!id_prova || !database) {
+    return reply.code(400).send({ error: "ID da prova ou banco não encontrado." });
+  }
+
+  try {
+    const provaData = await database.getProvaComQuestoes(id_prova);
+
+    if (!provaData || !provaData.questoes?.length) {
+      return reply.view("provas/exibir_prova.ejs", {
+        user,
+        error: "Prova não encontrada ou sem questões.",
+        prova: null,
+        questoesDetalhes: [],
+      });
+    }
+
+    const questoesDetalhes = (
+      await Promise.all(
+        provaData.questoes.map((qId) =>
+          database.buscarQuestaoENEMPorIndex(qId.enem_year, qId.enem_index)
+        )
+      )
+    ).filter(Boolean);
+
+    return reply.view("provas/exibir_prova.ejs", {
+      user,
+      prova: provaData.metadata,
+      questoesDetalhes,
+      error: null,
+    });
+  } catch (err) {
+    console.error("🚨 Erro ao exibir prova:", err);
+    return reply.code(500).send({ error: "Erro ao carregar prova." });
+  }
 }

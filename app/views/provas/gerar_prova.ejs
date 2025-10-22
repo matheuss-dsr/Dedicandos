@@ -5,16 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gerar Prova - Dedicandos</title>
-  <link rel="shortcut icon" href="/static/images/logo.png" type="image/x-icon">
-  <link rel="stylesheet" href="/static/css/gerarProva.css">
+  <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/gerarProva.css">
 </head>
 
 <body>
   <nav class="sidebar">
     <a href="/" class="logo">
-            <img src="/static/images/logo.png" alt="Logo">
-        </a>
+      <img src="../static/images/logo.png" alt="Logo">
+    </a>
     <a href="/home">Início</a>
     <a href="/perfil">Meu Perfil</a>
     <a href="/prova/gerar/form" class="active">Gerar Prova</a>
@@ -41,13 +41,13 @@
 
           <form method="GET" action="/prova/gerar">
             <label for="year">Ano da Prova</label>
-            <select id="year" name="year" required>
-              <% const year=[2023,2022,2021,2020,2019,2018,2017,2016,2015,2014,2013,2012,2011,2010,2009]; %>
-                <% year.forEach(ano=> { %>
-                  <option value="<%= ano %>" <%=ano==year ? "selected" : "" %>><%= ano %>
-                  </option>
-                  <% }) %>
+            <select name="year" required>
+              <% years.forEach(y => { %>
+                <option value="<%= y %>"><%= y %></option>
+              <% }) %>
             </select>
+
+
 
             <label for="quantity">Quantidade de Questões</label>
             <input type="number" id="quantity" name="quantity" min="1" max="180" value="<%= quantity || 10 %>" required>
@@ -95,17 +95,15 @@
                           <%= q.idioma %>
                       </p>
                       <p><%- q.enunciado %></p>
-                          <div class="alternativas">
-                            <% q.alternativas.forEach(a=> { %>
-                              <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
-                                <%= a.letra %>) <%- a.texto %>
-                              </div>
-                              <% }) %>
-                            </div>
+                      <div class="alternativas">
+                        <% q.alternativas.forEach(a=> { %>
+                          <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
+                            <%= a.letra %>) <%- a.texto %>
+                          </div>
+                          <% }) %>
+                      </div>
                     </div>
                     <% }) %>
-
-                      <button type="submit" class="btn-salvar">Salvar Questões Selecionadas</button>
               </form>
               <% } else { %>
                 <p>Nenhuma questão do ENEM encontrada. Tente refinar seus filtros.</p>

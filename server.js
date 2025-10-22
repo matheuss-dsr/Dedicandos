@@ -8,6 +8,7 @@ import "dotenv/config"
 import path from "path";
 import crypto from "crypto";
 import fs from 'fs/promises';
+import { decrypt, hashForLookup } from './app/utils/cryptoUtils.js';
 
 const server = fastify({ logger: true })
 const database = new DatabasePostgres()
@@ -16,20 +17,27 @@ await registerPlugins(server)
 
 // ---------------- MIDDLEWARES ----------------
 server.decorate("authenticate", async (req, reply) => {
-  if (!req.user) return reply.redirect('/login');
+  if (!req.user) {
+    return reply.redirect('/login');
+  }
 });
 
-// Middleware para checar se o email está verificado
 server.decorate("checkEmailVerified", async (req, reply) => {
-  if (!req.user) return reply.redirect('/login');
+  if (!req.user) {
+    return reply.redirect('/login');
+  }
 
-  const userFromDb = await database.getUserByEmail(req.user.email);
+  const userFromDb = await database.getUserByEmailHash(hashForLookup(req.user.email));
+
   if (!userFromDb) return reply.redirect('/login');
-
-  if (!userFromDb.email_verificado) return reply.redirect('/email-nao-verificado');
+  if (!userFromDb.email_verificado) {
+    return reply.redirect('/email-nao-verificado');
+  }
 
   req.user = userFromDb;
 });
+
+
 
 server.addHook('preHandler', async (req, reply) => {
   try {
@@ -56,28 +64,43 @@ server.get('/login', (req, reply) => {
 });
 
 server.post('/login', async (req, reply) => {
-  const { email, senha } = req.body;
-  const user = await database.getUserByEmail(email);
+  try {
+    const { email, senha } = req.body;
+  const emailHash = hashForLookup(email);
 
-  if (!user) return reply.view('user/login.ejs', { error: 'Usuário ou senha incorretos', success: null });
+  const user = await database.getUserByEmailHash(emailHash);
 
-  const senhaValida = await bcrypt.compare(senha, user.senha);
-  if (!senhaValida) return reply.view('user/login.ejs', { error: 'Usuário ou senha incorretos', success: null });
+    if (!user) {
+      return reply.view("user/login.ejs", { error: "Usuário ou senha incorretos", success: null });
+    }
 
-  const token = reply.server.jwt.sign(
-    { id_usuario: user.id_usuario, email: user.email, nome: user.nome, role: user.role },
-    { expiresIn: '6h' }
-  );
+    const senhaValida = await bcrypt.compare(senha, user.senha);
 
-  reply.setCookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    maxAge: 60 * 60 * 6
-  });
+    if (!senhaValida) {
+      return reply.view("user/login.ejs", { error: "Usuário ou senha incorretos", success: null });
+    }
 
-  return reply.redirect('/home');
+    const token = reply.server.jwt.sign(
+      { id_usuario: user.id_usuario, email: decrypt(user.email), nome: user.nome, role: user.role },
+      { expiresIn: "6h" }
+    );
+
+
+
+    reply.setCookie("token", token, {
+      httpOnly: true,
+      secure: 'false',
+      path: "/",
+      maxAge: 60 * 60 * 6
+    });
+
+    return reply.redirect('/home');
+
+  } catch (err) {
+    return reply.view("user/login.ejs", { error: "Erro interno no login", success: null });
+  }
 });
+
 
 
 // ---------------- ROTAS DE USUÁRIOS ----------------
@@ -90,7 +113,7 @@ server.get('/home', { preHandler: [server.authenticate, server.checkEmailVerifie
       [req.user.id_usuario]
     );
 
-    return reply.view('home.ejs', { user: req.user, provas: provas.rows });
+    return reply.view('/home', { user: req.user, provas: provas.rows });
   } catch (err) {
     console.error(err);
     return reply.status(500).send('Erro ao carregar a página inicial');
@@ -103,7 +126,7 @@ server.get('/logout', (req, reply) => {
   return reply.redirect('/')
 })
 
-// ---------------- ROTAS PROVAS ----------------
+// ---------------- ROTAS DE PROVAS ----------------
 server.get(
   '/prova/gerar',
   { preHandler: [server.authenticate, server.checkEmailVerified] },
@@ -165,13 +188,36 @@ server.get('/verificar-email', async (req, reply) => {
 
 server.get('/perfil', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {
   try {
-    const formatDate = (date) => date ? new Intl.DateTimeFormat('pt-BR').format(new Date(date)) : 'Não informado';
+    const { decrypt } = await import('./app/utils/cryptoUtils.js');
 
-    // req.user já vem do middleware atualizado
+    const formatDate = (date) => {
+      if (!date) return 'Não informado';
+      try {
+        const plain = decrypt(date);
+        const parsed = new Date(plain);
+        return isNaN(parsed.getTime()) ? plain : new Intl.DateTimeFormat('pt-BR').format(parsed);
+      } catch {
+        try {
+          const parsed = new Date(date);
+          return isNaN(parsed.getTime()) ? 'Não informado' : new Intl.DateTimeFormat('pt-BR').format(parsed);
+        } catch {
+          return 'Não informado';
+        }
+      }
+    };
+
+    // Descriptografa o email e a data de nascimento (se criptografados)
+    let emailDescriptografado = req.user.email;
+    try {
+      emailDescriptografado = decrypt(req.user.email);
+    } catch {
+      // se não estiver criptografado, mantém como está
+    }
+
     const user = {
       id_usuario: req.user.id_usuario,
       nome: req.user.nome,
-      email: req.user.email,
+      email: emailDescriptografado,
       avatar_url: req.user.avatar_url || 'default-avatar.png',
       data_nascimento: formatDate(req.user.data_nascimento),
       data_cadastro: formatDate(req.user.data_cadastro),
@@ -185,6 +231,7 @@ server.get('/perfil', { preHandler: [server.authenticate, server.checkEmailVerif
     return reply.status(500).send('Erro ao carregar perfil do usuário');
   }
 });
+
 
 
 
