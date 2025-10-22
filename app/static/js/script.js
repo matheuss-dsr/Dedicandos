@@ -77,4 +77,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     avatarInput.addEventListener("change", () => avatarInput.form.submit());
   }
+
+  // =========================
+  // TROCA ENTRE LOGIN E CADASTRO
+  // =========================
+  const switchToCadastro = document.querySelector(".switch-to-cadastro");
+  const switchToLogin = document.querySelector(".switch-to-login");
+  const container = document.querySelector(".auth-wrapper");
+  const image = document.querySelector(".auth-image img");
+
+  if (switchToCadastro && container && image) {
+    switchToCadastro.addEventListener("click", e => {
+      e.preventDefault();
+      image.classList.add("fade-out");
+
+      setTimeout(() => {
+        container.classList.add("show-cadastro");
+        image.src = "/static/images/cadastro-img.png";
+        image.classList.remove("fade-out");
+      }, 500);
+    });
+  }
+
+  if (switchToLogin && container && image) {
+    switchToLogin.addEventListener("click", e => {
+      e.preventDefault();
+      image.classList.add("fade-out");
+
+      setTimeout(() => {
+        container.classList.remove("show-cadastro");
+        image.src = "/static/images/login-img.png";
+        image.classList.remove("fade-out");
+      }, 500);
+    });
+  }
 });

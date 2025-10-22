@@ -1,164 +1,3 @@
-/* 🎨 Tema principal */
-:root {
-  /* Paleta Water & Rust */
-  --color-dark: #151F30;
-  --color-primary-dark: #103778;
-  --color-primary: #0593A2;
-  --color-accent: #FF7A48;
-  --color-alert: #E3371E;
-
-  /* Cores gerais */
-  --color-bg: #e2e5f9;
-  --color-bg-card: #fff;
-  --color-text: #333;
-  --color-text-light: #bbb;
-  --color-border: #ccc;
-
-  /* Específicas da interface */
-  --sidebar-bg: var(--color-dark);
-  --sidebar-hover: var(--color-primary-dark);
-  --sidebar-active: var(--color-primary);
-  --sidebar-text: var(--color-text-light);
-  --sidebar-logout-bg: var(--color-primary);
-  --sidebar-logout-hover: var(--color-primary-dark);
-
-  --topbar-bg: var(--color-bg-card);
-  --topbar-border: #2c3e50;
-
-  --button-primary: var(--color-primary);
-  --button-primary-hover: var(--color-primary-dark);
-
-  --table-header-bg: #f4f7fb;
-  --table-header-text: var(--color-primary);
-  --table-row-hover: #f1f5ff;
-
-  --edit-bg: #ffc107;
-  --edit-hover: #e0a800;
-  --delete-bg: #dc3545;
-  --delete-hover: #c82333;
-  --reactivate-bg: #28a745;
-  --reactivate-hover: #218838;
-}
-
-/* --- Reset básico --- */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
-}
-
-/* --- Sidebar --- */
-nav.sidebar {
-  background-color: var(--sidebar-bg);
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  padding: 25px 20px;
-}
-
-nav.sidebar .logo {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 40px;
-}
-
-nav.sidebar .logo img {
-  width: 140px;
-  object-fit: contain;
-}
-
-nav.sidebar a {
-  color: var(--sidebar-text);
-  text-decoration: none;
-  padding: 14px 18px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  display: block;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-}
-
-nav.sidebar a:hover,
-nav.sidebar a.active {
-  background-color: var(--sidebar-hover);
-  color: var(--sidebar-active);
-  font-weight: 600;
-}
-
-nav.sidebar .logout-btn {
-  margin-top: auto;
-  background-color: var(--sidebar-logout-bg);
-  color: white;
-  padding: 14px 18px;
-  border-radius: 10px;
-  text-align: center;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-nav.sidebar .logout-btn:hover {
-  background-color: var(--sidebar-logout-hover);
-}
-
-/* --- Topbar --- */
-.topbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  background-color: var(--topbar-bg);
-  padding: 10px 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.topbar span {
-  font-weight: 600;
-}
-
-.topbar .avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--topbar-border);
-  margin-left: 10px;
-}
-
-/* --- Main content --- */
-.main {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 40px;
-  overflow: auto;
-}
-
-.dashboard-content {
-  background-color: var(--color-bg-card);
-  border-radius: 0 0 20px 20px;
-  padding: 40px;
-  width: 100%;
-  height: calc(100vh - 80px);
-  overflow-y: auto;
-  box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
-}
-
-/* --- User List --- */
-.user-list-container h1 {
-  text-align: center;
-  color: var(--color-primary);
-  margin-bottom: 30px;
-  font-size: 2rem;
-}
-
 /* --- Filtros --- */
 .filter-controls {
   display: flex;
@@ -178,13 +17,13 @@ nav.sidebar .logout-btn:hover {
 .filter-controls input[type="text"] {
   flex-grow: 1;
   padding: 10px 12px;
-  border: 1px solid var(--color-border);
+  border: 1px solid #ccc;
   border-radius: 8px;
 }
 
 .filter-controls button {
   padding: 10px 20px;
-  background-color: var(--button-primary);
+  background-color: #3fa9f5;
   color: white;
   border: none;
   border-radius: 8px;
@@ -193,7 +32,7 @@ nav.sidebar .logout-btn:hover {
 }
 
 .filter-controls button:hover {
-  background-color: var(--button-primary-hover);
+  background-color: #337acc;
 }
 
 .status-filter a {
@@ -208,11 +47,11 @@ nav.sidebar .logout-btn:hover {
 
 .status-filter a.active,
 .status-filter a:hover {
-  background-color: var(--button-primary);
+  background-color: #3fa9f5;
   color: white;
 }
 
-/* --- Tabela --- */
+/* --- Tabela de usuários --- */
 .user-table {
   width: 100%;
   border-collapse: collapse;
@@ -226,16 +65,16 @@ nav.sidebar .logout-btn:hover {
 }
 
 .user-table th {
-  background-color: var(--table-header-bg);
-  color: var(--table-header-text);
+  background-color: #f4f7fb;
+  color: #3fa9f5;
   font-weight: 600;
 }
 
 .user-table tbody tr:hover {
-  background-color: var(--table-row-hover);
+  background-color: #f1f5ff;
 }
 
-/* --- Ações --- */
+/* --- Botões de ação --- */
 .actions a.edit,
 .actions button.delete,
 .actions button.reactivate {
@@ -251,30 +90,30 @@ nav.sidebar .logout-btn:hover {
 }
 
 .actions a.edit {
-  background-color: var(--edit-bg);
+  background-color: #ffc107;
   color: #333;
 }
 
 .actions a.edit:hover {
-  background-color: var(--edit-hover);
+  background-color: #e0a800;
 }
 
 .actions button.delete {
-  background-color: var(--delete-bg);
+  background-color: #dc3545;
   color: white;
 }
 
 .actions button.delete:hover {
-  background-color: var(--delete-hover);
+  background-color: #c82333;
 }
 
 .actions button.reactivate {
-  background-color: var(--reactivate-bg);
+  background-color: #28a745;
   color: white;
 }
 
 .actions button.reactivate:hover {
-  background-color: var(--reactivate-hover);
+  background-color: #218838;
 }
 
 /* --- Nenhum usuário --- */
@@ -295,14 +134,5 @@ nav.sidebar .logout-btn:hover {
   .status-filter {
     display: flex;
     justify-content: space-between;
-  }
-
-  .main {
-    padding: 20px;
-  }
-
-  .dashboard-content {
-    padding: 20px;
-    height: auto;
   }
 }

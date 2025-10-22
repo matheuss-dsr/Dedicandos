@@ -29,36 +29,6 @@
   background-color: var(--color-bg);
 }
 
-body {
-  padding: 30px;
-  background: var(--color-bg);
-  line-height: 1.6;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--color-topbar-bg);
-  padding: 8px 20px;
-  box-shadow: 0 1px 3px var(--color-topbar-shadow);
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.topbar span {
-  font-size: 1em;
-}
-
-.topbar .avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-left: 75%;
-  border: var(--color-avatar-border) 5px solid;
-}
-
 h1 {
   text-align: center;
   margin-bottom: 30px;

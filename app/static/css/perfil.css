@@ -1,40 +1,44 @@
 :root {
-  --primary-color: #3fa9f5;
-  --bg-color: #fff;
-  --text-color: #333;
-  --error-bg: #fce4e4;
-  --error-text: #b71c1c;
-  --error-border: #f5c6cb;
-  --success-bg: #e6f4ea;
-  --success-text: #2e7d32;
-  --success-border: #c3e6cb;
-  --border-color: #eee;
-  --button-bg: #28a745;
-  --button-bg-hover: #218838;
-  --overlay-bg: rgba(0,0,0,0.6);
-  --overlay-text: #fff;
-  --avatar-border: var(--primary-color);
-}
+  --color-gray-blue: #91A3AD; /* Azul Acinzentado - Neutro/Secundário */
+  --color-dark-red: #8C1843; /* Bordô/Vinho - Fundo Escuro Principal */
+  --color-light-gray: #F2F2F2; /* Cinza Claro - Fundo Claro/Geral */
+  --color-black: #17181B; /* Preto - Texto Principal */
+  --color-magenta: #ED145B; /* Magenta/Rosa Shock - Ação/Destaque */
 
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f7fb;
-  color: var(--text-color);
-  transition: background 0.3s, color 0.3s;
+  /* 🧩 Mapeamento de Uso */
+  --color-bg-dark: var(--color-black); /* Fundo escuro */
+  --color-bg-light: var(--color-light-gray); /* Fundo claro */
+  --color-text-dark: var(--color-black); /* Texto principal */
+  --color-text-light: #fff; /* Texto em fundo escuro */
+  --color-accent: var(--color-magenta); /* Botões, links, hover */
+  --color-button-primary: var(--color-dark-red);
+  --color-button-hover: #630C2E;
+  --color-highlight: var(--color-magenta);
+
+  /* Cores de status */
+  --color-success: #4CAF50;
+  --color-danger: #D32F2F;
+
+  /* Layout */
+  --sidebar-width: 250px;
+  --border-radius-default: 10px;
+  --border-radius-large: 20px;
+  --font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .profile-container {
   max-width: 700px;
   margin: 40px auto;
-  background-color: var(--bg-color);
+  background-color: var(--color-bg-light);
   padding: 40px;
   border-radius: 12px;
   transition: background-color 0.3s, color 0.3s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .profile-container h1 {
   text-align: center;
-  color: var(--primary-color);
+  color: var(--color-accent);
   margin-bottom: 35px;
   font-size: 2rem;
 }
@@ -66,8 +70,8 @@ body {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 .avatar-section:hover img {
-  transform: scale(1.05);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 .avatar-section .overlay {
   position: absolute;
@@ -107,23 +111,28 @@ body {
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 6px;
 }
-.user-details p strong { color: var(--primary-color); font-weight: 600; }
+.user-details p strong { color: var(--color-accent); font-weight: 600; }
 
 .edit-button {
   display: block;
   margin: 25px auto 0;
   width: fit-content;
-  background-color: var(--button-bg);
-  color: #fff;
+  background-color: var(--color-button-primary);
+  color: var(--color-text-light);
   padding: 12px 25px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
   font-size: 1rem;
   text-align: center;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
 }
-.edit-button:hover { background-color: var(--button-bg-hover); transform: translateY(-2px); }
+.edit-button:hover { 
+  background-color: var(--color-button-hover); 
+  color: var(--color-text-light);
+  transform: scale(1.05); 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
 
 @media (max-width: 768px) {
   .profile-container { padding: 25px; margin: 20px; }

@@ -1,70 +1,57 @@
-/* ============================== */
-/* 🎨 Tema Principal (Default) */
-/* ============================== */
 :root {
-  /* Cores gerais */
-  --color-bg-body: #e2e5f9;
-  --color-text: #333;
-  --color-text-light: #bbb;
-  --color-text-strong: #111;
+  --color-gray-blue: #91A3AD; /* Azul Acinzentado - Neutro/Secundário */
+  --color-dark-red: #8C1843; /* Bordô/Vinho - Fundo Escuro Principal */
+  --color-light-gray: #F2F2F2; /* Cinza Claro - Fundo Claro/Geral */
+  --color-black: #17181B; 
+  --color-light: #25262b; /* Preto - Texto Principal */
+  --color-magenta: #ED145B; /* Magenta/Rosa Shock - Ação/Destaque */
 
-  /* Sidebar */
-  --color-sidebar-bg: #0b0c17;
-  --color-sidebar-hover-bg: #191b31;
-  --color-sidebar-hover-text: #3fa9f5;
+  /* 🧩 Mapeamento de Uso */
+  --color-bg-dark: var(--color-black); /* Fundo escuro */
+  --color-bg-light: var(--color-light-gray); /* Fundo claro */
+  --color-text-dark: var(--color-black); /* Texto principal */
+  --color-text-light: #fff; /* Texto em fundo escuro */
+  --color-accent: var(--color-magenta); /* Botões, links, hover */
+  --color-button-primary: var(--color-dark-red);
+  --color-button-hover: #630C2E;
+  --color-highlight: var(--color-magenta);
 
-  /* Botão de logout */
-  --color-logout-bg: #3fa9f5;
-  --color-logout-hover-bg: #337acc;
-  --color-logout-text: #ffffff;
+  /* Cores de status */
+  --color-success: #4CAF50;
+  --color-danger: #D32F2F;
 
-  /* Topbar */
-  --color-topbar-bg: #ffffff;
-  --color-topbar-shadow: rgba(0, 0, 0, 0.1);
-  --color-avatar-border: #2c3e50;
-
-  /* Dashboard / Conteúdo principal */
-  --color-main-bg: #ffffff;
-  --color-main-text: #111;
-  --color-main-shadow: rgba(255, 255, 255, 0.1);
-
-  /* Layout e espaçamentos */
+  /* Layout */
   --sidebar-width: 250px;
-  --sidebar-padding: 25px 20px;
-  --main-padding: 20px 40px;
-  --dashboard-padding: 50px;
   --border-radius-default: 10px;
   --border-radius-large: 20px;
-
-  /* Tipografia */
-  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* ============================== */
-/* 🧱 Estilos gerais */
+/* 🧱 Estrutura Geral */
 /* ============================== */
-
 body {
   margin: 0;
   font-family: var(--font-family);
-  background: var(--color-bg-body);
+  background: var(--color-bg-light);
   display: flex;
   height: 100vh;
-  color: var(--color-text);
+  color: var(--color-text-dark);
   overflow: hidden;
 }
 
 /* ============================== */
 /* 🧭 Sidebar */
 /* ============================== */
-
 nav.sidebar {
-  background-color: var(--color-sidebar-bg);
+  background-color: var(--color-bg-dark);
   width: var(--sidebar-width);
   display: flex;
   flex-direction: column;
-  padding: var(--sidebar-padding);
+  padding: 25px 20px;
   box-sizing: border-box;
+  color: var(--color-text-light);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
 }
 
 nav.sidebar .logo {
@@ -78,7 +65,11 @@ nav.sidebar .logo img {
   width: 140px;
   height: auto;
   object-fit: contain;
-  border-radius: 12px; /* leve arredondamento opcional */
+  border-radius: 12px;
+  background: transparent;
+}
+nav.sidebar .logo:hover {
+  background: transparent !important;
 }
 
 nav.sidebar a {
@@ -94,15 +85,15 @@ nav.sidebar a {
 
 nav.sidebar a:hover,
 nav.sidebar a.active {
-  background-color: var(--color-sidebar-hover-bg);
-  color: var(--color-sidebar-hover-text);
+  background-color: var(--color-button-hover);
+  color: var(--color-light-gray);
   font-weight: 600;
 }
 
 nav.sidebar .logout-btn {
   margin-top: auto;
-  background-color: var(--color-logout-bg);
-  color: var(--color-logout-text);
+  background-color: var(--color-dark-red);
+  color: var(--color-text-light);
   padding: 14px 18px;
   border-radius: var(--border-radius-default);
   text-align: center;
@@ -112,56 +103,108 @@ nav.sidebar .logout-btn {
 }
 
 nav.sidebar .logout-btn:hover {
-  background-color: var(--color-logout-hover-bg);
+  background-color: var(--color-button-hover);
 }
 
 /* ============================== */
 /* 📊 Topbar */
 /* ============================== */
-
 .topbar {
+  width: 98%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--color-topbar-bg);
-  padding: 8px 20px;
-  box-shadow: 0 1px 3px var(--color-topbar-shadow);
+  background-color: var(--color-bg-light);
+  padding: 10px 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   border-radius: 12px;
   margin-bottom: 20px;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .topbar span {
   font-size: 1em;
+  font-weight: 500;
+  color: var(--color-text-dark);
 }
 
 .topbar .avatar {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  margin-left: 75%;
-  border: 5px solid var(--color-avatar-border);
+  border: 3px solid var(--color-accent);
+  box-shadow: 0 0 8px rgba(237, 20, 91, 0.3);
 }
 
 /* ============================== */
-/* 🧩 Main / Dashboard */
+/* 🧩 Conteúdo Principal */
 /* ============================== */
-
 .main {
+  background-color: var(--color-light);
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: var(--main-padding);
+  padding: 20px 40px;
   overflow: hidden;
 }
 
 main.dashboard-content {
-  background-color: var(--color-main-bg);
-  border-radius: 0 0 var(--border-radius-large) var(--border-radius-large);
-  padding: var(--dashboard-padding);
-  width: 100%;
+  background-color: var(--color-text-light);
+  border-radius: var(--border-radius-large);
+  padding: 40px 50px;
+  width: 95%;
   height: calc(100vh - 65px);
-  color: var(--color-main-text);
+  color: var(--color-text-dark);
   overflow-y: auto;
-  box-shadow: inset 0 0 6px var(--color-main-shadow);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* ============================== */
+/* ✨ Estilo de Botões e Links */
+/* ============================== */
+button, .btn {
+  background-color: var(--color-button-primary);
+  color: var(--color-text-light);
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--border-radius-default);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover, .btn:hover {
+  background-color: var(--color-button-hover);
+}
+
+a {
+  color: var(--color-accent);
+  transition: color 0.3s ease;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-button-hover);
+}
+
+/* ============================== */
+/* ✨ Scroll e Transições */
+/* ============================== */
+main.dashboard-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+main.dashboard-content::-webkit-scrollbar-thumb {
+  background: var(--color-dark-red);
+  border-radius: 10px;
+}
+
+main.dashboard-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-button-hover);
+}
+
+a, button, .logout-btn {
+  transition: all 0.3s ease;
 }

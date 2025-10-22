@@ -18,18 +18,6 @@
   --color-dark-card-bg: #333;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  background: var(--color-bg);
-  color: var(--color-text);
-  transition: background 0.3s, color 0.3s;
-}
-
-body.dark {
-  background: var(--color-dark-bg);
-  color: var(--color-dark-text);
-}
-
 h1,
 h2 {
   color: var(--color-primary);

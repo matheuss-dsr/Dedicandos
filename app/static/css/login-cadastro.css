@@ -1,186 +1,178 @@
 :root {
-  /* Cores Base */
-  --color-gray-blue: #91A3AD;
-  /* Neutro Secundário (Bordas, Textos Fracos) */
-  --color-dark-red: #8C1843;
-  /* Bordô - Primário / Fundo Escuro Secundário */
-  --color-light-gray: #F2F2F2;
-  /* Cinza Claro - Texto Claro Principal */
-  --color-black: #17181B;
-  /* Preto - Fundo Principal do Body (Dark) */
-  --color-magenta: #ED145B;
-  /* Magenta - Ação / Destaque / Highlight */
+  /* 🎨 Paleta de Cores Global */
+  --color-gray-blue: #91A3AD; /* Azul Acinzentado - Neutro/Secundário */
+  --color-dark-red: #8C1843; /* Bordô/Vinho - Fundo Escuro Principal */
+  --color-light-gray: #F2F2F2; /* Cinza Claro - Fundo Claro/Geral */
+  --color-black: #17181B; /* Preto - Texto Principal */
+  --color-magenta: #ED145B; /* Magenta/Rosa Shock - Ação/Destaque */
 
-  /* --- Mapeamento Geral do Tema (Dark Mode) --- */
-  --color-bg-body: var(--color-black);
-  /* Fundo da Página: Preto */
-  --color-bg-section: var(--color-dark-red);
-  /* Seções de Destaque (Planos): Bordô */
-  --color-bg-card: var(--color-black);
-  /* Fundo de Cards: Preto */
+  /* 🧩 Mapeamento de Uso */
+  --color-bg-dark: var(--color-dark-red); /* Fundo escuro */
+  --color-bg-light: var(--color-light-gray); /* Fundo claro */
+  --color-text-dark: var(--color-black); /* Texto principal */
+  --color-text-light: #fff; /* Texto em fundo escuro */
+  --color-accent: var(--color-magenta); /* Botões, links, hover */
+  --color-button-primary: var(--color-dark-red);
+  --color-button-hover: #630C2E;
+  --color-highlight: var(--color-magenta);
 
-  --color-text-primary: var(--color-light-gray);
-  /* Texto Principal: Cinza Claro */
-  --color-text-secondary: var(--color-gray-blue);
-  /* Texto Secundário: Azul Acinzentado */
-
-  --color-accent: var(--color-magenta);
-  /* Destaque / Links Hover */
-  --color-button-primary: var(--color-magenta);
-  /* Botão: Magenta */
-  --color-button-hover: #C51147;
-  /* Magenta mais escuro */
-
-  /* --- Cores para Formulário de Auth (Container Claro) --- */
-  --color-auth-bg: #fff;
-  /* Fundo do Container Auth */
-  --color-auth-text: var(--color-black);
-  /* Texto no Auth */
-  --color-auth-label: var(--color-dark-red);
-  /* Label no Auth */
-  --color-auth-input-bg: var(--color-light-gray);
-  /* Fundo do Input no Auth */
-  --color-auth-input-border: var(--color-gray-blue);
-  /* Borda do Input no Auth */
-
-  /* Gradiente para o Auth Body (Usa as cores escuras) */
-  --color-bg-gradient-start: var(--color-black);
-  --color-bg-gradient-end: #630C2E;
-
-  /* Cores de Status */
+  /* Cores de status */
   --color-success: #4CAF50;
-  --color-success-bg: #D4EDDA;
   --color-danger: #D32F2F;
-  --color-danger-bg: #F8D7DA;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
+/* =============================== */
+/* 🌐 Login / Cadastro Container   */
+/* =============================== */
 
 body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--color-black);
+  color: var(--color-text-dark);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(135deg, var(--color-bg-gradient-start), var(--color-bg-gradient-end));
+  margin: 0;
 }
 
-.auth-container {
-  background: var(--color-auth-bg);
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(23, 24, 27, 0.4);
-  width: 100%;
-  max-width: 400px;
-  animation: fadeIn 0.6s ease-in-out;
+.container {
+  width: 900px;
+  height: 550px;
+  background: var(--color-bg-light);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.image-container {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 0.6s ease-in-out, opacity 0.6s ease-in-out;
+  position: relative;
+  opacity: 1;
+}
+
+.image-container.fade-out {
+  opacity: 0;
+}
+
+.form-container {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h2 {
   text-align: center;
-}
-
-.auth-container h2 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  color: var(--color-auth-text);
+  margin-bottom: 20px;
+  color: var(--color-dark-red);
+  font-weight: bold;
 }
 
 .form-group {
-  margin-bottom: 1.2rem;
-  text-align: left;
+  margin-bottom: 15px;
 }
 
 label {
   display: block;
-  font-weight: bold;
-  margin-bottom: 0.4rem;
-  color: var(--color-auth-label);
+  margin-bottom: 5px;
+  color: var(--color-gray-blue);
 }
 
 input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid var(--color-auth-input-border);
+  padding: 10px;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 1rem;
-  transition: border 0.3s, background 0.3s;
-  background: var(--color-auth-input-bg);
-  color: var(--color-auth-text);
-}
-
-input:focus {
-  border-color: var(--color-accent);
-  outline: none;
   background: #fff;
-  color: var(--color-auth-text);
+  color: var(--color-black);
 }
 
 .btn-primary {
   width: 100%;
-  padding: 12px;
+  background-color: var(--color-button-primary);
+  color: var(--color-text-light);
+  padding: 10px;
   border: none;
-  background: var(--color-accent);
-  color: #fff;
-  font-weight: bold;
   border-radius: 8px;
+  font-size: 16px;
   cursor: pointer;
-  transition: background 0.3s;
-  margin-top: 0.5rem;
+  font-weight: bold;
+  transition: background 0.3s ease;
 }
 
 .btn-primary:hover {
-  background: var(--color-button-hover);
-}
-
-.error {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
-  border: 1px solid var(--color-danger);
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-}
-
-.success {
-  background: var(--color-success-bg);
-  color: var(--color-success);
-  border: 1px solid var(--color-success);
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 1rem;
+  background-color: var(--color-button-hover);
 }
 
 .auth-links {
-  margin-top: 1.5rem;
   text-align: center;
+  margin-top: 15px;
 }
 
 .auth-links a {
-  color: var(--color-auth-label);
+  color: var(--color-accent);
   text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s;
+  font-weight: 600;
 }
 
 .auth-links a:hover {
-  color: var(--color-accent);
+  text-decoration: underline;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Mensagens */
+.error {
+  color: var(--color-danger);
+  background: #ffeaea;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-@media (max-width: 768px) {
-  .auth-container {
-    padding: 2rem;
-    max-width: 90%;
+.success {
+  color: var(--color-success);
+  background: #eaffea;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Modo Cadastro (imagem à direita, form à esquerda) */
+.cadastro-mode .image-container {
+  order: 2;
+}
+
+.cadastro-mode .form-container {
+  order: 1;
+}
+
+.auth-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.6s ease;
+}
+
+.auth-wrapper.show-cadastro {
+  flex-direction: row-reverse;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    height: auto;
+  }
+  .image-container {
+    height: 200px;
   }
 }

@@ -38,6 +38,7 @@ body {
   background-color: var(--color-black);
   line-height: 1.6;
   overflow-x: hidden;
+  scrollbar-color: var(--color-black);
 }
 
 .navbar {
@@ -365,29 +366,31 @@ footer .socials a:hover {
 }
 
 .user-menu {
-  position: absolute;
-  top: 70px;
-  right: 20px;
-  background: var(--color-bg-light); /* Usando cor */
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  padding: 10px 0;
   display: none;
-  flex-direction: column;
-  min-width: 160px;
-  z-index: 1000;
+  position: absolute;
+  top: 100%; /* abaixo do avatar */
+  right: 0;
+  background: var(--color-bg-dark);
+  border-radius: var(--border-radius-default);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 10px 0;
+  z-index: 100;
+}
+
+.user-menu.open {
+  display: block;
 }
 
 .user-menu a {
-  text-decoration: none;
-  color: var(--color-text-dark); /* Usando cor */
-  padding: 10px 15px;
   display: block;
-  transition: background-color 0.2s;
+  padding: 10px 20px;
+  color: var(--color-text-light);
+  text-decoration: none;
+  transition: background 0.2s;
 }
 
 .user-menu a:hover {
-  background-color: var(--color-light-gray); /* Usando cor */
+  background-color: var(--color-button-hover);
 }
 
 .topbar {
