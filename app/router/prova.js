@@ -1,255 +1,285 @@
 import showdown from "showdown";
 import fetch from "node-fetch";
-
-// !!! NOVOS IMPORTS NECESSÁRIOS PARA A FUNÇÃO salvarPDF !!!
 import PDFDocument from "pdfkit";
-import path from "path";
-import fs from "fs";
-// ----------------------------------------------------
-
-// Importa a função do arquivo de utilidades da AI. 
-// Certifique-se de que gerarResolucao em '../utils/aiUtils.js'
-// está usando o import e o cliente corretos (@google/genai).
-import { gerarResolucao } from "../utils/aiUtils.js";
-
+import { parse } from "node-html-parser";
 
 const disciplineMapping = {
- linguagens: "linguagens",
- humanas: "ciencias-humanas",
- natureza: "ciencias-natureza",
- matematica: "matematica",
+  linguagens: "linguagens",
+  humanas: "ciencias-humanas",
+  natureza: "ciencias-natureza",
+  matematica: "matematica",
 };
 
 function getValidanos() {
- const anos = [];
- for (let i = 2023; i >= 2009; i--) anos.push(i);
- return anos;
+  const anos = [];
+  for (let i = 2022; i >= 2009; i--) anos.push(i);
+  return anos;
 }
-
 
 // Processar questão
 function processQuestion(q, converter) {
- // Tratamento para garantir que o enunciado seja sempre uma string
- const enunciadoTexto = q.context || q.text || "";
- const enunciadoHTML = converter.makeHtml(enunciadoTexto);
+  const enunciadoTexto = q.context || q.text || "";
+  const enunciadoHTML = converter.makeHtml(enunciadoTexto);
 
- const alternativas = q.alternatives.map((alt) => ({
-  letra: alt.letter,
-  // Tratamento para garantir que o texto da alternativa seja sempre uma string
-  texto: converter.makeHtml(alt.text || ""), 
-  correta: alt.isCorrect,
- }));
+  const alternativas = q.alternatives.map((alt) => ({
+    letra: alt.letter,
+    texto: converter.makeHtml(alt.text || ""),
+    correta: alt.isCorrect,
+  }));
 
- return {
-  title: q.title || "Questão",
-  // Retorna o texto bruto para a Gemini API, e não o HTML
-  enunciado: enunciadoTexto, 
-  enunciadoHTML: enunciadoHTML, // Mantém o HTML para renderização na view
-  alternativas,
-  alternativaCorreta: q.correctAlternative,
-  disciplina: q.discipline,
- };
+  return {
+    title: q.title || "Questão",
+    enunciado: enunciadoTexto,
+    enunciadoHTML: enunciadoHTML,
+    alternativas,
+    alternativaCorreta: q.correctAlternative,
+    disciplina: q.discipline,
+  };
 }
 
 // Mostrar formulário de geração
 export async function mostrarFormularioGerarProva(req, reply) {
- const anos = getValidanos();
- return reply.view("provas/gerar_prova.ejs", {
-  user: req.user,
-  anos,
-  ano: null,
-  quantity: null,
-  disciplina: null,
-  questoesOriginais: [],
-  error: null,
-  resolucao: null,
-  success: null,
- });
+  const anos = getValidanos();
+  return reply.view("provas/gerar_prova.ejs", {
+    user: req.user,
+    anos,
+    ano: req.query.ano || null,
+    quantity: null,
+    disciplina: null,
+    questoesOriginais: [],
+    error: null,
+    success: null,
+  });
 }
 
 // Listar questões do ENEM
 export async function listarQuestoesENEM(req, reply) {
- try {
-  let { ano, quantity, disciplina } = req.query;
-  ano = parseInt(ano);
-  quantity = parseInt(quantity);
-  const anos = getValidanos();
-  const converter = new showdown.Converter();
+  try {
+    let { ano, disciplina } = req.query;
+    ano = parseInt(ano);
+    const anos = getValidanos();
+    const converter = new showdown.Converter();
+    const NUM_QUESTOES = 10; // Sempre mostrar 10 questões válidas
 
-  // --- Validações de entrada ---
-  if (!ano || isNaN(ano) || ano < 2009 || ano > 2023) {
-   return reply.view("provas/gerar_prova.ejs", {
-    user: req.user,
-    anos,
-    error: "Ano inválido (deve ser entre 2009 e 2023).",
-    questoesOriginais: [],
-    quantity,
-    disciplina,
-    resolucao: null,
-    success: null,
-   });
+    if (!ano || isNaN(ano) || ano < 2009 || ano > 2022) {
+      return reply.view("provas/gerar_prova.ejs", {
+        user: req.user,
+        anos,
+        error: "Ano inválido (deve ser entre 2009 e 2022).",
+        questoesOriginais: [],
+        quantity: NUM_QUESTOES,
+        disciplina,
+        ano: req.query.ano || null,
+        success: null,
+      });
+    }
+
+    const baseUrl = `https://api.enem.dev/v1/exams/${ano}/questions`;
+    const mappedDiscipline = disciplina ? disciplineMapping[disciplina] : null;
+
+    const disciplinaOffsetMap = {
+      linguagens: 0,
+      "ciencias-humanas": 46,
+      "ciencias-natureza": 91,
+      matematica: 136,
+    };
+
+    let questoes = [];
+    let offset = mappedDiscipline ? disciplinaOffsetMap[mappedDiscipline] : 0;
+    let limit = NUM_QUESTOES;
+    const maxLimit = 180;
+
+    // Buscar até ter pelo menos NUM_QUESTOES válidas
+    while (questoes.length < NUM_QUESTOES && limit <= maxLimit) {
+      const url = `${baseUrl}?limit=${limit}&offset=${offset}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Erro HTTP ao buscar questões: ${response.status}`);
+
+      const data = await response.json();
+      let fetched = data.questions || [];
+      if (mappedDiscipline) fetched = fetched.filter((q) => q.discipline === mappedDiscipline);
+
+      // Filtrar questões válidas (enunciado e alternativas não null)
+      fetched = fetched.filter(q => (q.context || q.text) && q.alternatives.every(alt => alt.text));
+
+      questoes = questoes.concat(fetched);
+
+      // Aumentar limit para próxima busca se necessário
+      limit += NUM_QUESTOES;
+      offset += limit; // Ajustar offset para não repetir questões
+    }
+
+    // Pegar apenas as primeiras NUM_QUESTOES válidas
+    questoes = questoes.slice(0, NUM_QUESTOES);
+
+    const questoesOriginais = questoes.map((q, i) => {
+      const questaoProcessada = processQuestion(q, converter);
+      questaoProcessada.index = i + 1;
+      return questaoProcessada;
+    });
+
+    return reply.view("provas/gerar_prova.ejs", {
+      user: req.user,
+      anos,
+      ano,
+      quantity: NUM_QUESTOES,
+      disciplina,
+      questoesOriginais,
+      error: null,
+      success: `${questoesOriginais.length} questões carregadas com sucesso!`,
+    });
+
+  } catch (err) {
+    console.error("Erro geral na listagem de questões:", err.message);
+    const anos = getValidanos();
+    return reply.view("provas/gerar_prova.ejs", {
+      user: req.user,
+      anos,
+      error: `Ocorreu um erro: ${err.message}`,
+      questoesOriginais: [],
+      quantity: 10,
+      disciplina: req.query.disciplina || null,
+      ano: req.query.ano || null,
+      success: null,
+    });
   }
-
-  if (!quantity || isNaN(quantity) || quantity <= 0) {
-   return reply.view("provas/gerar_prova.ejs", {
-    user: req.user,
-    anos,
-    error: "Quantidade inválida (deve ser um número positivo).",
-    questoesOriginais: [],
-    quantity,
-    disciplina,
-    resolucao: null,
-    success: null,
-   });
-  }
-  // -------------------------------
-
-  const baseUrl = `https://api.enem.dev/v1/exams/${ano}/questions`;
-  const mappedDiscipline = disciplina ? disciplineMapping[disciplina] : null;
-
-  const disciplinaOffsetMap = {
-   linguagens: 0,
-   "ciencias-humanas": 46,
-   "ciencias-natureza": 91,
-   matematica: 136,
-  };
-
-  const offset = mappedDiscipline ? disciplinaOffsetMap[mappedDiscipline] : 0;
-  const maxLimit = 180;
-  // Garante que a quantidade não ultrapasse o limite da prova
-  if (quantity + offset > maxLimit) quantity = maxLimit - offset;
-
-  const url = `${baseUrl}?limit=${quantity}&offset=${offset}`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Erro HTTP ao buscar questões: ${response.status}`);
-
-  const data = await response.json();
-  let questoes = data.questions || [];
-  
-  // A filtragem deve ser feita APENAS se o mappedDiscipline não for nulo
-  // Se a API já estiver filtrando (o que é o caso com o offset), esta linha pode ser redundante, 
-  // mas é mantida por segurança.
-  if (mappedDiscipline)
-   questoes = questoes.filter((q) => q.discipline === mappedDiscipline);
-
-  // Processa questões e gera resolução automaticamente
-  const questoesOriginais = [];
-  for (let i = 0; i < questoes.length; i++) {
-   // Passa o converter para processQuestion
-   const q = processQuestion(questoes[i], converter); 
-   q.index = i + 1;
-   
-   // O enunciado passado para gerarResolucao é o texto BRUTO, não o HTML.
-   try {
-    // Concatena a questão para dar mais contexto ao Gemini
-    const promptCompleto = `ENEM ${ano} | Disciplina: ${q.disciplina} | Questão ${q.index}:\n${q.enunciado}`;
-    q.resolucao = await gerarResolucao(promptCompleto);
-   } catch (err) {
-    console.error(`Erro ao gerar resolução para questão ${q.index}:`, err.message);
-    q.resolucao = "Não foi possível gerar a resolução.";
-   }
-   questoesOriginais.push(q);
-  }
-
-  return reply.view("provas/gerar_prova.ejs", {
-   user: req.user,
-   anos,
-   ano,
-   quantity,
-   disciplina,
-   questoesOriginais,
-   error: null,
-   resolucao: null,
-   success: `Resoluções geradas automaticamente para ${questoesOriginais.length} questões!`,
-  });
- } catch (err) {
-  console.error("Erro geral na listagem de questões:", err.message);
-  const anos = getValidanos();
-  return reply.view("provas/gerar_prova.ejs", {
-   user: req.user,
-   anos,
-   error: `Ocorreu um erro: ${err.message}`,
-   questoesOriginais: [],
-   quantity: req.query.quantity || null,
-   disciplina: req.query.disciplina || null,
-   resolucao: null,
-   success: null,
-  });
- }
 }
 
-// Gerar resolução da questão
-export async function gerarResolucaoQuestao(req, reply) {
- try {
-  const { questao } = req.body;
-  
-  if (!questao) throw new Error("O corpo da requisição não contém a questão.");
-  
+function limparHTML(html) {
+  const root = parse(html);
+  return root.text; // retorna apenas o texto
+}
 
-  const resolucao = await gerarResolucao(questao);
+// Função auxiliar para baixar imagem e retornar buffer
+async function fetchImagemBuffer(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Erro ao baixar imagem: " + url);
+  return Buffer.from(await response.arrayBuffer());
+}
 
-  const anos = getValidanos();
-  console.log("Resolução gerada:", resolucao);
-  return reply.view("provas/gerar_prova.ejs", {
-   user: req.user,
-   anos,
-   questoesOriginais: [],
-   ano: null,
-   quantity: null,
-   disciplina: null,
-   error: null,
-   resolucao,
-   success: "Resolução gerada com sucesso!",
+// Função para estimar a altura de uma questão
+function estimarAlturaQuestao(doc, q) {
+  let altura = 0;
+
+  // Título da questão
+  altura += doc.heightOfString(`Questão #${q.index}: ${q.title}`, { width: doc.page.width - 100, fontSize: 14 });
+
+  // Enunciado
+  const enunciado = limparHTML(q.enunciadoHTML || q.enunciado);
+  altura += doc.heightOfString(enunciado, { width: doc.page.width - 140, fontSize: 12 }); // indent 20*2 = 40, mais margem
+
+  // Imagens: assumir altura fixa de 300 + margens
+  const imgRegex = /!\[.*?\]\((.*?)\)/g;
+  const numImagens = (q.enunciado.match(imgRegex) || []).length;
+  altura += numImagens * (300 + 20); // 300 altura imagem + 20 margem
+
+  // Alternativas - estimar como bloco único
+  const alternativasTexto = q.alternativas.map(a => `${a.letra}) ${limparHTML(a.texto)}`).join('\n');
+  altura += doc.heightOfString(alternativasTexto, { width: doc.page.width - 180, fontSize: 12 }); // indent 40*2 = 80, mais margem
+
+  // Espaços e linha
+  altura += 50; // moveDowns aproximados
+
+  return altura;
+}
+
+async function gerarPDFBuffer(questoes, tituloProva) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ margin: 50 });
+      const chunks = [];
+
+      doc.on("data", (chunk) => chunks.push(chunk));
+      doc.on("end", () => resolve(Buffer.concat(chunks)));
+      doc.on("error", (err) => reject(err));
+
+      // Leve espaçamento no topo
+      doc.moveDown(0.5);
+
+      for (let idx = 0; idx < questoes.length; idx++) {
+        const q = questoes[idx];
+
+        // Estimar altura da questão
+        const alturaQuestao = estimarAlturaQuestao(doc, q);
+
+        // Verificar se cabe na página atual (exceto para a primeira questão, para evitar página em branco)
+        const espacoDisponivel = doc.page.height - doc.page.margins.bottom - doc.y;
+        if (idx > 0 && alturaQuestao > espacoDisponivel) {
+          doc.addPage();
+        }
+
+        // Questão
+        doc.fontSize(14).fillColor("black").text(`Questão #${idx + 1}: ${q.title}`, { bold: true });
+        doc.moveDown(0.5);
+
+        // Enunciado - limpar HTML
+        let enunciado = limparHTML(q.enunciadoHTML || q.enunciado);
+        doc.fontSize(12).text(enunciado, { indent: 20, align: "justify" });
+        doc.moveDown(0.5);
+
+        // Buscar e inserir imagens se houver links de imagem no enunciado
+        const imgRegex = /!\[.*?\]\((.*?)\)/g;
+        const matches = [...(q.enunciado.matchAll(imgRegex))];
+        for (const match of matches) {
+          const url = match[1];
+          try {
+            const imgBuffer = await fetchImagemBuffer(url);
+            doc.moveDown(0.5);
+            doc.image(imgBuffer, { width: 300, align: "center" });
+            doc.moveDown(0.5);
+          } catch (e) {
+            console.warn("Imagem não carregou:", url, e.message);
+          }
+        }
+
+        // Alternativas - exibir como bloco único para melhor formatação
+        const alternativasTexto = q.alternativas.map(a => `${a.letra}) ${limparHTML(a.texto)}`).join('\n');
+        doc.fontSize(12).text(alternativasTexto, { indent: 40 });
+
+        doc.moveDown(1);
+        doc.moveTo(doc.x, doc.y).lineTo(doc.page.width - doc.page.margins.right, doc.y).stroke();
+        doc.moveDown(1);
+      }
+
+      doc.end();
+    } catch (err) {
+      reject(err);
+    }
   });
- } catch (err) {
-  console.error("Erro em gerarResolucaoQuestao:", err.message);
-  const anos = getValidanos();
-  return reply.view("provas/gerar_prova.ejs", {
-   user: req.user,
-   anos,
-   questoesOriginais: [],
-   ano: null,
-   quantity: null,
-   disciplina: null,
-   error: "Erro ao gerar resolução: " + err.message,
-   resolucao: null,
-   success: null,
-  });
- }
 }
 
 export async function salvarPDF(req, reply) {
- try {
-  const { resolucao } = req.body;
-  if (!resolucao) return reply.code(400).send({ error: "Nenhuma resolução recebida." });
+  try {
+    const { nomePDF, todasQuestoes, questoesSelecionadas } = req.body;
+    if (!nomePDF || !todasQuestoes) {
+      return reply.code(400).send({ error: "Nome do PDF ou questões não fornecidos." });
+    }
 
-  const doc = new PDFDocument();
-  
-  const filePath = path.join(process.cwd(), "app", "static", "pdfs"); 
-  fs.mkdirSync(filePath, { recursive: true });
-  const fileName = `resolucao-${Date.now()}.pdf`;
-  const outputPath = path.join(filePath, fileName);
+    const todas = JSON.parse(todasQuestoes);
+    let selecionadas = [];
 
-  const stream = fs.createWriteStream(outputPath);
-  doc.pipe(stream);
+    if (questoesSelecionadas) {
+      if (Array.isArray(questoesSelecionadas)) {
+        selecionadas = questoesSelecionadas.map(i => todas[i]);
+      } else {
+        selecionadas = [todas[questoesSelecionadas]];
+      }
+    }
 
-  doc.fontSize(18).text("Resolução da Questão", { align: "center" });
-  doc.moveDown();
-  doc.fontSize(12).text(resolucao, { align: "left" });
-  doc.end();
+    if (selecionadas.length === 0) {
+      return reply.code(400).send({ error: "Nenhuma questão selecionada." });
+    }
 
-  stream.on("finish", () => {
-   reply.download(outputPath, fileName); 
-  });
+    const buffer = await gerarPDFBuffer(selecionadas, `Prova - ${nomePDF}`);
+    const fileName = nomePDF.toString().trim().replace(/\s+/g, "_") + ".pdf";
 
-  // Trata o caso em que o download não é iniciado imediatamente (erro ou time-out)
-  stream.on("error", (err) => {
-   console.error("Erro no stream do PDF:", err);
-   reply.code(500).send({ error: "Erro ao escrever o arquivo PDF." });
-  });
+    return reply
+      .header("Content-Type", "application/pdf")
+      .header("Content-Disposition", `attachment; filename="${fileName}"`)
+      .send(buffer);
 
- } catch (err) {
-  console.error("Erro em salvarPDF:", err.message);
-  return reply.code(500).send({ error: "Erro ao gerar PDF: " + err.message });
- }
+  } catch (err) {
+    console.error("Erro em salvarPDF:", err);
+    return reply.code(500).send({ error: "Erro ao gerar PDF: " + err.message });
+  }
 }

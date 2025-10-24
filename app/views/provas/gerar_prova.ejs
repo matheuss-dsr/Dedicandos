@@ -2,157 +2,110 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerar Prova - Dedicandos</title>
-    <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="/static/css/gerarProva.css">
-    <link rel="stylesheet" href="/static/css/dashboard.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerar Prova - Dedicandos</title>
+  <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="/static/css/gerarProva.css">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
 </head>
 
 <body>
-    <nav class="sidebar">
-        <a href="/" class="logo">
-            <img src="../static/images/logo.png" alt="Logo">
-        </a>
-        <a href="/home">Início</a>
-        <a href="/perfil">Meu Perfil</a>
-        <a href="/prova/gerar/form" class="active">Gerar Prova</a>
-        <% if (user && user.role==='admin' ) { %>
-            <a href="/users">Gerenciar Usuários</a>
-            <% } %>
-            <a href="/logout" class="logout-btn">Sair</a>
-    </nav>
+  <nav class="sidebar">
+    <a href="/" class="logo">
+      <img src="/static/images/logo.png" alt="Logo">
+    </a>
+    <a href="/home">Início</a>
+    <a href="/perfil">Meu Perfil</a>
+    <a href="/prova/gerar/form" class="active">Gerar Prova</a>
+    <% if (user && user.role==='admin' ) { %>
+      <a href="/users">Gerenciar Usuários</a>
+      <% } %>
+        <a href="/logout" class="logout-btn">Sair</a>
+  </nav>
 
-    <div class="main">
-        <header class="topbar">
-            <span class="welcome-text">Bem-vindo, <%= user.nome %>!</span>
-            <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar">
-        </header>
+  <div class="main">
+    <header class="topbar">
+      <span class="welcome-text">Bem-vindo, <%= user.nome %>!</span>
+      <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar">
+    </header>
 
-        <main class="dashboard-content">
-            <h1>Gerar Prova ENEM</h1>
+    <main class="dashboard-content">
+      <h1>Gerar Prova ENEM</h1>
 
-            <form method="GET" action="/prova/gerar">
-                <label for="ano">Ano da Prova</label>
-                <select name="ano" required>
-                    <% anos.forEach(y=> { %>
-                        <option value="<%= y %>" <%= ano == y ? 'selected' : '' %>>
-                            <%= y %>
-                        </option>
-                        <% }) %>
-                </select>
+      <form method="GET" action="/prova/gerar">
+        <label for="ano">Ano da Prova</label>
+        <select name="ano" required>
+          <% anos.forEach(y=> { %>
+            <option value="<%= y %>" <%=ano==y ? 'selected' : '' %>><%= y %>
+            </option>
+            <% }) %>
+        </select>
 
-                <label for="quantity">Quantidade de Questões</label>
-                <input type="number" id="quantity" name="quantity" min="1" max="45" value="<%= quantity || 10 %>" required>
+        <label for="quantity">Quantidade de Questões</label>
+        <input type="number" id="quantity" name="quantity" min="1" max="45" value="<%= quantity || 10 %>" required>
 
-                <label for="disciplina">Disciplina</label>
-                <select id="disciplina" name="disciplina">
-                    <option value="linguagens" <%=disciplina==='linguagens' ? 'selected' : '' %>>Linguagens e Códigos</option>
-                    <option value="humanas" <%=disciplina==='humanas' ? 'selected' : '' %>>Ciências Humanas</option>
-                    <option value="natureza" <%=disciplina==='natureza' ? 'selected' : '' %>>Ciências da Natureza</option>
-                    <option value="matematica" <%=disciplina==='matematica' ? 'selected' : '' %>>Matemática</option>
-                </select>
-                <button type="submit">Gerar Prova</button>
-            </form>
+        <label for="disciplina">Disciplina</label>
+        <select id="disciplina" name="disciplina">
+          <option value="linguagens" <%=disciplina==='linguagens' ? 'selected' : '' %>>Linguagens e Códigos</option>
+          <option value="humanas" <%=disciplina==='humanas' ? 'selected' : '' %>>Ciências Humanas</option>
+          <option value="natureza" <%=disciplina==='natureza' ? 'selected' : '' %>>Ciências da Natureza</option>
+          <option value="matematica" <%=disciplina==='matematica' ? 'selected' : '' %>>Matemática</option>
+        </select>
+        <button type="submit">Gerar Prova</button>
+      </form>
 
-            <% if (error) { %>
-                <div class="message error">Erro: <%= error %></div>
-            <% } %>
-            <% if (success) { %>
-                <div class="message success"><%= success %></div>
-            <% } %>
+      <div class="section">
+        <h2>Questões Originais do ENEM</h2>
+        <% if (questoesOriginais && questoesOriginais.length> 0) { %>
 
-            <div class="section">
-                <h2>Questões Originais do ENEM</h2>
-                <% if (questoesOriginais && questoesOriginais.length > 0) { %>
+          <form action="/prova/salvar-pdf" method="POST">
+            <label for="nome-pdf">Nome do Arquivo PDF:</label>
+            <input type="text" id="nome-pdf" name="nomePDF" placeholder="Ex: Simulado_ENEM_2022" required>
 
-                    <form id="form-salvar-prova" method="POST" action="/prova/salvar">
-                        <input type="hidden" name="ano" value="<%= ano %>">
-                        <input type="hidden" name="disciplina" value="<%= disciplina || 'Todas' %>">
+            <div class="questoes-lista">
+              <% questoesOriginais.forEach((q, idx)=> { %>
+                <% const questaoIndex=q.number || (idx + 1); %>
+                  <div class="questao-item">
+                    <input type="checkbox" name="questoesSelecionadas" value="<%= idx %>" id="q_<%= questaoIndex %>"
+                      checked>
+                    <label for="q_<%= questaoIndex %>">
+                      Questão #<%= questaoIndex %>: <%= q.title %> (<%= q.disciplina || 'Desconhecida' %>)
+                    </label>
+                  </div>
+                  <% }) %>
+            </div>
 
-                        <label for="titulo-prova">Título da Nova Prova:</label>
-                        <input type="text" id="titulo-prova" name="titulo" required
-                            placeholder="Ex: Simulado ENEM <%= ano %> - <%= disciplina || 'Geral' %>">
+            <input type="hidden" name="todasQuestoes" value='<%= JSON.stringify(questoesOriginais) %>'>
 
-                        <button type="submit" class="btn-salvar">Salvar Questões Selecionadas</button>
+            <button type="submit" class="btn-pdf">Salvar em PDF</button>
+          </form>
 
-                        <% questoesOriginais.forEach((q, idx)=> { %>
-                            <% questaoIndex=q.number || (idx + 1); %>
-                            <div class="questao">
-                                <input type="checkbox" name="questoes_selecionadas" value="<%= questaoIndex %>"
-                                    id="q_<%= questaoIndex %>" checked>
-
-                                <label for="q_<%= questaoIndex %>">
-                                    <h4 data-enunciado-bruto="<%= q.enunciado %>">Questão #<%= questaoIndex %>: <%= q.title %></h4>
-                                </label>
-
-                                <p><strong>Disciplina:</strong> <%= q.disciplina || 'Desconhecida' %> | 
-                                    <strong>Idioma:</strong> <%= q.idioma || 'Português' %></p>
-
-                                <p><%- q.enunciadoHTML %></p> <div class="alternativas">
-                                    <% q.alternativas.forEach(a=> { %>
-                                        <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
-                                            <%= a.letra %>) <%- a.texto %>
-                                        </div>
-                                    <% }) %>
-                                </div>
-                                
-                                <% if (q.resolucao) { %>
-                                    <div class="resolucao-individual">
-                                        <h5>Resolução (Automática):</h5>
-                                        <pre><%- q.resolucao %></pre>
-                                    </div>
-                                <% } %>
-                            </div>
-                        <% }) %>
-                    </form>
-
-                    <form id="form-gerar-resolucao" method="POST" action="/prova/gerar-resolucao">
-                        <input type="hidden" id="questoesSelecionadas" name="questao"> 
-
-                        <button type="submit" class="btn-ia">Gerar Resolução de Selecionadas com IA (Gemini)</button>
-                    </form>
-
-                    <script>
-                        const formIA = document.getElementById("form-gerar-resolucao");
-                        formIA.addEventListener("submit", () => {
-                            const questoesHTML = document.querySelectorAll(".questao");
-
-                            const selecionadas = [...document.querySelectorAll("input[name='questoes_selecionadas']:checked")]
-                                .map(qInput => {
-                                    const questaoDiv = qInput.parentElement;
-                                    const tituloEl = questaoDiv.querySelector('label h4');
-                                    const infoEl = questaoDiv.querySelector('p');
-                                    
-                                    // Pega o texto bruto do enunciado que foi salvo no atributo data-enunciado-bruto
-                                    const enunciadoBruto = tituloEl.getAttribute('data-enunciado-bruto'); 
-                                    
-                                    return `Questão: ${tituloEl.innerText}\n${infoEl.innerText}\n\nEnunciado:\n${enunciadoBruto}`;
-                                })
-                                .join("\n\n---\n\n");
-                            
-                            document.getElementById("questoesSelecionadas").value = selecionadas;
-                        });
-                    </script>
-
-                    <% if (resolucao) { %>
-                        <div class="resolucao-section">
-                            <h2>Resolução Gerada</h2>
-                            <pre class="resolucao"><%= resolucao %></pre>
-
-                            <form action="/prova/salvar-pdf" method="POST">
-                                <input type="hidden" name="resolucao" value="<%= resolucao %>">
-                                <button type="submit" class="btn-pdf">Salvar Resolução em PDF</button>
-                            </form>
-                        </div>
-                    <% } %>
+          <% questoesOriginais.forEach((q, idx)=> { %>
+            <% questaoIndex=q.number || (idx + 1); %>
+              <div class="questao">
+                <h4>Questão #<%= questaoIndex %>: <%= q.title %>
+                </h4>
+                <p><strong>Disciplina:</strong>
+                  <%= q.disciplina || 'Desconhecida' %>
+                </p>
+                <p><%- q.enunciadoHTML %></p>
+                <div class="alternativas">
+                  <% q.alternativas.forEach(a=> { %>
+                    <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
+                      <%= a.letra %>) <%- a.texto %>
+                    </div>
+                    <% }) %>
+                </div>
+              </div>
+              <% }) %>
 
                 <% } else { %>
-                    <p>Nenhuma questão do ENEM encontrada. Tente refinar seus filtros.</p>
-                <% } %>
-            </div>
-        </main>
-    </div>
+                  <p>Nenhuma questão do ENEM encontrada. Tente refinar seus filtros.</p>
+                  <% } %>
+      </div>
+    </main>
+  </div>
 </body>
+
 </html>

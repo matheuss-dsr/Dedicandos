@@ -147,11 +147,7 @@ server.get("/prova/gerar",
   { preHandler: [server.authenticate, server.checkEmailVerified] }, 
   (req, reply) => provaController.listarQuestoesENEM(req, reply));
 
-server.post("/questoes/gerar", 
-  { preHandler: [server.authenticate, server.checkEmailVerified] }, 
-  (req, reply) => provaController.gerarResolucaoQuestao(req, reply));
-
-server.post("/questoes/salvar-pdf", 
+server.post("/prova/salvar-pdf", 
   { preHandler: [server.authenticate, server.checkEmailVerified] }, 
   (req, reply) => provaController.salvarPDF(req, reply));
 
