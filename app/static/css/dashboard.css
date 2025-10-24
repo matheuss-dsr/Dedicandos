@@ -66,6 +66,7 @@ nav.sidebar .logo img {
   object-fit: contain;
   border-radius: 12px;
   transition: transform 0.3s ease;
+  max-width: 100%;
 }
 
 nav.sidebar .logo img:hover {
@@ -120,12 +121,15 @@ nav.sidebar .logout-btn:hover {
   border-radius: 12px;
   margin-bottom: 20px;
   border: 1px solid rgba(0,0,0,0.05);
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .topbar span {
   font-size: 1em;
   font-weight: 500;
   color: var(--color-text-dark);
+  word-break: break-word;
 }
 
 .topbar .avatar {
@@ -135,6 +139,13 @@ nav.sidebar .logout-btn:hover {
   object-fit: cover;
   border: 3px solid var(--color-accent);
   box-shadow: 0 0 8px rgba(237, 20, 91, 0.3);
+  max-width: 100%;
+  height: auto;
+  transition: transform 0.3s ease-in-out;
+}
+
+.topbar .avatar:hover {
+  transform: scale(1.05);
 }
 
 /* ============================== */
@@ -159,14 +170,27 @@ main.dashboard-content {
   overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   border: 1px solid rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
 }
 
 /* ============================== */
 /* 📱 Responsividade */
 /* ============================== */
+@media (max-width: 1280px) {
+  .main {
+    padding: 20px;
+  }
+
+  main.dashboard-content {
+    width: 100%;
+    padding: 30px;
+  }
+}
+
 @media (max-width: 1024px) {
   body {
     flex-direction: column;
+    overflow: auto;
   }
 
   nav.sidebar {
@@ -192,26 +216,58 @@ main.dashboard-content {
   }
 
   .topbar {
-    justify-content: space-between;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .topbar span {
+    font-size: 0.95em;
+  }
+
+  .topbar .avatar {
+    width: 55px;
   }
 
   .main {
-    padding: 20px;
+    padding: 15px;
   }
 
   main.dashboard-content {
     padding: 25px 20px;
+    height: auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .topbar .avatar {
+    width: 50px;
+  }
+
+  main.dashboard-content {
+    padding: 20px 15px;
   }
 }
 
 @media (max-width: 480px) {
+  .topbar {
+    padding: 8px;
+  }
+
   .topbar span {
     font-size: 0.9em;
   }
 
   .topbar .avatar {
     width: 45px;
-    height: 45px;
   }
 
   nav.sidebar {
@@ -220,6 +276,10 @@ main.dashboard-content {
 
   nav.sidebar a {
     font-size: 0.9rem;
+  }
+
+  main.dashboard-content {
+    padding: 15px;
   }
 }
 
