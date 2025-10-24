@@ -1,26 +1,22 @@
 :root {
-  --color-gray-blue: #91A3AD; /* Azul Acinzentado - Neutro/Secundário */
-  --color-dark-red: #8C1843; /* Bordô/Vinho - Fundo Escuro Principal */
-  --color-light-gray: #F2F2F2; /* Cinza Claro - Fundo Claro/Geral */
-  --color-black: #17181B; 
-  --color-light: #25262b; /* Preto - Texto Principal */
-  --color-magenta: #ED145B; /* Magenta/Rosa Shock - Ação/Destaque */
+  --color-gray-blue: #91A3AD;
+  --color-dark-red: #8C1843;
+  --color-light-gray: #F2F2F2;
+  --color-black: #17181B;
+  --color-light: #25262b;
+  --color-magenta: #ED145B;
 
-  /* 🧩 Mapeamento de Uso */
-  --color-bg-dark: var(--color-black); /* Fundo escuro */
-  --color-bg-light: var(--color-light-gray); /* Fundo claro */
-  --color-text-dark: var(--color-black); /* Texto principal */
-  --color-text-light: #fff; /* Texto em fundo escuro */
-  --color-accent: var(--color-magenta); /* Botões, links, hover */
+  --color-bg-dark: var(--color-black);
+  --color-bg-light: var(--color-light-gray);
+  --color-text-dark: var(--color-black);
+  --color-text-light: #fff;
+  --color-accent: var(--color-magenta);
   --color-button-primary: var(--color-dark-red);
   --color-button-hover: #630C2E;
-  --color-highlight: var(--color-magenta);
 
-  /* Cores de status */
   --color-success: #4CAF50;
   --color-danger: #D32F2F;
 
-  /* Layout */
   --sidebar-width: 250px;
   --border-radius-default: 10px;
   --border-radius-large: 20px;
@@ -52,6 +48,8 @@ nav.sidebar {
   box-sizing: border-box;
   color: var(--color-text-light);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+  z-index: 1000;
 }
 
 nav.sidebar .logo {
@@ -59,6 +57,7 @@ nav.sidebar .logo {
   align-items: center;
   justify-content: center;
   margin-bottom: 40px;
+  cursor: pointer;
 }
 
 nav.sidebar .logo img {
@@ -66,10 +65,11 @@ nav.sidebar .logo img {
   height: auto;
   object-fit: contain;
   border-radius: 12px;
-  background: transparent;
+  transition: transform 0.3s ease;
 }
-nav.sidebar .logo:hover {
-  background: transparent !important;
+
+nav.sidebar .logo img:hover {
+  transform: scale(1.05);
 }
 
 nav.sidebar a {
@@ -129,8 +129,8 @@ nav.sidebar .logout-btn:hover {
 }
 
 .topbar .avatar {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--color-accent);
@@ -162,31 +162,65 @@ main.dashboard-content {
 }
 
 /* ============================== */
-/* ✨ Estilo de Botões e Links */
+/* 📱 Responsividade */
 /* ============================== */
-button, .btn {
-  background-color: var(--color-button-primary);
-  color: var(--color-text-light);
-  border: none;
-  padding: 10px 18px;
-  border-radius: var(--border-radius-default);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+@media (max-width: 1024px) {
+  body {
+    flex-direction: column;
+  }
+
+  nav.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+  }
+
+  nav.sidebar.active {
+    transform: translateX(0);
+  }
+
+  .menu-toggle {
+    display: block;
+    background: var(--color-dark-red);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .topbar {
+    justify-content: space-between;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  main.dashboard-content {
+    padding: 25px 20px;
+  }
 }
 
-button:hover, .btn:hover {
-  background-color: var(--color-button-hover);
-}
+@media (max-width: 480px) {
+  .topbar span {
+    font-size: 0.9em;
+  }
 
-a {
-  color: var(--color-accent);
-  transition: color 0.3s ease;
-  text-decoration: none;
-}
+  .topbar .avatar {
+    width: 45px;
+    height: 45px;
+  }
 
-a:hover {
-  color: var(--color-button-hover);
+  nav.sidebar {
+    width: 200px;
+  }
+
+  nav.sidebar a {
+    font-size: 0.9rem;
+  }
 }
 
 /* ============================== */
@@ -203,8 +237,4 @@ main.dashboard-content::-webkit-scrollbar-thumb {
 
 main.dashboard-content::-webkit-scrollbar-thumb:hover {
   background: var(--color-button-hover);
-}
-
-a, button, .logout-btn {
-  transition: all 0.3s ease;
 }
