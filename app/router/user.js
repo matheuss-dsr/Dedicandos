@@ -240,18 +240,47 @@ export async function mostrarPerfil(req, reply, database) {
 
 export async function mostrarFormularioEditarUsuario(req, reply, database) {
   const id_usuario = parseInt(req.params.id_usuario, 10);
+
   try {
     const usuario = await database.getUserById(id_usuario);
+
     if (!usuario) {
-      return reply.status(404).view("user/edit_user.ejs", { error: "Usuário não encontrado.", usuario: null });
+      return reply
+        .status(404)
+        .view("user/edit_user.ejs", { error: "Usuário não encontrado.", usuario: null });
     }
+
+    // ✅ Descriptografar o e-mail, se existir
+    if (usuario.email) {
+      try {
+        usuario.email = decrypt(usuario.email);
+      } catch (e) {
+        console.error("Erro ao descriptografar o e-mail:", e);
+        usuario.email = ""; // Evita quebrar a página
+      }
+    }
+
+    // ✅ Tratar a data de nascimento de forma segura
     if (usuario.data_nascimento) {
-      usuario.data_nascimento = new Date(usuario.data_nascimento).toISOString().split('T')[0];
+      const data = new Date(usuario.data_nascimento);
+      if (!isNaN(data.getTime())) {
+        usuario.data_nascimento = data.toISOString().split("T")[0];
+      } else {
+        usuario.data_nascimento = "";
+      }
+    } else {
+      usuario.data_nascimento = "";
     }
+
+    // ✅ Renderiza a view normalmente
     return reply.view("user/edit_user.ejs", { error: null, success: null, usuario });
+
   } catch (err) {
+    console.log(err);
     req.log.error("Erro ao buscar usuário para edição:", err);
-    return reply.status(500).view("user/edit_user.ejs", { error: "Erro ao buscar usuário.", usuario: null });
+    return reply
+      .status(500)
+      .view("user/edit_user.ejs", { error: "Erro ao buscar usuário.", usuario: null });
   }
 }
 

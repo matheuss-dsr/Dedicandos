@@ -10,40 +10,55 @@
 <body>
   <div class="container">
     <% if (error) { %>
-      <div class="error"><%= error %></div>
-    <% } %>
+  <div class="error"><%= error %></div>
+<% } %>
 
-    <% if (prova) { %>
-      <div class="prova-info">
-        <h1><%= prova.titulo %></h1>
-        <p><strong>Disciplina:</strong> <%= prova.disciplina %></p>
-        <p><strong>Ano:</strong> <%= prova.ano %></p>
-        <p><strong>Quantidade de Questões:</strong> <%= prova.quantidade_questoes %></p>
-      </div>
+<% if (prova) { %>
+  <section class="prova-info">
+    <h1><%= prova.titulo %></h1>
+    <p><strong>Disciplina:</strong> <%= prova.disciplina || 'Não informada' %></p>
+    <p><strong>Ano:</strong> <%= prova.ano || '—' %></p>
+    <p><strong>Quantidade de Questões:</strong> <%= prova.quantidade_questoes || questoesDetalhes.length %></p>
+  </section>
 
-      <% questoesDetalhes.forEach(function(questao, index) { %>
-        <div class="questao">
-          <div class="questao-title">Questão <%= index + 1 %>: <%= questao.title %></div>
-          <div class="enunciado"><%- questao.enunciado %></div>
+  <% if (questoesDetalhes && questoesDetalhes.length > 0) { %>
+    <% questoesDetalhes.forEach(function(questao, index) { %>
+      <article class="questao">
+        <header class="questao-header">
+          <h2>Questão <%= index + 1 %>: <%= questao.title || '' %></h2>
+        </header>
 
-          <% if (questao.imageHTML) { %>
-            <div class="imagem-questao"><%- questao.imageHTML %></div>
-          <% } %>
-
-          <div class="alternativas">
-            <% questao.alternativas.forEach(function(alt) { 
-              const classe = alt.letra === questao.alternativaCorreta ? 'alternativa correta' : 'alternativa incorreta';
-            %>
-              <div class="<%= classe %>">
-                <strong><%= alt.letra %></strong>: <%= alt.texto %>
-              </div>
-            <% }) %>
-          </div>
+        <div class="enunciado">
+          <%- questao.enunciado %>
         </div>
-      <% }) %>
-    <% } %>
 
-    <a href="/prova/gerar/form" class="voltar">Voltar para a lista de provas</a>
-  </div>
+        <% if (questao.imageHTML) { %>
+          <div class="imagem-questao">
+            <%- questao.imageHTML %>
+          </div>
+        <% } %>
+
+        <div class="alternativas">
+          <% questao.alternativas.forEach(function(alt) { 
+            const classe = alt.letra === questao.alternativaCorreta ? 'alternativa correta' : 'alternativa';
+          %>
+            <div class="<%= classe %>">
+              <strong><%= alt.letra %></strong>:
+              <span><%- alt.texto %></span>
+              <% if (alt.imageHTML) { %>
+                <div class="imagem-alternativa"><%- alt.imageHTML %></div>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      </article>
+    <% }) %>
+  <% } else { %>
+    <p class="sem-questoes">Nenhuma questão encontrada nesta prova.</p>
+  <% } %>
+<% } else { %>
+  <p class="sem-prova">Prova não encontrada.</p>
+<% } %>
+  <a href="/prova/gerar/form" class="voltar">← Voltar para a lista de provas</a>
 </body>
 </html>

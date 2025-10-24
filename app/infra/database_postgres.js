@@ -128,62 +128,6 @@ async listarProvas() {
   return result.rows;
 }
 
-async salvarProva({ titulo, id_usuario, ano, disciplina, questoes_selecionadas }) {
-  const indicesSelecionados = Array.isArray(questoes_selecionadas)
-    ? questoes_selecionadas.map(Number)
-    : questoes_selecionadas
-    ? [Number(questoes_selecionadas)]
-    : [];
-
-  if (!titulo || indicesSelecionados.length === 0) {
-    throw new Error("Título e pelo menos uma questão são obrigatórios.");
-  }
-
-  const client = await this.pool.connect();
-  try {
-    await client.query("BEGIN");
-
-    const insertProvaQuery = `
-      INSERT INTO provas
-        (titulo, id_usuario, ano, quantidade_questoes, disciplina, ativo)
-      VALUES
-        ($1, $2, $3, $4, $5, true)
-      RETURNING id_prova;
-    `;
-
-    const resultProva = await client.query(insertProvaQuery, [
-      titulo,
-      id_usuario,
-      parseInt(ano),
-      indicesSelecionados.length,
-      disciplina || "Todas",
-    ]);
-
-    const id_prova = resultProva.rows[0].id_prova;
-
-    const insertQuestaoQuery = `
-      INSERT INTO questoes_prova
-        (id_prova, enem_year, enem_index)
-      VALUES
-        ($1, $2, $3);
-    `;
-
-    const inserts = indicesSelecionados.map((index) =>
-      client.query(insertQuestaoQuery, [id_prova, parseInt(ano), index])
-    );
-
-    await Promise.all(inserts);
-    await client.query("COMMIT");
-
-    return id_prova;
-  } catch (err) {
-    await client.query("ROLLBACK");
-    throw err;
-  } finally {
-    client.release();
-  }
-}
-
 async getProvaComQuestoes(id_prova) {
   const resultProva = await this.query(
     `SELECT * FROM provas WHERE id_prova = $1 AND ativo = true`,
