@@ -102,23 +102,8 @@ server.post('/login', async (req, reply) => {
 });
 
 
-
-// ---------------- ROTAS DE USUÁRIOS ----------------
 server.get('/cadastro', (req, reply) => userController.mostrarFormularioCriarUsuario(req, reply))
 server.post('/cadastro', (req, reply) => userController.criarUsuario(req, reply, database))
-server.get('/home', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {
-  try {
-    const provas = await database.query(
-      'SELECT * FROM provas WHERE id_usuario = $1 AND ativo = true ORDER BY id_prova DESC',
-      [req.user.id_usuario]
-    );
-
-    return reply.view('/home', { user: req.user, provas: provas.rows });
-  } catch (err) {
-    console.error(err);
-    return reply.status(500).send('Erro ao carregar a página inicial');
-  }
-});
 
 
 server.get('/logout', (req, reply) => {
@@ -141,19 +126,27 @@ server.post(
 
 server.get("/prova/gerar/form", 
   { preHandler: [server.authenticate, server.checkEmailVerified] }, 
-  (req, reply) => provaController.mostrarFormularioGerarProva(req, reply));
+  (req, reply) => provaController.mostrarFormularioGerarProva(req, reply)
+);
 
 server.get("/prova/gerar", 
   { preHandler: [server.authenticate, server.checkEmailVerified] }, 
-  (req, reply) => provaController.listarQuestoesENEM(req, reply));
+  (req, reply) => provaController.listarQuestoesENEM(req, reply)
+);
 
-server.post("/prova/salvar-pdf", 
+server.post("/prova/salvar-docx", 
   { preHandler: [server.authenticate, server.checkEmailVerified] }, 
-  (req, reply) => provaController.salvarPDF(req, reply));
+  (req, reply) => provaController.salvarDOCX(req, reply)
+);
 
-server.post('/prova/gerar-resolucao',
+server.post(
+  "/prova/salvar-pdf",
   { preHandler: [server.authenticate, server.checkEmailVerified] },
-  (req, reply) => provaController.gerarResolucaoQuestao(req, reply));
+  (req, reply) => provaController.salvarPDF(req, reply)
+);
+
+
+
 
 // ---------------- ROTAS USUÁRIOS ----------------
 server.get('/users', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {
@@ -164,9 +157,16 @@ server.get('/users', { preHandler: [server.authenticate, server.checkEmailVerifi
   return reply.view('user/list_users.ejs', { search, status, users, user: req.user })
 })
 
-
 server.get('/verificar-email', async (req, reply) => {
-  return userController.verificarEmail(req, reply, database);
+    return userController.verificarEmail(req, reply, database);
+});
+
+server.get('/reenviar-verificacao', async (req, reply) => {
+    return reply.view('user/reenviar_email.ejs', { error: null, success: null });
+});
+
+server.post('/reenviar-verificacao', async (req, reply) => {
+    return userController.reenviarEmailVerificacao(req, reply, database);
 });
 
 
@@ -191,12 +191,10 @@ server.get('/perfil', { preHandler: [server.authenticate, server.checkEmailVerif
       }
     };
 
-    // Descriptografa o email e a data de nascimento (se criptografados)
     let emailDescriptografado = req.user.email;
     try {
       emailDescriptografado = decrypt(req.user.email);
     } catch {
-      // se não estiver criptografado, mantém como está
     }
 
     const user = {
@@ -216,9 +214,6 @@ server.get('/perfil', { preHandler: [server.authenticate, server.checkEmailVerif
     return reply.status(500).send('Erro ao carregar perfil do usuário');
   }
 });
-
-
-
 
 server.get('/users/:id_usuario/editar', { preHandler: [server.authenticate,  server.checkEmailVerified] } , (req, reply) => {
   return userController.mostrarFormularioEditarUsuario(req, reply, database)
@@ -273,8 +268,21 @@ server.get("/resetar-senha", async (req, reply) => {
 });
 
 server.post("/resetar-senha", async (req, reply) => {
-  const { token } = req.body;
-  return reply.view("user/resetar_senha.ejs", { token, error: "Token inválido ou expirado", success: null });
+  return userController.resetarSenha(req, reply, database);
+});
+
+server.get('/home', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {
+  try {
+    const provas = await database.query(
+      'SELECT * FROM provas WHERE id_usuario = $1 AND ativo = true ORDER BY id_prova DESC',
+      [req.user.id_usuario]
+    );
+
+    return reply.view('/home', { user: req.user, provas: provas.rows });
+  } catch (err) {
+    console.error(err);
+    return reply.status(500).send('Erro ao carregar a página inicial');
+  }
 });
 
 // ---------------- START ----------------

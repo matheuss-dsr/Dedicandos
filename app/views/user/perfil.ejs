@@ -41,9 +41,8 @@
               <% } %>
 
                 <div class="profile-info">
-                  <!-- Avatar com overlay -->
                   <div class="avatar-section">
-                    <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário">
+                    <img src="/static/uploads/<%= user.avatar_url %>" alt="Avatar do Usuário">
                     <div class="overlay">Alterar Foto</div>
                     <form action="/users/<%= user.id_usuario %>/upload-avatar" method="POST"
                       enctype="multipart/form-data">
@@ -53,7 +52,6 @@
                   </div>
 
 
-                  <!-- Detalhes do usuário -->
                   <div class="user-details">
                     <p><strong>Nome:</strong>
                       <%= user.nome %>

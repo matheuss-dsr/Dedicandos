@@ -61,45 +61,52 @@
 
           <form action="/prova/salvar-pdf" method="POST">
             <label for="nome-pdf">Nome do Arquivo PDF:</label>
-            <input type="text" id="nome-pdf" name="nomePDF" placeholder="Ex: Simulado_ENEM_2022" required>
+            <input type="text" id="nome-pdf" name="nomeArquivo" placeholder="Ex: Simulado_ENEM_2022" required>
 
             <div class="questoes-lista">
               <% questoesOriginais.forEach((q, idx)=> { %>
-                <% const questaoIndex=q.number || (idx + 1); %>
-                  <div class="questao-item">
-                    <input type="checkbox" name="questoesSelecionadas" value="<%= idx %>" id="q_<%= questaoIndex %>"
-                      checked>
-                    <label for="q_<%= questaoIndex %>">
-                      Questão #<%= questaoIndex %>: <%= q.title %> (<%= q.disciplina || 'Desconhecida' %>)
-                    </label>
-                  </div>
-                  <% }) %>
+                <div class="questao-item">
+                  <input type="checkbox" name="questoesSelecionadas" value="<%= idx %>" id="q_pdf_<%= idx %>" checked>
+                  <label for="q_pdf_<%= idx %>">Questão #<%= q.number || idx + 1 %>: <%= q.title %></label>
+                </div>
+                <% }) %>
             </div>
 
             <input type="hidden" name="todasQuestoes" value='<%= JSON.stringify(questoesOriginais) %>'>
-
-            <button type="submit" class="btn-pdf">Salvar em PDF</button>
+            <button type="submit" class="btn-pdf">📄 Gerar PDF</button>
+            <input type="hidden" name="todasQuestoes" value='<%= JSON.stringify(questoesOriginais) %>'>
+            <button type="submit" class="btn-docx">📝 Gerar DOCX</button>
           </form>
 
           <% questoesOriginais.forEach((q, idx)=> { %>
-            <% questaoIndex=q.number || (idx + 1); %>
+            <% const questaoIndex=q.number || (idx + 1); %>
               <div class="questao">
                 <h4>Questão #<%= questaoIndex %>: <%= q.title %>
                 </h4>
                 <p><strong>Disciplina:</strong>
                   <%= q.disciplina || 'Desconhecida' %>
                 </p>
+
+                <!-- Enunciado principal da questão -->
                 <p><%- q.enunciadoHTML %></p>
-                <div class="alternativas">
-                  <% q.alternativas.forEach(a=> { %>
-                    <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
-                      <%= a.letra %>) <%- a.texto %>
+
+                <!-- Introdução das alternativas -->
+                <% if (q.alternativesIntroduction) { %>
+                  <p class="intro-alternativas"><em>
+                      <%= q.alternativesIntroduction %>
+                    </em></p>
+                  <% } %>
+
+                    <!-- Lista de alternativas -->
+                    <div class="alternativas">
+                      <% q.alternativas.forEach(a=> { %>
+                        <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
+                          <%= a.letra %>) <%- a.texto %>
+                        </div>
+                        <% }) %>
                     </div>
-                    <% }) %>
-                </div>
               </div>
               <% }) %>
-
                 <% } else { %>
                   <p>Nenhuma questão do ENEM encontrada. Tente refinar seus filtros.</p>
                   <% } %>

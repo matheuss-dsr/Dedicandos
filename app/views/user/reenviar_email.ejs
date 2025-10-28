@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Reenviar e-mail de confirmação</title>
+    <link href="/static/css/login-cadastro.css" rel="stylesheet">
+    <style>
+        body { background:#f5f7fa; }
+        .card { max-width:480px; margin:6vh auto; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Reenviar e-mail de confirmação</h4>
+
+                <% if (typeof success !== 'undefined' && success) { %>
+                    <div class="alert alert-success"><%= success %></div>
+                <% } %>
+
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert alert-danger"><%= error %></div>
+                <% } %>
+
+                <% if (typeof errors !== 'undefined' && errors.length) { %>
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            <% errors.forEach(function(err){ %>
+                                <li><%= err.msg || err %></li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                <% } %>
+
+                <form id="resendForm" action="/reenviar-email" method="post" novalidate>
+                    <% if (typeof csrfToken !== 'undefined') { %>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <% } %>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-mail cadastrado</label>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            class="form-control"
+                            placeholder="seu@exemplo.com"
+                            required
+                            value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>"
+                            autofocus>
+                        <div class="form-text">Será enviado um novo e-mail de confirmação para este endereço.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="/login" class="btn btn-link p-0">Voltar ao login</a>
+                        <button id="submitBtn" type="submit" class="btn btn-primary">
+                            <span id="btnText">Reenviar e-mail</span>
+                            <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function(){
+            var form = document.getElementById('resendForm');
+            var btn = document.getElementById('submitBtn');
+            var spinner = document.getElementById('btnSpinner');
+            var btnText = document.getElementById('btnText');
+
+            form.addEventListener('submit', function(e){
+                if (!form.checkValidity()) {
+                    // Let browser show validation messages
+                    return;
+                }
+                // prevent double submit
+                btn.disabled = true;
+                spinner.classList.remove('d-none');
+                btnText.textContent = 'Enviando...';
+            });
+        })();
+    </script>
+</body>
+</html></div>

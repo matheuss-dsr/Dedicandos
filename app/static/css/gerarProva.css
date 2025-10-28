@@ -181,3 +181,28 @@ body.dark .questao {
   border-left: 4px solid var(--color-success);
   font-weight: bold;
 }
+
+.header-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.format-select {
+  margin: 15px 0;
+}
+
+.btn-pdf {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.btn-pdf:hover {
+  background-color: #45a049;
+}
