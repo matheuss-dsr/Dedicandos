@@ -1,45 +1,62 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meu Perfil - Dedicandos</title>
-  <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
+  <link rel="shortcut icon" href="/static/images/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="/static/css/dashboard.css">
   <link rel="stylesheet" href="/static/css/perfil.css">
 </head>
 
 <body>
-  <nav class="sidebar">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
     <a href="/" class="logo">
-            <img src="../static/images/logo.png" alt="Logo">
-        </a>
+      <img src="/static/images/logo.png" alt="Logo">
+    </a>
     <a href="/home">Início</a>
     <a href="/perfil" class="active">Meu Perfil</a>
-    <a href="/prova/gerar">Gerar Prova</a>
-    <% if (user && user.role==='admin' ) { %>
+    <a href="/prova/gerar/form">Gerar Prova</a>
+    <% if (user && user.role === 'admin') { %>
       <a href="/users">Gerenciar Usuários</a>
-      <% } %>
-        <a href="/logout" class="logout-btn">Sair</a>
+    <% } %>
+    <a href="/logout" class="logout-btn">Sair</a>
   </nav>
 
+  <!-- Conteúdo Principal -->
   <div class="main">
+    <header class="topbar">
+      <button id="menu-toggle" class="menu-toggle">☰</button>
+      <span class="welcome-text">Bem-vindo, <%= user.nome %>!</span>
+      <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar">
+    </header>
+
     <main class="dashboard-content">
       <div class="profile-container">
         <h1>Meu Perfil</h1>
 
-        <% if (typeof error !=='undefined' && error !==null && error) { %>
-          <div class="message error">
-            <%= error %>
-          </div>
-          <% } %>
-            <% if (typeof success !=='undefined' && success !==null && success) { %>
-              <div class="message success">
-                <%= success %>
-              </div>
-              <% } %>
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="message error"><%= error %></div>
+        <% } %>
 
+        <% if (typeof success !== 'undefined' && success) { %>
+          <div class="message success"><%= success %></div>
+        <% } %>
+
+        <div class="profile-info">
+          <!-- Avatar com overlay -->
+          <div class="avatar-section" id="avatar-section">
+            <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar-img">
+            <div class="overlay">Alterar Foto</div>
+
+            <form action="/users/<%= user.id_usuario %>/upload-avatar" method="POST" enctype="multipart/form-data">
+              <input type="file" id="avatarInput" name="avatar" accept="image/png, image/jpeg, image/gif" hidden>
+            </form>
+          </div>
+
+<<<<<<< HEAD
                 <div class="profile-info">
                   <div class="avatar-section">
                     <img src="/static/uploads/<%= user.avatar_url %>" alt="Avatar do Usuário">
@@ -74,11 +91,45 @@
                     <a href="/users/<%= user.id_usuario %>/editar" class="edit-button">Editar Perfil</a>
                   </div>
                 </div>
+=======
+          <!-- Detalhes do usuário -->
+          <div class="user-details">
+            <p><strong>Nome:</strong> <%= user.nome %></p>
+            <p><strong>E-mail:</strong> <%= user.email %></p>
+            <p><strong>Data de Nascimento:</strong> <%= user.data_nascimento %></p>
+            <p><strong>Membro Desde:</strong> <%= user.data_cadastro %></p>
+            <p><strong>Tipo de Conta:</strong> <%= user.role %></p>
+            <p><strong>E-mail Verificado:</strong> <%= user.email_verificado ? 'Sim' : 'Não' %></p>
+
+            <a href="/users/<%= user.id_usuario %>/editar" class="edit-button">Editar Perfil</a>
+          </div>
+        </div>
+>>>>>>> e4a3247df7ad68008af30ac0d152878d6a12faff
       </div>
     </main>
   </div>
 
-  <script src="/static/js/script.js"></script>
+  <script>
+    // Sidebar retrátil
+    const sidebar = document.getElementById('sidebar');
+    const toggle = document.getElementById('menu-toggle');
+    toggle.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+    // Upload de avatar com clique na imagem
+    const avatarSection = document.getElementById('avatar-section');
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarForm = avatarSection.querySelector('form');
+
+    avatarSection.addEventListener('click', () => {
+      avatarInput.click();
+    });
+
+    avatarInput.addEventListener('change', () => {
+      if (avatarInput.files.length > 0) {
+        avatarForm.submit();
+      }
+    });
+  </script>
 </body>
 
 </html>

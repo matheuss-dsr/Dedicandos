@@ -18,6 +18,15 @@
   --color-dark-card-bg: #333;
 }
 
+/* --- ESTILO PADRÃO --- */
+body {
+  font-family: Arial, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+}
+
 h1,
 h2 {
   color: var(--color-primary);
@@ -32,6 +41,7 @@ h2 {
   margin-bottom: 15px;
 }
 
+/* --- FORMULÁRIOS --- */
 form {
   background: var(--color-form-bg);
   padding: 20px;
@@ -39,6 +49,9 @@ form {
   margin-bottom: 30px;
   box-shadow: 0 2px 6px var(--color-form-shadow);
   transition: background 0.3s;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 body.dark form {
@@ -74,6 +87,7 @@ form button:hover {
   background: var(--color-primary-dark);
 }
 
+/* --- QUESTÕES --- */
 .questao {
   background: var(--color-questao-bg);
   border-radius: 12px;
@@ -87,93 +101,52 @@ body.dark .questao {
   background: var(--color-dark-card-bg);
 }
 
-.questao h3 {
+.questao h4 {
   margin: 0 0 10px;
   font-size: 1.1em;
 }
 
-.alternativas {
-  margin-left: 20px;
+/* --- IMAGEM DO ENUNCIADO RESPONSIVA --- */
+.questao img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 10px 0;
+  object-fit: contain;
+  transition: transform 0.3s ease-in-out;
 }
 
-.alternativa {
-  margin: 5px 0;
+.questao img:hover {
+  transform: scale(1.03);
 }
 
-.gabarito {
-  font-weight: bold;
-  color: var(--color-success);
-  margin-top: 10px;
-}
-
-.section {
-  margin-bottom: 40px;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--color-topbar-bg);
-  padding: 8px 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.topbar span {
-  font-size: 1em;
-}
-
-.topbar .avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-left: 75%;
-  border: var(--color-topbar-border) 5px solid;
-}
-
-.toggle-theme {
-  margin-bottom: 20px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.toggle-theme:hover {
-  background: var(--color-primary-dark);
-}
-
+/* --- ALTERNATIVAS --- */
 .alternativas {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-left: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .alternativa {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: 8px;
   background-color: var(--color-alternativa-bg);
+  line-height: 1.4em;
+  word-wrap: break-word;
 }
 
 .alternativa .letra {
-  display: flex;
-  align-items: center;
   font-weight: bold;
-  color: #000000;
+  color: #000;
   flex-shrink: 0;
-  min-width: 20px;
-}
-
-.alternativa .texto {
-  flex: 1;
+  min-width: 25px;
 }
 
 .alternativa.correta {
@@ -181,7 +154,6 @@ body.dark .questao {
   border-left: 4px solid var(--color-success);
   font-weight: bold;
 }
-
 .header-info {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -205,4 +177,106 @@ body.dark .questao {
 
 .btn-pdf:hover {
   background-color: #45a049;
+}
+/* --- TOPO --- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-topbar-bg);
+  padding: 10px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.topbar .welcome-text {
+  font-size: 1em;
+  flex: 1;
+}
+
+/* --- IMAGEM RESPONSIVA (AVATAR) --- */
+.topbar .avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: var(--color-topbar-border) 3px solid;
+  max-width: 100%;
+  height: auto;
+  transition: all 0.3s ease-in-out;
+}
+
+.topbar .avatar:hover {
+  transform: scale(1.05);
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 1024px) {
+  form {
+    max-width: 90%;
+  }
+
+  .topbar .avatar {
+    width: 60px;
+    height: auto;
+  }
+
+  .questao img {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .topbar .avatar {
+    width: 50px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  form {
+    padding: 15px;
+  }
+
+  .questao {
+    padding: 12px;
+  }
+
+  .questao img {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 0.95em;
+  }
+
+  .topbar {
+    padding: 8px;
+  }
+
+  .topbar .avatar {
+    width: 40px;
+    height: auto;
+  }
+
+  form button {
+    width: 100%;
+  }
+
+  .alternativa {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .questao img {
+    max-width: 100%;
+  }
 }
