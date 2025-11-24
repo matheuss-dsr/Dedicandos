@@ -1,25 +1,22 @@
 :root {
-  --color-gray-blue: #91A3AD; /* Azul Acinzentado - Neutro/Secundário */
-  --color-dark-red: #8C1843; /* Bordô/Vinho - Fundo Escuro Principal */
-  --color-light-gray: #F2F2F2; /* Cinza Claro - Fundo Claro/Geral */
-  --color-black: #17181B; /* Preto - Texto Principal */
-  --color-magenta: #ED145B; /* Magenta/Rosa Shock - Ação/Destaque */
+  --color-gray-blue: #91A3AD;
+  --color-dark-red: #8C1843; 
+  --color-light-gray: #F2F2F2; 
+  --color-black: #17181B; 
+  --color-magenta: #ED145B; 
 
-  /* 🧩 Mapeamento de Uso */
-  --color-bg-dark: var(--color-black); /* Fundo escuro */
-  --color-bg-light: var(--color-light-gray); /* Fundo claro */
-  --color-text-dark: var(--color-black); /* Texto principal */
-  --color-text-light: #fff; /* Texto em fundo escuro */
-  --color-accent: var(--color-magenta); /* Botões, links, hover */
+  --color-bg-dark: var(--color-black);
+  --color-bg-light: var(--color-light-gray);
+  --color-text-dark: var(--color-black);
+  --color-text-light: #fff;
+  --color-accent: var(--color-magenta);
   --color-button-primary: var(--color-dark-red);
   --color-button-hover: #630C2E;
   --color-highlight: var(--color-magenta);
 
-  /* Cores de status */
   --color-success: #4CAF50;
   --color-danger: #D32F2F;
 
-  /* Layout */
   --sidebar-width: 250px;
   --border-radius-default: 10px;
   --border-radius-large: 20px;

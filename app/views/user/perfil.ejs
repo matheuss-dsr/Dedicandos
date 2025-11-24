@@ -11,7 +11,6 @@
 </head>
 
 <body>
-  <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
     <a href="/" class="logo">
       <img src="/static/images/logo.png" alt="Logo">
@@ -25,7 +24,6 @@
     <a href="/logout" class="logout-btn">Sair</a>
   </nav>
 
-  <!-- Conteúdo Principal -->
   <div class="main">
     <header class="topbar">
       <button id="menu-toggle" class="menu-toggle">☰</button>
@@ -46,7 +44,6 @@
         <% } %>
 
         <div class="profile-info">
-          <!-- Avatar com overlay -->
           <div class="avatar-section" id="avatar-section">
             <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar-img">
             <div class="overlay">Alterar Foto</div>
@@ -56,55 +53,19 @@
             </form>
           </div>
 
-<<<<<<< HEAD
-                <div class="profile-info">
-                  <div class="avatar-section">
-                    <img src="/static/uploads/<%= user.avatar_url %>" alt="Avatar do Usuário">
-                    <div class="overlay">Alterar Foto</div>
-                    <form action="/users/<%= user.id_usuario %>/upload-avatar" method="POST"
-                      enctype="multipart/form-data">
-                      <input type="file" id="avatarInput" name="avatar" accept="image/png, image/jpeg, image/gif"
-                        hidden>
-                    </form>
-                  </div>
-
-
-                  <div class="user-details">
-                    <p><strong>Nome:</strong>
-                      <%= user.nome %>
-                    </p>
-                    <p><strong>E-mail:</strong>
-                      <%= user.email %>
-                    </p>
-                    <p><strong>Data Nasc.:</strong>
-                      <%= user.data_nascimento %>
-                    </p>
-                    <p><strong>Membro Desde:</strong>
-                      <%= user.data_cadastro %>
-                    </p>
-                    <p><strong>Tipo de Conta:</strong>
-                      <%= user.role %>
-                    </p>
-                    <p><strong>E-mail Verificado:</strong>
-                      <%= user.email_verificado ? 'Sim' : 'Não' %>
-                    </p>
-                    <a href="/users/<%= user.id_usuario %>/editar" class="edit-button">Editar Perfil</a>
-                  </div>
-                </div>
-=======
-          <!-- Detalhes do usuário -->
           <div class="user-details">
             <p><strong>Nome:</strong> <%= user.nome %></p>
             <p><strong>E-mail:</strong> <%= user.email %></p>
             <p><strong>Data de Nascimento:</strong> <%= user.data_nascimento %></p>
             <p><strong>Membro Desde:</strong> <%= user.data_cadastro %></p>
+            <% if (user && user.role === 'admin') { %>
             <p><strong>Tipo de Conta:</strong> <%= user.role %></p>
+            <% } %>
             <p><strong>E-mail Verificado:</strong> <%= user.email_verificado ? 'Sim' : 'Não' %></p>
 
             <a href="/users/<%= user.id_usuario %>/editar" class="edit-button">Editar Perfil</a>
           </div>
         </div>
->>>>>>> e4a3247df7ad68008af30ac0d152878d6a12faff
       </div>
     </main>
   </div>

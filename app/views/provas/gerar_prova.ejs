@@ -1,161 +1,146 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerar Prova ENEM</title>
-  <link rel="stylesheet" href="/static/css/gerarProva.css">
-  <link rel="stylesheet" href="/static/css/dashboard.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Prova ENEM</title>
+    <link rel="shortcut icon" href="/static/images/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/gerarProva.css">
 </head>
 
 <body>
-  <nav class="sidebar" id="sidebar">
-    <a href="/" class="logo">
-      <img src="/static/images/logo.png" alt="Logo">
-    </a>
-    <a href="/home">Início</a>
-    <a href="/perfil">Meu Perfil</a>
-    <a href="/prova/gerar/form" class="active">Gerar Prova</a>
-    <% if (user && user.role === 'admin') { %>
-      <a href="/users">Gerenciar Usuários</a>
-    <% } %>
-    <a href="/logout" class="logout-btn">Sair</a>
-  </nav>
-
-  <div class="main">
-    <header class="topbar">
-      <button id="menu-toggle" class="menu-toggle">☰</button>
-      <span class="welcome-text">Bem-vindo, <%= user.nome %>!</span>
-      <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar" class="avatar">
-    </header>
-
-    <main class="dashboard-content">
-      <h1>Gerar Prova ENEM</h1>
-
-      <form method="GET" action="/prova/gerar">
-        <label for="ano">Ano da Prova</label>
-        <select name="ano" required>
-          <% anos.forEach(y => { %>
-            <option value="<%= y %>" <%= ano == y ? 'selected' : '' %>><%= y %></option>
-          <% }) %>
-        </select>
-
-        <label for="quantity">Quantidade de Questões</label>
-        <input type="number" id="quantity" name="quantity" min="1" max="45" value="<%= quantity || 10 %>" required>
-
-        <label for="disciplina">Disciplina</label>
-        <select id="disciplina" name="disciplina">
-          <option value="linguagens" <%= disciplina === 'linguagens' ? 'selected' : '' %>>Linguagens e Códigos</option>
-          <option value="humanas" <%= disciplina === 'humanas' ? 'selected' : '' %>>Ciências Humanas</option>
-          <option value="natureza" <%= disciplina === 'natureza' ? 'selected' : '' %>>Ciências da Natureza</option>
-          <option value="matematica" <%= disciplina === 'matematica' ? 'selected' : '' %>>Matemática</option>
-        </select>
-
-        <button type="submit">Gerar Prova</button>
-      </form>
-
-      <div class="section">
-        <h2>Questões Originais do ENEM</h2>
-
-        <% if (questoesOriginais && questoesOriginais.length > 0) { %>
-          <form action="/prova/salvar-pdf" method="POST">
-            <label for="nome-pdf">Nome do Arquivo PDF:</label>
-            <input type="text" id="nome-pdf" name="nomeArquivo" placeholder="Ex: Simulado_ENEM_2022" required>
-
-            <div class="questoes-lista">
-<<<<<<< HEAD
-              <% questoesOriginais.forEach((q, idx)=> { %>
-                <div class="questao-item">
-                  <input type="checkbox" name="questoesSelecionadas" value="<%= idx %>" id="q_pdf_<%= idx %>" checked>
-                  <label for="q_pdf_<%= idx %>">Questão #<%= q.number || idx + 1 %>: <%= q.title %></label>
-                </div>
-                <% }) %>
-            </div>
-
-            <input type="hidden" name="todasQuestoes" value='<%= JSON.stringify(questoesOriginais) %>'>
-            <button type="submit" class="btn-pdf">📄 Gerar PDF</button>
-            <input type="hidden" name="todasQuestoes" value='<%= JSON.stringify(questoesOriginais) %>'>
-            <button type="submit" class="btn-docx">📝 Gerar DOCX</button>
-          </form>
-
-          <% questoesOriginais.forEach((q, idx)=> { %>
-            <% const questaoIndex=q.number || (idx + 1); %>
-              <div class="questao">
-                <h4>Questão #<%= questaoIndex %>: <%= q.title %>
-                </h4>
-                <p><strong>Disciplina:</strong>
-                  <%= q.disciplina || 'Desconhecida' %>
-                </p>
-
-                <!-- Enunciado principal da questão -->
-                <p><%- q.enunciadoHTML %></p>
-
-                <!-- Introdução das alternativas -->
-                <% if (q.alternativesIntroduction) { %>
-                  <p class="intro-alternativas"><em>
-                      <%= q.alternativesIntroduction %>
-                    </em></p>
-                  <% } %>
-
-                    <!-- Lista de alternativas -->
-                    <div class="alternativas">
-                      <% q.alternativas.forEach(a=> { %>
-                        <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
-                          <%= a.letra %>) <%- a.texto %>
-                        </div>
-                        <% }) %>
-                    </div>
-              </div>
-              <% }) %>
-                <% } else { %>
-                  <p>Nenhuma questão do ENEM encontrada. Tente refinar seus filtros.</p>
-                  <% } %>
-=======
-              <% questoesOriginais.forEach((q, idx) => { %>
-                <% const questaoIndex = q.number || (idx + 1); %>
-                <div class="questao-item">
-                  <input type="checkbox" name="questoesSelecionadas" value="<%= idx %>" id="q_<%= questaoIndex %>" checked>
-                  <label for="q_<%= questaoIndex %>">
-                    Questão #<%= questaoIndex %>: <%= q.title %> (<%= q.disciplina || 'Desconhecida' %>)
-                  </label>
-                </div>
-              <% }) %>
-            </div>
-
-            <input type="hidden" name="todasQuestoes" value='<%= JSON.stringify(questoesOriginais) %>'>
-            <button type="submit" class="btn-pdf">Salvar em PDF</button>
-          </form>
-
-          <% questoesOriginais.forEach((q, idx) => { %>
-            <% const questaoIndex = q.number || (idx + 1); %>
-            <div class="questao">
-              <h4>Questão #<%= questaoIndex %>: <%= q.title %></h4>
-              <p><strong>Disciplina:</strong> <%= q.disciplina || 'Desconhecida' %></p>
-              <p><%- q.enunciadoHTML %></p>
-              <div class="alternativas">
-                <% q.alternativas.forEach(a => { %>
-                  <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
-                    <%= a.letra %>) <%- a.texto %>
-                  </div>
-                <% }) %>
-              </div>
-            </div>
-          <% }) %>
-        <% } else { %>
-          <p>Nenhuma questão do ENEM encontrada. Tente refinar seus filtros.</p>
+    <nav class="sidebar" id="sidebar">
+        <a href="/" class="logo">
+            <img src="/static/images/logo.png" alt="Logo">
+        </a>
+        <a href="/home">Início</a>
+        <a href="/perfil">Meu Perfil</a>
+        <a href="/prova/gerar/form" class="active">Gerar Prova</a>
+        <% if (user && user.role==='admin' ) { %>
+            <a href="/users">Gerenciar Usuários</a>
         <% } %>
->>>>>>> e4a3247df7ad68008af30ac0d152878d6a12faff
-      </div>
-    </main>
-  </div>
+        <a href="/logout" class="logout-btn">Sair</a>
+    </nav>
 
-  <script>
-    const sidebar = document.getElementById('sidebar');
-    const menuToggle = document.getElementById('menu-toggle');
+    <div class="main">
+        <header class="topbar">
+            <button id="menu-toggle" class="menu-toggle">☰</button> 
+            <span class="welcome-text">Bem-vindo, <%= user.nome %>!</span>
+            <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar" class="avatar">
+        </header>
 
-    menuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-    });
-  </script>
+        <main class="dashboard-content">
+            <h1>Gerar Prova ENEM</h1>
+            <form method="GET" action="/prova/gerar">
+                <label for="ano">Ano da Prova</label>
+                <select name="ano" required>
+                    <% anos.forEach(y=> { %>
+                        <option value="<%= y %>" <%=ano==y ? 'selected' : '' %>>
+                            <%= y %>
+                        </option>
+                    <% }) %>
+                </select>
+                <label for="quantity">Quantidade de Questões</label>
+                <input type="number" id="quantity" name="quantity" min="1" max="45" value="<%= quantity || 10 %>" required>
+
+                <label for="disciplina">Disciplina</label>
+                <select id="disciplina" name="disciplina">
+                    <option value="linguagens" <%=disciplina==='linguagens' ? 'selected' : '' %>>Linguagens e Códigos</option>
+                    <option value="humanas" <%=disciplina==='humanas' ? 'selected' : '' %>>Ciências Humanas</option>
+                    <option value="natureza" <%=disciplina==='natureza' ? 'selected' : '' %>>Ciências da Natureza</option>
+                    <option value="matematica" <%=disciplina==='matematica' ? 'selected' : '' %>>Matemática</option>
+                </select>
+                <button type="submit">Gerar Prova</button>
+            </form>
+
+            <% if (questoesOriginais && questoesOriginais.length> 0) { %>
+            <form action="/prova/salvar-prova" method="POST" class="form-gerar-prova">
+                <h2>Salvar Prova Gerada</h2>
+                <label for="nome-arquivo">Nome do Arquivo:</label>
+                <input type="text" id="nome-arquivo" name="nomeArquivo" placeholder="Ex: Simulado_ENEM_2022" required>
+
+                <div class="questoes-lista">
+                    <h3>Selecione as Questões para o Arquivo:</h3>
+                    <% questoesOriginais.forEach((q, idx)=> { %>
+                        <% const questaoIndex=q.number || (idx + 1); %>
+                        <div class="questao-item">
+                            <input type="checkbox" name="questoesSelecionadas" value="<%= idx %>" id="q_<%= questaoIndex %>" class="custom-checkbox">
+                            <label for="q_<%= questaoIndex %>" class="checkmark">
+                                Q#<%= questaoIndex %>: <%= q.title %> (<%= q.disciplina || 'Desconhecida' %>)
+                            </label>
+                        </div>
+                    <% }) %>
+                    <h3>Algumas podem ter sido puladas por falta de informações</h3>
+                </div>
+
+                <input type="hidden" name="todasQuestoes" value='<%= JSON.stringify(questoesOriginais) %>'>
+
+                <div class="botoes">
+                    <button type="submit" name="tipoArquivo" value="pdf" class="btn btn-pdf">Salvar em PDF</button>
+                    <button type="submit" name="tipoArquivo" value="docx" class="btn btn-docx">Salvar em DOCX</button>
+                    <button type="submit" name="tipoArquivo" value="database" class="btn btn-database">Salvar na Nuvem</button>
+                </div>
+            </form>
+            <% } %>
+
+            <div class="section">
+                <h2>Questões ENEM
+                </h2>
+                <% if (questoesOriginais && questoesOriginais.length> 0) { %>
+                    <% questoesOriginais.forEach((q, idx)=> { %>
+                        <% const questaoIndex=q.number || (idx + 1); %>
+                        <div class="questao">
+                            <h4>Questão #<%= questaoIndex %>: <%= q.title %>
+                            </h4>
+                            <p><strong>Disciplina:</strong>
+                                <%= q.disciplina || 'Desconhecida' %>
+                            </p>
+                            <p><%- q.enunciadoHTML %></p>
+
+                            <% if (q.alternativesIntroduction) { %>
+                                <p class="intro-alternativas"><em>
+                                    <%= q.alternativesIntroduction %>
+                                </em></p>
+                            <% } %>
+
+                            <div class="alternativas">
+                                <% q.alternativas.forEach(a=> { %>
+                                    <div class="alternativa <%= a.letra === q.alternativaCorreta ? 'correta' : '' %>">
+                                        <span class="letra"><%= a.letra %>)</span> <%- a.texto %>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>Nenhuma questão do ENEM encontrada. Tente refinar seus filtros.</p>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <script>
+  const sidebar = document.getElementById('sidebar');
+  const menuToggle = document.getElementById('menu-toggle');
+
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+
+  function ajustarSidebar() {
+    if (window.innerWidth > 1024) {
+      sidebar.classList.remove('active');
+    } else {
+      sidebar.style.transform = "";
+    }
+  }
+
+  ajustarSidebar();
+  window.addEventListener('resize', ajustarSidebar);
+</script>
+
 </body>
+
 </html>

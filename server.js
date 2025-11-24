@@ -145,6 +145,12 @@ server.post(
   (req, reply) => provaController.salvarPDF(req, reply)
 );
 
+server.post(
+  "/prova/salvar-prova",
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.salvarProva(req, reply)
+);
+
 
 
 

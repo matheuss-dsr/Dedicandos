@@ -85,15 +85,12 @@ export async function criarUsuario(req, reply, database) {
     const emailHash = cryptoUtils.hashForLookup(email);
     const hashedPassword = await bcrypt.hash(senha, 10);
 
-    await db.createUser({
-      nome,
-      email: encryptedEmail,
-      senha: hashedPassword,
-      role: "usuario",
-      data_nascimento: encryptedBirth,
-      email_verificado: false,
-      email_hash: emailHash,
-    });
+    await db.query(
+      `INSERT INTO usuarios (nome, email, senha, role, data_nascimento, email_verificado, email_hash)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [nome, encryptedEmail, hashedPassword, 'usuario', encryptedBirth, false, emailHash]
+    );
+
     console.log(`[DB] Usuário criado com sucesso no banco: ${email}`);
 
 
@@ -116,7 +113,7 @@ export async function criarUsuario(req, reply, database) {
       });
     }
     return reply.view("user/cadastro.ejs", {
-      error: "Erro ao criar conta. Tente novamente.",
+      error: "Erro ao criar conta. Tente novamente." + error.message,
       success: null,
     });
   }

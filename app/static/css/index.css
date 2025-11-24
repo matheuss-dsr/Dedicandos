@@ -1,22 +1,20 @@
 :root {
-  /* Cores Base Fornecidas */
-  --color-gray-blue: #91A3AD; /* Azul Acinzentado - Neutro/Secundário */
-  --color-dark-red: #8C1843; /* Bordô/Vinho - Fundo Escuro Principal */
-  --color-light-gray: #F2F2F2; /* Cinza Claro - Fundo Claro/Geral */
-  --color-black: #17181B; /* Preto - Texto Principal */
-  --color-magenta: #ED145B; /* Magenta/Rosa Shock - Ação/Destaque */
 
-  /* Mapeamento das Variáveis de Uso */
-  --color-bg-dark: var(--color-black); /* Navbar, Seção Planos */
-  --color-bg-light: var(--color-black); /* Fundo Claro */
-  --color-text-dark: var(--color-light-gray); /* Texto Principal */
-  --color-text-light: #fff; /* Texto em Fundo Escuro */
-  --color-accent: var(--color-magenta); /* Links, Hover, Botões de Destaque */
-  --color-button-primary: var(--color-dark-red); /* Botões Principais */
-  --color-button-hover: #630C2E; /* Versão mais escura do Bordô */
-  --color-highlight: var(--color-magenta); /* Preços, Borda de Destaque */
+  --color-gray-blue: #91A3AD; 
+  --color-dark-red: #8C1843; 
+  --color-light-gray: #F2F2F2; 
+  --color-black: #17181B; 
+  --color-magenta: #ED145B; 
 
-  /* Cores de Status (mantidas para funcionalidade) */
+  --color-bg-dark: var(--color-black);
+  --color-bg-light: var(--color-black); 
+  --color-text-dark: var(--color-light-gray); 
+  --color-text-light: #fff; 
+  --color-accent: var(--color-magenta); 
+  --color-button-primary: var(--color-dark-red); 
+  --color-button-hover: #630C2E; 
+  --color-highlight: var(--color-magenta); 
+
   --color-success: #4CAF50;
   --color-danger: #D32F2F;
 }
@@ -113,7 +111,7 @@ body {
 }
 
 .btn-register:hover {
-  background: var(--color-button-hover); /* Usando cor derivada de para hover */
+  background: var(--color-button-hover);
 }
 
 .btn-logout {
@@ -125,15 +123,13 @@ body {
   background: var(--color-button-hover);
 }
 
-/* Botão hamburguer */
 .hamburger {
-  display: none; /* Oculto por padrão */
+  display: none;
   font-size: 2rem;
   cursor: pointer;
   color: var(--color-text-light);
 }
 
-/* Hero */
 .hero {
   position: relative;
   height: 90vh;
@@ -170,11 +166,10 @@ body {
   font-size: 1.2rem;
 }
 
-/* Sobre nós */
 .sobre {
   padding: 80px 20px;
   text-align: center;
-  background: var(--color-bg-light); /* Usando cor */
+  background: var(--color-bg-light);
 }
 
 .sobre h2 {
@@ -187,7 +182,7 @@ body {
   max-width: 800px;
   margin: auto;
   font-size: 1.1rem;
-  color: var(--color-gray-blue); /* Usando cor para texto secundário */
+  color: var(--color-gray-blue);
 }
 
 /* Planos */
@@ -233,7 +228,7 @@ body {
 .plano-card p {
   font-size: 1rem;
   margin-bottom: 15px;
-  color: var(--color-gray-blue); /* Usando cor para texto secundário */
+  color: var(--color-gray-blue);
 }
 
 .preco {
@@ -368,7 +363,7 @@ footer .socials a:hover {
 .user-menu {
   display: none;
   position: absolute;
-  top: 100%; /* abaixo do avatar */
+  top: 100%;
   right: 0;
   background: var(--color-bg-dark);
   border-radius: var(--border-radius-default);
@@ -413,11 +408,10 @@ footer .socials a:hover {
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  margin-left: 50%; /* Ajustado para evitar overflow em mobile */
+  margin-left: 50%;
   border: 5px solid var(--color-bg-dark);
 }
 
-/* Responsividade e Menu Mobile */
 @media (max-width: 768px) {
   .menu {
     display: none;
@@ -439,7 +433,7 @@ footer .socials a:hover {
   }
 
   .hamburger {
-    display: block; /* Mostra o hambúrguer em mobile */
+    display: block;
   }
 
   .planos-container {
@@ -456,11 +450,10 @@ footer .socials a:hover {
   }
 
   .topbar .avatar {
-    margin-left: 20%; /* Ajuste adicional para mobile */
+    margin-left: 20%;
   }
 }
 
-/* Navbar escondida ao descer */
 .navbar.hide {
   transform: translateY(-100%);
   transition: transform 0.3s ease-in-out;

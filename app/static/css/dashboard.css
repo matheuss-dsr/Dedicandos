@@ -13,7 +13,6 @@
   --color-accent: var(--color-magenta);
   --color-button-primary: var(--color-dark-red);
   --color-button-hover: #630C2E;
-
   --color-success: #4CAF50;
   --color-danger: #D32F2F;
 
@@ -23,9 +22,6 @@
   --font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ============================== */
-/* 🧱 Estrutura Geral */
-/* ============================== */
 body {
   margin: 0;
   font-family: var(--font-family);
@@ -36,12 +32,18 @@ body {
   overflow: hidden;
 }
 
-/* ============================== */
-/* 🧭 Sidebar */
-/* ============================== */
+.main {
+  background-color: var(--color-light);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 40px;
+  overflow: hidden;
+}
+
 nav.sidebar {
   background-color: var(--color-bg-dark);
-  width: var(--sidebar-width);
+  width: 250px;
   display: flex;
   flex-direction: column;
   padding: 25px 20px;
@@ -93,7 +95,7 @@ nav.sidebar a.active {
 
 nav.sidebar .logout-btn {
   margin-top: auto;
-  background-color: var(--color-dark-red);
+  background-color: var(--color-button-primary);
   color: var(--color-text-light);
   padding: 14px 18px;
   border-radius: var(--border-radius-default);
@@ -107,9 +109,6 @@ nav.sidebar .logout-btn:hover {
   background-color: var(--color-button-hover);
 }
 
-/* ============================== */
-/* 📊 Topbar */
-/* ============================== */
 .topbar {
   width: 98%;
   display: flex;
@@ -117,10 +116,10 @@ nav.sidebar .logout-btn:hover {
   align-items: center;
   background-color: var(--color-bg-light);
   padding: 10px 25px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
   margin-bottom: 20px;
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   flex-wrap: wrap;
   gap: 15px;
 }
@@ -147,17 +146,120 @@ nav.sidebar .logout-btn:hover {
 .topbar .avatar:hover {
   transform: scale(1.05);
 }
+nav.sidebar {
+    background-color: var(--color-bg-dark);
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    padding: 25px 20px;
+    box-sizing: border-box;
+    color: var(--color-text-light);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
 
-/* ============================== */
-/* 🧩 Conteúdo Principal */
-/* ============================== */
-.main {
-  background-color: var(--color-light);
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 40px;
-  overflow: hidden;
+nav.sidebar .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    cursor: pointer;
+}
+
+nav.sidebar .logo img {
+    width: 140px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+    max-width: 100%;
+}
+
+nav.sidebar .logo img:hover {
+    transform: scale(1.05);
+}
+
+nav.sidebar a {
+    color: var(--color-text-light);
+    text-decoration: none;
+    padding: 14px 18px;
+    border-radius: var(--border-radius-default);
+    margin-bottom: 15px;
+    display: block;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+nav.sidebar a:hover,
+nav.sidebar a.active {
+    background-color: var(--color-button-hover);
+    color: var(--color-light-gray);
+    font-weight: 600;
+}
+
+nav.sidebar .logout-btn {
+    margin-top: auto;
+    background-color: var(--color-button-primary);
+    color: var(--color-text-light);
+    padding: 14px 18px;
+    border-radius: var(--border-radius-default);
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+nav.sidebar .logout-btn:hover {
+    background-color: var(--color-button-hover);
+}
+
+.menu-toggle {
+    display: none; 
+    background: var(--color-dark-red);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.topbar {
+    width: 98%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-bg-light);
+    padding: 10px 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.topbar span {
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--color-text-dark);
+    word-break: break-word;
+}
+
+.topbar .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-accent);
+    box-shadow: 0 0 8px rgba(237, 20, 91, 0.3);
+    max-width: 100%;
+    height: auto;
+    transition: transform 0.3s ease-in-out;
+}
+
+.topbar .avatar:hover {
+    transform: scale(1.05);
 }
 
 main.dashboard-content {
@@ -168,14 +270,24 @@ main.dashboard-content {
   height: calc(100vh - 65px);
   color: var(--color-text-dark);
   overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
 
-/* ============================== */
-/* 📱 Responsividade */
-/* ============================== */
+main.dashboard-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+main.dashboard-content::-webkit-scrollbar-thumb {
+  background: var(--color-dark-red);
+  border-radius: 10px;
+}
+
+main.dashboard-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-button-hover);
+}
+
 @media (max-width: 1280px) {
   .main {
     padding: 20px;
@@ -198,7 +310,8 @@ main.dashboard-content {
     top: 0;
     left: 0;
     height: 100vh;
-    transform: translateX(-100%);
+    width: 250px;
+    transform: translateX(-100%) !important;
   }
 
   nav.sidebar.active {
@@ -208,7 +321,7 @@ main.dashboard-content {
   .menu-toggle {
     display: block;
     background: var(--color-dark-red);
-    color: #fff;
+    color: var(--color-text-light);
     padding: 10px 15px;
     border-radius: 8px;
     border: none;
@@ -237,20 +350,30 @@ main.dashboard-content {
     padding: 25px 20px;
     height: auto;
     width: 100%;
+    overflow-y: visible;
   }
 }
 
 @media (max-width: 768px) {
-  .topbar {
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-    text-align: center;
-  }
+  .menu-toggle {
+        display: block; 
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001; 
+    }
 
-  .topbar .avatar {
-    width: 50px;
-  }
+    .topbar {
+        margin-top: 50px; 
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .topbar .avatar {
+        width: 50px;
+    }
 
   main.dashboard-content {
     padding: 20px 15px;
@@ -281,20 +404,4 @@ main.dashboard-content {
   main.dashboard-content {
     padding: 15px;
   }
-}
-
-/* ============================== */
-/* ✨ Scroll e Transições */
-/* ============================== */
-main.dashboard-content::-webkit-scrollbar {
-  width: 10px;
-}
-
-main.dashboard-content::-webkit-scrollbar-thumb {
-  background: var(--color-dark-red);
-  border-radius: 10px;
-}
-
-main.dashboard-content::-webkit-scrollbar-thumb:hover {
-  background: var(--color-button-hover);
 }

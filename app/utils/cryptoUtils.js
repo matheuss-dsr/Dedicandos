@@ -1,6 +1,5 @@
 import crypto from "crypto";
 
-const algorithm = "aes-256-cbc";
 let key = process.env.ENCRYPTION_KEY || null;
 
 if (key && key.length === 44 && key.includes('=')) {
@@ -10,15 +9,10 @@ if (key && key.length === 44 && key.includes('=')) {
 }
 
 if (!key) {
-  throw new Error("ENCRYPTION_KEY must be set in environment.");
+  throw new Error("ENCRYPTION_KEY tem que estar no .env");
 }
 if (key.length < 32) {
   key = crypto.createHash('sha256').update(key).digest();
-}
-
-function deriveIv(text) {
-  const h = crypto.createHmac('sha256', key).update(text).digest();
-  return h.slice(0, 16);
 }
 
 export function encrypt(text) {
@@ -40,7 +34,6 @@ export function decrypt(text) {
   return decrypted;
 }
 
-// FUNÇÃO NOVA: hash fixo para lookup (256-bit hex)
 export function hashForLookup(value) {
   if (!value) return null;
   return crypto.createHash("sha256").update(value).digest("hex");
