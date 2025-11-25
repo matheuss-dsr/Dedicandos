@@ -3,13 +3,8 @@ import fetch from "node-fetch";
 import PDFDocument from "pdfkit";
 import { parse } from "node-html-parser";
 import { Document, Packer, Paragraph, HeadingLevel } from "docx";
-
-const disciplineMapping = {
-  linguagens: "linguagens",
-  humanas: "ciencias-humanas",
-  natureza: "ciencias-natureza",
-  matematica: "matematica",
-};
+import { DatabasePostgres } from "../infra/database_postgres.js";
+const database = new DatabasePostgres();
 
 function getValidanos() {
   const anos = [];
@@ -218,187 +213,61 @@ export async function salvarDOCX(req, reply) {
   }
 }
 
-export async function salvarNuvem(req, reply) {
+export async function salvarNuvem(req, reply, database) { 
+    const { titulo, ano, disciplina, questoes_selecionadas } = req.body;
+    const user = req.user;
+    if (!titulo || !questoes_selecionadas || questoes_selecionadas.length === 0) {
+        return reply.code(400).send({ error: "Título e pelo menos uma questão são obrigatórios." });
+    }
     try {
-        const { nomeArquivo, todasQuestoes, questoesSelecionadas, nome, sala, escola, nota, ano } = req.body; 
-
-        if (!nomeArquivo || !todasQuestoes) {
-            return reply.code(400).send({ error: "Nome do arquivo ou questões não fornecidos." });
+        if (!database) {
+            return reply.code(500).send({ error: "Serviço de banco de dados indisponível." });
         }
         
-        const anoInt = parseInt(ano);
-        if (isNaN(anoInt)) {
-            return reply.code(400).send({ error: "Ano da prova inválido para salvar no banco." });
-        }
-        
-        const todas = JSON.parse(todasQuestoes);
-        
-        let selecionadas = [];
-        if (Array.isArray(questoesSelecionadas)) {
-            selecionadas = questoesSelecionadas.map(i => todas[i]);
-        } else if (typeof questoesSelecionadas === "string") {
-            selecionadas = [todas[questoesSelecionadas]];
-        }
+        const resultado = await database.salvarProva(user.id, titulo, ano, disciplina, questoes_selecionadas);
 
-        if (selecionadas.length === 0) {
-            return reply.code(400).send({ error: "Nenhuma questão selecionada para salvar." });
-        }
-        
-        const questoesNormalizadas = selecionadas.map((q, idx) => ({
-            ...q,
-            index: idx + 1, 
-            disciplina: q.disciplina || "",
-            title: q.title || "Questão",
-        }));
-
-        const infoProva = { nomeArquivo, nome, sala, escola, nota };
-
-        const insertedId = await salvarNoBanco(infoProva, questoesNormalizadas, anoInt);
-
-        return reply.code(200).send({
-            success: "Prova salva com sucesso na nuvem (banco de dados).",
-            id: insertedId,
-            fileName: nomeArquivo
+        return reply.code(200).send({ 
+            success: "Prova salva na nuvem com sucesso!", 
+            prova_id: resultado.id 
         });
 
     } catch (err) {
-        console.error("Erro em salvarNuvem:", err);
-        return reply.code(500).send({ error: "Erro interno ao salvar prova: " + err.message });
+        console.error("Erro ao salvar prova no DB:", err);
+        return reply.code(500).send({ error: "Erro ao salvar prova na nuvem: " + err.message });
     }
 }
 
-export async function mostrarFormularioGerarProva(req, reply) {
-  const anos = getValidanos();
-  return reply.view("provas/gerar_prova.ejs", {
-    user: req.user,
-    anos,
-    ano: req.query.ano || null,
-    quantity: 45,
-    disciplina: null,
-    questoesOriginais: [],
-    error: null,
-    success: null,
-  });
-}
 
-export async function listarQuestoesENEM(req, reply) {
+export async function salvarProva(req, reply, database) {
+  console.log("DADOS RECEBIDOS:", req.body);
   try {
-    let { ano, disciplina, quantity } = req.query;
-    ano = parseInt(ano);
-    const anos = getValidanos();
-    const converter = new showdown.Converter();
-    const numQuestoes = parseInt(quantity) || 45;
+    const { 
+            nomeArquivo, 
+            todasQuestoes, 
+            questoesSelecionadas, 
+            tipoArquivo,
+            nome, 
+            sala, 
+            escola, 
+            nota,
+            ano, 
+            disciplina
+        } = req.body;
 
-    if (!ano || isNaN(ano) || ano < 2009 || ano > 2023) {
-      return reply.view("provas/gerar_prova.ejs", {
-        user: req.user,
-        anos,
-        error: "Ano inválido (deve ser entre 2009 e 2023).",
-        questoesOriginais: [],
-        quantity: numQuestoes,
-        disciplina,
-        ano: req.query.ano || null,
-        success: null,
-      });
-    }
-
-    const baseUrl = `https://api.enem.dev/v1/exams/${ano}/questions`;
-    const mappedDiscipline = disciplina ? disciplineMapping[disciplina] : null;
-
-    const disciplinaOffsetMap = {
-      linguagens: 0,
-      "ciencias-humanas": 46,
-      "ciencias-natureza": 91,
-      matematica: 136,
-    };
-
-    let questoes = [];
-    let offset = mappedDiscipline ? disciplinaOffsetMap[mappedDiscipline] : 0;
-    let limit = 45;
-    const maxLimit = 45;
-
-    while (questoes.length < numQuestoes && offset < maxLimit) {
-      const url = `${baseUrl}?limit=${limit}&offset=${offset}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-
-      const data = await response.json();
-      let fetched = data.questions || [];
-      if (mappedDiscipline) fetched = fetched.filter((q) => q.discipline === mappedDiscipline);
-
-      const questoesFiltradas = [];
-      const BROKEN_IMAGE_URL = "https://enem.dev/broken-image.svg";
-
-      for (const q of fetched) {
-        const enunciado = q.context || q.text || "";
-        const alternativasInvalidas = !q.alternatives || !q.alternatives.every(alt => alt.text);
-        const temImagemQuebrada = enunciado.includes(BROKEN_IMAGE_URL);
-
-        if ( alternativasInvalidas || temImagemQuebrada) {
-          let motivo = [];
-          if (alternativasInvalidas) motivo.push("Alternativas sem texto");
-          if (temImagemQuebrada) motivo.push("Imagem quebrada detectada");
-
-          console.log(`Questão pulada (ID: ${q.id || 'Desconhecido'}, Disciplina: ${q.discipline || 'Desconhecida'}): ${motivo.join(' e ')}`);
-        } else {
-          questoesFiltradas.push(q);
-        }
-      }
-
-      questoes = questoes.concat(questoesFiltradas);
-      offset += 45;
-    }
-
-    questoes = questoes.slice(0, numQuestoes);
-
-    const questoesOriginais = questoes.map((q, i) => {
-      const questaoProcessada = processQuestion(q, converter);
-      questaoProcessada.index = i + 1;
-      return questaoProcessada;
-    });
-
-    return reply.view("provas/gerar_prova.ejs", {
-      user: req.user,
-      anos,
-      ano,
-      quantity: numQuestoes,
-      disciplina,
-      questoesOriginais,
-      error: null,
-      success: `${questoesOriginais.length} questões carregadas com sucesso!`,
-    });
-
-  } catch (err) {
-    console.error("Erro geral na listagem de questões:", err.message);
-    const anos = getValidanos();
-    return reply.view("provas/gerar_prova.ejs", {
-      user: req.user,
-      anos,
-      error: `Ocorreu um erro: ${err.message}`,
-      questoesOriginais: [],
-      quantity: parseInt(req.query.quantity) || 45,
-      disciplina: req.query.disciplina || null,
-      ano: req.query.ano || null,
-      success: null,
-    });
-  }
-}
-
-export async function salvarProva(req, reply) {
-  try {
-    const { nomeArquivo, todasQuestoes, questoesSelecionadas, tipoArquivo } = req.body;
-
-    if (!nomeArquivo || !todasQuestoes)
+    if (!nomeArquivo || nomeArquivo.trim() === '' || !todasQuestoes)
       return reply.code(400).send({ error: "Nome ou questões não fornecidos." });
 
     const todas = JSON.parse(todasQuestoes);
 
     let selecionadas = [];
+    let questoesIndices = [];
     if (Array.isArray(questoesSelecionadas)) {
-      selecionadas = questoesSelecionadas.map(i => todas[i]);
+      questoesIndices = questoesSelecionadas.map(Number);
     } else if (typeof questoesSelecionadas === "string") {
-      selecionadas = [todas[questoesSelecionadas]];
+      questoesIndices = [Number(questoesSelecionadas)];
     }
+    
+    selecionadas = questoesIndices.map(i => todas[i]).filter(q => q);
 
     if (selecionadas.length === 0)
       return reply.code(400).send({ error: "Nenhuma questão selecionada." });
@@ -420,12 +289,228 @@ export async function salvarProva(req, reply) {
         .header("Content-Disposition", `attachment; filename="${fileName}.docx"`)
         .send(buffer);
 
-    } else {
-      return reply.code(400).send({ error: "Tipo de arquivo inválido." });
+    } else if (tipoArquivo === "database") {
+            
+            if (!database) {
+                return reply.code(500).send({ error: "Serviço de banco de dados indisponível." });
+            }
+
+            if (!ano || ano.toString().trim() === '' || !disciplina || disciplina.toString().trim() === '') {
+                console.error("Falha na validação de ano/disciplina:", { ano, disciplina });
+                return reply.code(400).send({ error: "O ano e a disciplina devem ser selecionados para salvar na nuvem." });
+            }
+
+            const reqParaNuvem = {
+                user: req.user,
+                body: {
+                    titulo: nomeArquivo,
+                    ano: ano.toString().trim(),
+                    disciplina: disciplina.toString().trim(),
+                    questoes_selecionadas: questoesIndices 
+                }
+            };
+
+            return await salvarNuvem(reqParaNuvem, reply, database);
+
+        } else {
+            return reply.code(400).send({ error: "Tipo de arquivo inválido." });
+        }
+
+    } catch (err) {
+        console.error("Erro em salvarProva:", err);
+        return reply.code(500).send({ error: "Erro ao gerar arquivo: " + err.message });
+    }
+}
+
+
+export async function exibirProva(req, reply, database) {
+  const id_prova = req.params.prova_id;
+  const user = req.user;
+
+  if (!id_prova || !database) {
+    return reply.code(400).send({ error: "ID da prova ou serviço de banco de dados não encontrado." });
+  }
+
+  try {
+    const provaData = await database.getProvaComQuestoes(id_prova);
+
+    if (!provaData || !provaData.questoes || provaData.questoes.length === 0) {
+      return reply.view("provas/visualizar_prova.ejs", {
+        user,
+        error: "Prova não encontrada ou sem questões salvas.",
+        prova: null,
+        questoesDetalhes: []
+      });
     }
 
+    const promessasQuestoes = provaData.questoes.map(qId =>
+      database.buscarQuestaoENEMPorIndex(qId.enem_year, qId.enem_index)
+    );
+
+    const questoesDetalhes = (await Promise.all(promessasQuestoes)).filter(q => q !== null);
+
+    return reply.view("provas/visualizar_prova.ejs", {
+      user,
+      prova: provaData.metadata,
+      questoesDetalhes,
+      error: null
+    });
+
   } catch (err) {
-    console.error("Erro em salvarProva:", err);
-    return reply.code(500).send({ error: "Erro ao gerar arquivo: " + err.message });
+    console.error("🚨 Erro ao exibir prova:", err);
+    return reply.code(500).send({ error: "Erro ao carregar os detalhes da prova." });
+  }
+}
+
+export async function mostrarFormularioGerarProva(req, reply) {
+  const anos = getValidanos();
+  return reply.view("provas/gerar_prova.ejs", {
+    user: req.user,
+    anos,
+    ano: req.query.ano || null,
+    quantity: 10,
+    disciplina: req.query.disciplina || null,
+    questoesOriginais: [],
+    error: null,
+    success: null,
+  });
+}
+
+export async function listarQuestoesENEM(req, reply) {
+  try {
+    let { ano, disciplina, quantity } = req.query;
+
+    const anos = getValidanos();
+    const converter = new showdown.Converter();
+
+    ano = parseInt(ano);
+    const numQuestoes = parseInt(quantity) || 45;
+
+    if (!ano || ano < 2009 || ano > 2023) {
+      return reply.view("provas/gerar_prova.ejs", {
+        user: req.user,
+        anos,
+        error: "Ano inválido (deve ser entre 2009 e 2023).",
+        questoesOriginais: [],
+        quantity: numQuestoes,
+        disciplina: disciplina || null,
+        ano: req.query.ano || null,
+        success: null,
+      });
+    }
+
+    const disciplinaOffsetMap = {
+      linguagens: 0,
+      humanas: 46,
+      natureza: 91,
+      matematica: 136,
+    };
+
+    let offset = disciplinaOffsetMap[disciplina] ?? 0;
+    const limit = 45;
+
+    console.log("📌 Disciplina:", disciplina);
+    console.log("📌 Offset usado:", offset);
+
+    let questoes = [];
+    const BROKEN_IMAGE = "broken-image.svg";
+
+    while (questoes.length < numQuestoes && offset < 180) {
+      const apiUrl = `https://api.enem.dev/v1/exams/${ano}/questions?limit=${limit}&offset=${offset}`;
+
+      console.log("📡 URL chamada:", apiUrl);
+
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        console.error("❌ Erro HTTP:", response.status, response.statusText);
+
+        return reply.view("provas/gerar_prova.ejs", {
+          user: req.user,
+          anos,
+          error: `Erro ao buscar API (${response.status}): ${response.statusText}`,
+          questoesOriginais: [],
+          quantity: numQuestoes,
+          disciplina,
+          ano,
+          success: null,
+        });
+      }
+
+      const data = await response.json();
+
+      if (!data.questions || !Array.isArray(data.questions)) {
+        console.error("❌ Resposta inesperada:", data);
+
+        return reply.view("provas/gerar_prova.ejs", {
+          user: req.user,
+          anos,
+          error: "A API retornou um formato inesperado.",
+          questoesOriginais: [],
+          quantity: numQuestoes,
+          disciplina,
+          ano,
+          success: null,
+        });
+      }
+
+      const blocoFiltrado = data.questions.filter((q) => {
+        const ctx = q.context || q.text || "";
+
+        const alternativasInvalidas =
+          !q.alternatives || !q.alternatives.every((alt) => alt.text);
+
+        const imagemQuebrada = ctx.includes(BROKEN_IMAGE);
+
+        if (alternativasInvalidas || imagemQuebrada) {
+          console.log(
+            `⚠️ Questão removida (ID ${q.id}) Motivo: ${
+              alternativasInvalidas ? "Alternativas inválidas" : ""
+            } ${imagemQuebrada ? "Imagem quebrada" : ""}`
+          );
+          return false;
+        }
+
+        return true;
+      });
+
+      questoes = questoes.concat(blocoFiltrado);
+
+      offset += limit;
+    }
+
+    const selecionadas = questoes.slice(0, numQuestoes);
+
+    const questoesOriginais = selecionadas.map((q, i) => {
+      const proc = processQuestion(q, converter);
+      proc.index = i + 1;
+      return proc;
+    });
+
+    return reply.view("provas/gerar_prova.ejs", {
+      user: req.user,
+      anos,
+      ano,
+      quantity: numQuestoes,
+      disciplina,
+      questoesOriginais,
+      error: null,
+      success: `${questoesOriginais.length} questões carregadas com sucesso!`,
+    });
+
+  } catch (err) {
+    console.error("🔥 ERRO GERAL:", err);
+
+    const anos = getValidanos();
+    return reply.view("provas/gerar_prova.ejs", {
+      user: req.user,
+      anos,
+      error: "Erro inesperado: " + err.message,
+      questoesOriginais: [],
+      quantity: req.query.quantity || 45,
+      disciplina: req.query.disciplina || null,
+      ano: req.query.ano || null,
+      success: null,
+    });
   }
 }

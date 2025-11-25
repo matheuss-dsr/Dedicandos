@@ -102,9 +102,7 @@ export class DatabasePostgres {
   /* ---------------- AUTENTICAÇÃO/TOKENS ---------------- */
   
   async savePasswordResetToken(email, token, expiresAt) {
-    console.log("[DEBUG SAVE] Salvando token:", { email, token: token.substring(0, 10) + '...', expiresAt });
     if (!email || !token || !expiresAt) {
-      console.error("[DB ERROR] Tentativa de salvar token de redefinição com parâmetros ausentes:", { email, token, expiresAt });
       throw new Error("ERRO CRÍTICO DE PARÂMETROS: E-mail, token ou expiração ausentes ao salvar o token.");
     }
 
@@ -114,9 +112,7 @@ export class DatabasePostgres {
   }
 
   async findPasswordResetByToken(token) {
-  console.log("[DEBUG] Buscando token:", token);
   const result = await this.query("SELECT * FROM password_resets WHERE token = $1", [token]);
-  console.log("[DEBUG] Resultado da query:", result.rows);
 
   const resetRecord = result.rows[0];
   if (!resetRecord) {
@@ -126,13 +122,10 @@ export class DatabasePostgres {
 
   const now = new Date();
   const expiresAt = new Date(resetRecord.expires_at);
-  console.log("[DEBUG] Agora:", now, "| Expira em:", expiresAt);
 
   if (now <= expiresAt) {
-    console.log("[DEBUG] Token válido.");
     return resetRecord;
   } else {
-    console.log("[DEBUG] Token expirado.");
     await this.deletePasswordResetToken(token);
     return null;
   }
@@ -143,7 +136,6 @@ export class DatabasePostgres {
         `DELETE FROM password_resets WHERE token = $1`,
         [token]
       );
-      console.log(`[DB] Token de redefinição ${token} deletado.`);
   }
 
   async updateUserPassword(emailHash, hashedPassword) {
@@ -197,6 +189,7 @@ export class DatabasePostgres {
       [id_prova]
     );
   }
+
  async buscarQuestaoENEMPorIndex(year, index) {
     const url = `https://api.enem.dev/v1/exams/${year}/questions/${index}`;
     const response = await fetch(url);
@@ -227,4 +220,58 @@ export class DatabasePostgres {
       numero: q.number
     };
   }
+
+  async salvarProva({ titulo, id_usuario, ano, disciplina, questoes_selecionadas }) {
+      const indicesSelecionados = Array.isArray(questoes_selecionadas)
+        ? questoes_selecionadas.map(Number)
+        : questoes_selecionadas
+        ? [Number(questoes_selecionadas)]
+        : [];
+
+      if (!titulo || indicesSelecionados.length === 0) {
+        throw new Error("Título e pelo menos uma questão são obrigatórios.");
+      }
+
+      const client = await this.pool.connect();
+      try {
+        await client.query("BEGIN");
+
+        const insertProvaQuery = `
+          INSERT INTO provas
+            (titulo, id_usuario, ano, quantidade_questoes, disciplina)
+          VALUES
+            ($1, $2, $3, $4, $5)
+          RETURNING id_prova;
+        `;
+        const resultProva = await client.query(insertProvaQuery, [
+          titulo,
+          id_usuario,
+          parseInt(ano),
+          indicesSelecionados.length,
+          disciplina || "Todas",
+        ]);
+        const id_prova = resultProva.rows[0].id_prova;
+
+        const insertQuestaoQuery = `
+          INSERT INTO questoes_prova
+            (id_prova, enem_year, enem_index)
+          VALUES
+            ($1, $2, $3);
+        `;
+
+        const inserts = indicesSelecionados.map((index) =>
+          client.query(insertQuestaoQuery, [id_prova, parseInt(ano), index])
+        );
+
+        await Promise.all(inserts);
+        await client.query("COMMIT");
+
+        return id_prova;
+      } catch (err) {
+        await client.query("ROLLBACK");
+        throw err;
+      } finally {
+        client.release();
+      }
+    }
 }

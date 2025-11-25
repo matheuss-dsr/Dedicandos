@@ -146,9 +146,15 @@ server.post(
 );
 
 server.post(
+  "/prova/salvar-nuvem",
+  { preHandler: [server.authenticate, server.checkEmailVerified] },
+  (req, reply) => provaController.salvarNuvem(req, reply)
+);
+
+server.post(
   "/prova/salvar-prova",
   { preHandler: [server.authenticate, server.checkEmailVerified] },
-  (req, reply) => provaController.salvarProva(req, reply)
+  (req, reply) => provaController.salvarProva(req, reply, database)
 );
 
 

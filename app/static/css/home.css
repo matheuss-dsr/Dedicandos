@@ -43,3 +43,61 @@
 .saved-tests ul li:hover {
   background-color: var(--color-section-hover);
 }
+
+.tutorial-box {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  margin-top: 20px;
+  animation: fadeIn 0.4s ease;
+}
+
+.tutorial-box h2 {
+  margin-top: 0;
+  font-size: 1.6rem;
+  color: var(--color-dark-red);
+  margin-bottom: 10px;
+}
+
+.tutorial-box p {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.tutorial-box ul {
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+.tutorial-box ul li {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  position: relative;
+}
+
+.tutorial-box ul li::before {
+  content: "✔";
+  color: var(--color-accent);
+  font-weight: bold;
+  position: absolute;
+  left: -20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .tutorial-box {
+    padding: 20px;
+  }
+  
+  .tutorial-box h2 {
+    font-size: 1.4rem;
+  }
+}

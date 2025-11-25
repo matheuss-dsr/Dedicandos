@@ -1,7 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // =========================
-  // ELEMENTOS PRINCIPAIS
-  // =========================
   const hamburger = document.getElementById("hamburger");
   const menu = document.getElementById("menu");
   const navbar = document.getElementById("navbar");
@@ -10,9 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const avatarOverlay = document.querySelector(".avatar-section .overlay");
   const avatarInput = document.getElementById("avatarInput");
 
-  // =========================
-  // MENU HAMBÚRGUER
-  // =========================
   if (hamburger && menu) {
     hamburger.addEventListener("click", () => menu.classList.toggle("active"));
 
@@ -22,9 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =========================
-  // ESCONDER/EXIBIR NAVBAR AO ROLAR
-  // =========================
   let lastScrollTop = 0;
   if (navbar) {
     window.addEventListener("scroll", () => {
@@ -35,9 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =========================
-  // SCROLL SUAVE PARA ÂNCORAS (#)
-  // =========================
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener("click", e => {
       e.preventDefault();
@@ -49,13 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
           behavior: "smooth"
         });
       }
-      menu?.classList.remove("active"); // fecha menu mobile se aberto
+      menu?.classList.remove("active");
     });
   });
 
-  // =========================
-  // MENU DO USUÁRIO (AVATAR)
-  // =========================
   if (avatarBtn && userMenu) {
     avatarBtn.addEventListener("click", e => {
       e.stopPropagation();
@@ -66,9 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
     userMenu.addEventListener("click", e => e.stopPropagation());
   }
 
-  // =========================
-  // TROCA DE AVATAR
-  // =========================
   if (avatarOverlay && avatarInput) {
     avatarOverlay.addEventListener("click", e => {
       e.stopPropagation();
@@ -78,9 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
     avatarInput.addEventListener("change", () => avatarInput.form.submit());
   }
 
-  // =========================
-  // TROCA ENTRE LOGIN E CADASTRO
-  // =========================
   const switchToCadastro = document.querySelector(".switch-to-cadastro");
   const switchToLogin = document.querySelector(".switch-to-login");
   const container = document.querySelector(".auth-wrapper");

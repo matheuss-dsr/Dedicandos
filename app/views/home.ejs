@@ -7,10 +7,10 @@
   <title>Home - Dedicandos</title>
   <link rel="shortcut icon" href="/static/images/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/home.css">
 </head>
 
 <body>
-  <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
     <a href="/" class="logo">
       <img src="/static/images/logo.png" alt="Logo">
@@ -18,15 +18,15 @@
     <a href="/home" class="active">Início</a>
     <a href="/perfil">Meu Perfil</a>
     <a href="/prova/gerar/form">Gerar Prova</a>
-    <% if (user && user.role === 'admin') { %>
+    <% if (user && user.role==='admin' ) { %>
       <a href="/users">Gerenciar Usuários</a>
-    <% } %>
-    <a href="/logout" class="logout-btn">Sair</a>
+      <% } %>
+        <a href="/logout" class="logout-btn">Sair</a>
   </nav>
 
   <div class="main">
     <header class="topbar">
-      <button id="menu-toggle" class="menu-toggle">☰</button> 
+      <button id="menu-toggle" class="menu-toggle">☰</button>
       <span class="welcome-text">Bem-vindo, <%= user.nome %>!</span>
       <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar">
     </header>
@@ -35,9 +35,9 @@
       <h1>Suas Provas Salvas</h1>
 
       <section class="saved-tests">
-        <% if (provas && provas.length > 0) { %>
+        <% if (provas && provas.length> 0) { %>
           <ul class="provas-lista">
-            <% provas.forEach(prova => { %>
+            <% provas.forEach(prova=> { %>
               <li class="prova-item">
                 <a href="/prova/<%= prova.id_prova %>" class="prova-link">
                   <%= prova.titulo %>
@@ -46,35 +46,49 @@
                   (<%= new Intl.DateTimeFormat('pt-BR').format(new Date(prova.data_criacao)) %>)
                 </span>
               </li>
-            <% }) %>
+              <% }) %>
           </ul>
-        <% } else { %>
-          <p>Você ainda não salvou nenhuma prova.</p>
-        <% } %>
+          <% } else { %>
+            <div class="tutorial-box">
+              <h2>Como usar a plataforma</h2>
+              <p>Aqui vai um guia rápido para você começar:</p>
+
+              <ul>
+                <li>Clique no menu lateral em <strong>“Gerar Prova”</strong>.</li>
+                <li>Escolha um ano, a disciplina e a quantidade de questões.</li>
+                <li>Clique em <strong>Gerar</strong> e aguarde as questões aparecerem.</li>
+                <li>Depois, você pode salvar sua prova para acessá-la aqui.</li>
+                <li>Seu histórico ficará sempre visível nesta página.</li>
+              </ul>
+
+              <p>Pronto! Agora teste gerar sua primeira prova 🚀</p>
+            </div>
+
+            <% } %>
       </section>
     </main>
   </div>
 
   <script>
-  const sidebar = document.getElementById('sidebar');
-  const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menu-toggle');
 
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
 
-  function ajustarSidebar() {
-    if (window.innerWidth > 1024) {
-      sidebar.classList.remove('active');
-      sidebar.style.transform = "translateX(0)";
-    } else {
-      sidebar.style.transform = "";
+    function ajustarSidebar() {
+      if (window.innerWidth > 1024) {
+        sidebar.classList.remove('active');
+        sidebar.style.transform = "translateX(0)";
+      } else {
+        sidebar.style.transform = "";
+      }
     }
-  }
 
-  ajustarSidebar();
-  window.addEventListener('resize', ajustarSidebar);
-</script>
+    ajustarSidebar();
+    window.addEventListener('resize', ajustarSidebar);
+  </script>
 </body>
 
 </html>

@@ -6,204 +6,175 @@
     <title>Editar Usuário - Dedicandos</title>
     <link rel="shortcut icon" href="/static/images/logo.png" type="image/x-icon">
     <style>
-:root {
-  --color-gray-blue: #91A3AD; /* Azul Acinzentado - Neutro/Secundário */
-  --color-dark-red: #8C1843; /* Bordô/Vinho - Fundo Escuro Principal */
-  --color-light-gray: #F2F2F2; /* Cinza Claro - Fundo Claro/Geral */
-  --color-black: #17181B; /* Preto - Texto Principal */
-  --color-magenta: #ED145B; /* Magenta/Rosa Shock - Ação/Destaque */
+        :root {
+          --color-gray-blue: #91A3AD;
+          --color-dark-red: #8C1843;
+          --color-light-gray: #F2F2F2;
+          --color-black: #17181B;
+          --color-magenta: #ED145B;
+          --color-bg-dark: var(--color-dark-red);
+          --color-bg-light: var(--color-light-gray);
+          --color-text-dark: var(--color-black);
+          --color-text-light: #fff;
+          --color-accent: var(--color-magenta);
+          --color-button-primary: var(--color-dark-red);
+          --color-button-hover: #630C2E;
+          --color-highlight: var(--color-magenta);
 
-  /* Mapeamento de Uso */
-  --color-bg-dark: var(--color-dark-red); /* Fundo escuro */
-  --color-bg-light: var(--color-light-gray); /* Fundo claro */
-  --color-text-dark: var(--color-black); /* Texto principal */
-  --color-text-light: #fff; /* Texto em fundo escuro */
-  --color-accent: var(--color-magenta); /* Botões, links, hover */
-  --color-button-primary: var(--color-dark-red);
-  --color-button-hover: #630C2E;
-  --color-highlight: var(--color-magenta);
-
-  /* Cores de status */
-  --color-success: #4CAF50;
-  --color-danger: #D32F2F;
-}
+          --color-success: #4CAF50;
+          --color-danger: #D32F2F;
+        }
 
 
-body {
-  font-family: "Poppins", sans-serif;
-  background: var(--color-black);
-  color: var(--color-text-dark);
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  box-sizing: border-box;
-}
+        body {
+          font-family: "Poppins", sans-serif;
+          background: var(--color-black);
+          color: var(--color-text-dark);
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          box-sizing: border-box;
+        }
 
-.auth-container {
-  max-width: 500px;
-  width: 100%;
-  padding: 3rem;
-  background-color: var(--color-bg-light);
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-  box-sizing: border-box;
-}
+        .auth-container {
+          max-width: 500px;
+          width: 100%;
+          padding: 3rem;
+          background-color: var(--color-bg-light);
+          border-radius: 15px;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+          box-sizing: border-box;
+        }
 
-.auth-container h2 {
-  font-size: 2.2rem;
-  margin-bottom: 2rem;
-  text-align: center;
-  color: var(--color-dark-red);
-  font-weight: bold;
-}
+        .auth-container h2 {
+          font-size: 2.2rem;
+          margin-bottom: 2rem;
+          text-align: center;
+          color: var(--color-dark-red);
+          font-weight: bold;
+        }
 
-/* ===============================
-   📝 Estilos do Formulário
-   ===============================
-*/
+        .form-group {
+          margin-bottom: 1.5rem;
+        }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
+        label {
+          display: block;
+          font-size: 1.1em;
+          margin-bottom: 0.6rem;
+          color: var(--color-gray-blue);
+          font-weight: 600;
+        }
 
-label {
-  display: block;
-  font-size: 1.1em;
-  margin-bottom: 0.6rem;
-  color: var(--color-gray-blue);
-  font-weight: 600;
-}
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        select {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          background: #fff;
+          color: var(--color-text-dark);
+          font-size: 1rem;
+          box-sizing: border-box;
+          transition: border-color 0.3s ease;
+        }
 
-input[type="text"],
-input[type="email"],
-input[type="date"],
-select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-  color: var(--color-text-dark);
-  font-size: 1rem;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease;
-}
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+          outline: none;
+          border-color: var(--color-accent);
+          box-shadow: 0 0 5px rgba(237, 20, 91, 0.3);
+        }
 
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="date"]:focus,
-select:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 5px rgba(237, 20, 91, 0.3);
-}
+        select {
+          cursor: pointer;
+        }
 
-select {
-  cursor: pointer;
-}
+        .btn-primary {
+          width: 100%;
+          background-color: var(--color-button-primary);
+          color: var(--color-text-light);
+          padding: 14px;
+          border: none;
+          border-radius: 8px;
+          font-size: 1.1em;
+          font-weight: bold;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
 
-/* ===============================
-   🔘 Estilos dos Botões
-   ===============================
-*/
+        .btn-primary:hover {
+          background-color: var(--color-button-hover);
+        }
 
-.btn-primary {
-  width: 100%;
-  background-color: var(--color-button-primary);
-  color: var(--color-text-light);
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1em;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+        .back-link {
+          display: block;
+          text-align: center;
+          margin-top: 20px;
+          color: var(--color-accent);
+          text-decoration: none;
+          font-weight: bold;
+          transition: color 0.3s ease;
+        }
 
-.btn-primary:hover {
-  background-color: var(--color-button-hover);
-}
+        .back-link:hover {
+          color: var(--color-button-hover);
+          text-decoration: underline;
+        }
 
-/* ===============================
-   🔗 Estilos dos Links
-   ===============================
-*/
+        .message {
+          padding: 10px;
+          margin-bottom: 15px;
+          border-radius: 5px;
+          text-align: center;
+          font-weight: bold;
+        }
 
-.back-link {
-  display: block;
-  text-align: center;
-  margin-top: 20px;
-  color: var(--color-accent);
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s ease;
-}
+        .message.error {
+          background-color: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+        }
 
-.back-link:hover {
-  color: var(--color-button-hover);
-  text-decoration: underline;
-}
+        .message.success {
+          background-color: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+        }
 
-/* ===============================
-   📢 Estilos das Mensagens
-   ===============================
-*/
+        @media (max-width: 600px) {
+          .auth-container {
+            padding: 2rem;
+            margin: 1rem;
+          }
 
-.message {
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  text-align: center;
-  font-weight: bold;
-}
+          .auth-container h2 {
+            font-size: 1.8rem;
+          }
 
-.message.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
+          label {
+            font-size: 1em;
+          }
 
-.message.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
+          input[type="text"],
+          input[type="email"],
+          input[type="date"],
+          select {
+            font-size: 0.9rem;
+          }
 
-/* ===============================
-   📱 Responsividade
-   ===============================
-*/
-
-@media (max-width: 600px) {
-  .auth-container {
-    padding: 2rem;
-    margin: 1rem;
-  }
-
-  .auth-container h2 {
-    font-size: 1.8rem;
-  }
-
-  label {
-    font-size: 1em;
-  }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="date"],
-  select {
-    font-size: 0.9rem;
-  }
-
-  .btn-primary {
-    padding: 12px;
-    font-size: 1em;
-  }
-}
-    
+          .btn-primary {
+            padding: 12px;
+            font-size: 1em;
+          }
+        }
     </style>
 </head>
 <body>

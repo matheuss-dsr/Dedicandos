@@ -29,7 +29,6 @@ body {
   display: flex;
   height: 100vh;
   color: var(--color-text-dark);
-  overflow: hidden;
 }
 
 .main {
@@ -267,25 +266,13 @@ main.dashboard-content {
   border-radius: var(--border-radius-default);
   padding: 40px 50px;
   width: 95%;
-  height: calc(100vh - 65px);
+  min-height: calc(100vh - 210px);
+  height: auto;
   color: var(--color-text-dark);
   overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
-}
-
-main.dashboard-content::-webkit-scrollbar {
-  width: 10px;
-}
-
-main.dashboard-content::-webkit-scrollbar-thumb {
-  background: var(--color-dark-red);
-  border-radius: 10px;
-}
-
-main.dashboard-content::-webkit-scrollbar-thumb:hover {
-  background: var(--color-button-hover);
 }
 
 @media (max-width: 1280px) {
