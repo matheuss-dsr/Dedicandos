@@ -140,14 +140,36 @@
 
 @media (max-width: 768px) {
   .saved-tests {
-    padding: 20px;
+    padding: 15px;
+  }
+
+  .saved-tests h2 {
+    font-size: 1.4rem;
   }
 
   .tutorial-box {
-    padding: 20px;
+    padding: 15px;
+  }
+
+  .tutorial-box h2 {
+    font-size: 1.4rem;
+  }
+
+  .tutorial-box p,
+  .tutorial-box ul li {
+    font-size: 0.95rem;
   }
 
   .provas-lista li {
-    padding: 14px;
+    padding: 12px;
+  }
+
+  .prova-link {
+    font-size: 1rem;
+  }
+
+  .btn-delete {
+    padding: 6px 12px;
+    font-size: 0.9rem;
   }
 }

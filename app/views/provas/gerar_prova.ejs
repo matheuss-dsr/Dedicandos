@@ -141,18 +141,6 @@
   menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('active');
   });
-
-  function ajustarSidebar() {
-    if (window.innerWidth > 1024) {
-      sidebar.classList.remove('active');
-    } else {
-      sidebar.style.transform = "";
-    }
-  }
-
-  ajustarSidebar();
-  window.addEventListener('resize', ajustarSidebar);
-  
 </script>
 <script>
 document.getElementById("btnSalvarNuvem").addEventListener("click", async () => {
