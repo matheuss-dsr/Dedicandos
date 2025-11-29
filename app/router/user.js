@@ -13,7 +13,6 @@ export async function reenviarEmailVerificacao(req, reply, database) {
   try {
     const email = req.body?.email || req.query?.email;
     if (!email) {
-      console.log("[ERRO FLUXO] E-mail não fornecido para reenviarEmailVerificacao.");
       return reply.view("user/reenviar_email.ejs", {
         error: "Informe o e-mail para reenviar a verificação.",
         success: null,
@@ -91,8 +90,6 @@ export async function criarUsuario(req, reply, database) {
       [nome, encryptedEmail, hashedPassword, 'usuario', encryptedBirth, false, emailHash]
     );
 
-    console.log(`[DB] Usuário criado com sucesso no banco: ${email}`);
-
 
     const token = authUtils.generateEmailToken(email);
     const verificationLink = `${process.env.APP_URL}/verificar-email?email=${encodeURIComponent(
@@ -122,10 +119,8 @@ export async function criarUsuario(req, reply, database) {
 export async function verificarEmail(req, reply, database) {
   const db = dbFor(database);
   const { email, token } = req.query; 
-  console.log(`[FLUXO] Iniciando verificarEmail para: ${email}.`);
 
   if (!email || !token) {
-    console.log("[ERRO FLUXO] Parâmetros de verificação inválidos (email ou token ausente).");
     return reply.status(400).view("user/login.ejs", {
       error: "Parâmetros de verificação inválidos.",
       success: null,
@@ -173,22 +168,17 @@ export async function mostrarFormularioEsqueciSenha(req, reply) {
 export async function esqueciSenha(req, reply, database) {
   const db = dbFor(database);
   const { email } = req.body; 
-  console.log(`[FLUXO] Iniciando esqueciSenha para: ${email}`);
 
   if (!email) {
-    console.log("[ERRO FLUXO] E-mail não fornecido para esqueciSenha.");
     return reply.view("user/esqueci_senha.ejs", { error: "Informe o e-mail.", success: null });
   }
 
   try {
     const emailHash = cryptoUtils.hashForLookup(email); 
-    console.log(`[DB] Buscando usuário pelo Hash para redefinição: ${emailHash.substring(0, 10)}...`);
 
     const user = await db.getUserByEmailHash(emailHash); 
-    console.log(`[DB] Busca concluída. Encontrado: ${!!user}`);
 
     if (!user) {
-      console.log("[FLUXO] Usuário não encontrado, retornando mensagem genérica.");
       return reply.view("user/esqueci_senha.ejs", {
         success:
           "Se o e-mail informado estiver em nosso sistema, você receberá instruções para redefinir sua senha.",
@@ -206,13 +196,10 @@ export async function esqueciSenha(req, reply, database) {
     const token = authUtils.generatePasswordResetToken(rawEmail);
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
     await db.savePasswordResetToken(rawEmail, token, expiresAt);
-    console.log(`[DB] Token de redefinição salvo para: ${rawEmail}.`);
 
     const resetLink = `${process.env.APP_URL}/resetar-senha?token=${token}`;
     
-    console.log(`[EMAIL] Chamando sendPasswordResetEmail para: ${rawEmail}`);
     await authUtils.sendPasswordResetEmail(rawEmail, resetLink);
-    console.log(`[EMAIL] sendPasswordResetEmail chamada concluída para: ${rawEmail}`);
 
     return reply.view("user/esqueci_senha.ejs", {
       success:
@@ -246,14 +233,11 @@ export async function mostrarFormularioResetarSenha(req, reply) {
 export async function resetarSenha(req, reply, database) {
   const db = dbFor(database);
   const { token, senha } = req.body;
-  console.log("[FLUXO] Iniciando resetarSenha. Token recebido:", token ? token.substring(0, 10) + '...' : 'Nulo');
 
   try {
     const dbToken = await db.findPasswordResetByToken(token);
-    console.log(`[DB] Resultado da busca por token no DB. Encontrado: ${!!dbToken}`);
 
     if (!dbToken) {
-      console.log("[ERRO FLUXO] Token não encontrado ou expirado no DB.");
       return reply.view("user/resetar_senha.ejs", {
         token,
         error: "Link de redefinição inválido ou expirado. Por favor, solicite um novo.",
@@ -266,7 +250,6 @@ export async function resetarSenha(req, reply, database) {
     const hashedPassword = await bcrypt.hash(senha, 12);
 
     await db.updateUserPassword(emailHash, hashedPassword);
-    console.log(`[DB] Senha atualizada com sucesso para: ${email}`);
 
     await db.deletePasswordResetToken(token);
 

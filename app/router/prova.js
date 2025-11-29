@@ -295,7 +295,6 @@ export async function mostrarFormularioGerarProva(req, reply) {
   const disciplinas = ["natureza", "humanas", "linguagens", "matematica"];
 
   let { ano, disciplina, quantity, apiUrl, id_prova } = req.query;
-  console.log("Parâmetros recebidos:", { ano, disciplina, quantity, apiUrl, id_prova });
   if (id_prova) {
     try {
       const result = await database.query(
@@ -325,7 +324,6 @@ export async function mostrarFormularioGerarProva(req, reply) {
         apiUrlUsada: null,
       });
     }
-    console.log("Carregando prova com ID:", id_prova, "API URL:", apiUrl);
   }
 
   if (apiUrl) {
