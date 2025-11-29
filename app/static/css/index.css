@@ -5,17 +5,17 @@
   --color-black: #17181B; 
   --color-magenta: #ED145B; 
 
-  --bg-dark: var(--color-black);
-  --bg-light: var(--color-light-gray); 
-  --text-dark: var(--color-light-gray); 
-  --text-light: #fff; 
-  --accent: var(--color-magenta); 
-  --button-primary: var(--color-dark-red); 
-  --button-hover: #630C2E; 
-  --highlight: var(--color-magenta); 
+  --color-bg-dark: var(--color-black);
+  --color-bg-light: var(--color-black); 
+  --color-text-dark: var(--color-light-gray); 
+  --color-text-light: #fff; 
+  --color-accent: var(--color-magenta); 
+  --color-button-primary: var(--color-dark-red); 
+  --color-button-hover: #630C2E; 
+  --color-highlight: var(--color-magenta); 
 
-  --success: #4CAF50;
-  --danger: #D32F2F;
+  --color-success: #4CAF50;
+  --color-danger: #D32F2F;
   --border-radius: 12px;
 }
 
@@ -28,8 +28,8 @@
 }
 
 body {
-  color: var(--text-dark);
-  background-color: var(--bg-dark);
+  color: var(--color-text-dark);
+  background-color: var(--color-black);
   line-height: 1.6;
   overflow-x: hidden;
 }
@@ -45,8 +45,8 @@ a {
   justify-content: space-between;
   align-items: center;
   padding: 15px 40px;
-  background: var(--bg-dark);
-  color: var(--text-light);
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -63,7 +63,7 @@ a {
   gap: 20px;
 }
 
-.menu a:hover { color: var(--accent); }
+.menu a:hover { color: var(--color-accent); }
 
 .buttons .btn {
   padding: 8px 15px;
@@ -75,18 +75,45 @@ a {
 }
 
 .btn-login, .btn-register, .btn-logout {
-  background: var(--button-primary);
-  color: var(--text-light);
+  background: var(--color-button-primary);
+  color: var(--color-text-light);
 }
 
 .btn-login:hover, .btn-register:hover, .btn-logout:hover {
-  background: var(--button-hover);
+  background: var(--color-button-hover);
 }
 
 .hamburger {
   display: none;
   font-size: 2rem;
   cursor: pointer;
+}
+.user-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--color-bg-dark);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 10px 0;
+    z-index: 100;
+}
+
+.user-menu.open {
+    display: block;
+}
+
+.user-menu a {
+    display: block;
+    padding: 10px 20px;
+    color: var(--color-text-light);
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.user-menu a:hover {
+    background-color: var(--color-button-hover);
 }
 
 .hero {
@@ -97,7 +124,7 @@ a {
   justify-content: center;
   align-items: center;
   text-align: center;
-  color: var(--text-light);
+  color: var(--color-text-light);
 }
 
 .hero .overlay {
@@ -118,61 +145,93 @@ a {
 .sobre {
   padding: 80px 20px;
   text-align: center;
-  background: var(--bg-light);
+  background: var(--color-bg-light);
 }
 
-.sobre h2 { font-size: 2.5rem; margin-bottom: 20px; color: var(--text-dark); }
+.sobre h2 { font-size: 2.5rem; margin-bottom: 20px; color: var(--color-text-dark); }
 .sobre p { max-width: 800px; margin: auto; font-size: 1.1rem; color: var(--color-gray-blue); }
 
 .planos {
   padding: 80px 20px;
   text-align: center;
-  background: var(--bg-dark);
+  background: var(--color-bg-dark);
 }
 
-.planos h2 { font-size: 2.5rem; margin-bottom: 40px; color: var(--text-light); }
+.planos h2 { font-size: 2.5rem; margin-bottom: 40px; color: var(--color-text-light); }
 
 .planos-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 25px;
+  gap: 30px;
 }
 
 .plano-card {
-  background: var(--bg-light);
-  padding: 30px;
+  background: var(--color-bg-light);
+  padding: 30px 20px;
   border-radius: var(--border-radius);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
   width: 280px;
-  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.plano-card:hover { transform: translateY(-5px); }
+.plano-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
 
-.plano-card h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--text-dark); }
-.plano-card p { font-size: 1rem; margin-bottom: 15px; color: var(--color-gray-blue); }
-.plano-card .preco { font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; color: var(--highlight); }
+.plano-card h3 {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  color: var(--color-text-dark);
+  text-align: center;
+}
+
+.plano-card p {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  color: var(--color-gray-blue);
+  text-align: center;
+}
+
+.preco {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-highlight);
+  margin-bottom: 20px;
+}
 
 .plano-card .btn {
-  background: var(--highlight);
-  color: var(--text-light);
+  background: var(--color-highlight);
+  color: var(--color-text-light);
   border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
 }
 
-.plano-card .btn:hover { background: var(--button-hover); }
+.plano-card .btn:hover {
+  background: var(--color-button-hover);
+  transform: scale(1.05);
+}
 
-.destaque { border: 2px solid var(--highlight); transform: scale(1.05); }
+.destaque {
+  border: 2px solid var(--color-highlight);
+  transform: scale(1.05);
+}
 
 .equipe {
   padding: 80px 20px;
   text-align: center;
-  background-color: var(--bg-light);
+  background-color: var(--color-bg-light);
 }
 
-.equipe h2 { font-size: 2.5rem; margin-bottom: 40px; color: var(--accent); }
+.equipe h2 { font-size: 2.5rem; margin-bottom: 40px; color: var(--color-accent); }
 
 .team-container {
   display: flex;
@@ -188,12 +247,12 @@ a {
   gap: 15px;
 }
 
-.team-member img {
+.team-member .icon {
   width: 160px;
   height: 160px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid var(--accent);
+  border: 4px solid var(--color-accent);
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -202,7 +261,33 @@ a {
   box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
 
-.team-member .name { font-size: 1.2rem; font-weight: 600; color: var(--text-dark); }
+.team-member .socials {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.team-member .socials a {
+  display: inline-block;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.team-member .socials a img {
+  border: none;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  transition: transform 0.2s;
+}
+
+.team-member .socials a img:hover {
+  transform: scale(1.2);
+}
+
+
+.team-member .name { font-size: 1.2rem; font-weight: 600; color: var(--color-text-dark); }
 .team-member .role { font-size: 1rem; color: var(--color-gray-blue); }
 .team-member .github {
   font-size: 0.85rem;
@@ -213,22 +298,23 @@ a {
 
 /* Footer */
 footer {
-  background: var(--bg-dark);
+  background: var(--color-bg-dark);
   color: var(--color-gray-blue);
   text-align: center;
   padding: 20px;
   margin-top: 40px;
 }
 
-footer .socials a { color: var(--accent); transition: color 0.3s; }
-footer .socials a:hover { color: var(--text-light); }
+footer .socials a { color: var(--color-accent); transition: color 0.3s; }
+footer .socials a:hover { color: var(--color-text-light); }
 
+/* Avatar / User Menu */
 .avatar {
   width: 45px;
   height: 45px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid var(--accent);
+  border: 2px solid var(--color-accent);
   object-fit: cover;
   transition: transform 0.2s;
 }
@@ -240,7 +326,7 @@ footer .socials a:hover { color: var(--text-light); }
   position: absolute;
   top: 100%;
   right: 0;
-  background: var(--bg-dark);
+  background: var(--color-bg-dark);
   border-radius: var(--border-radius);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   padding: 10px 0;
@@ -248,10 +334,11 @@ footer .socials a:hover { color: var(--text-light); }
 }
 
 .user-menu.open { display: block; }
-.user-menu a:hover { background-color: var(--button-hover); }
+.user-menu a:hover { background-color: var(--color-button-hover); }
 
+/* Responsividade */
 @media (max-width: 768px) {
-  .menu { display: none; flex-direction: column; position: absolute; top: 60px; right: 0; width: 200px; padding: 20px; background: var(--bg-dark); }
+  .menu { display: none; flex-direction: column; position: absolute; top: 60px; right: 0; width: 200px; padding: 20px; background: var(--color-bg-dark); }
   .menu.active { display: flex; }
   .hamburger { display: block; }
   .planos-container { flex-direction: column; align-items: center; }

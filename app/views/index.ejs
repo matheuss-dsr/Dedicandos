@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Landing Page</title>
+  <title>Dedicandos</title>
   <link rel="stylesheet" href="../static/css/index.css">
   <link rel="shortcut icon" href="../static/images/logo.png" type="image/x-icon">
   <script defer src="../static/js/script.js"></script>
@@ -27,7 +27,6 @@
           <img src="/static/uploads/<%= user.avatar_url || 'user.png' %>" alt="Avatar do Usuário" class="avatar"
             id="avatarBtn">
 
-          <!-- Menu de usuário -->
           <div class="user-menu" id="userMenu">
             <a href="/perfil">Meu Perfil</a>
             <a href="/home">Dashboard</a>
@@ -38,12 +37,8 @@
             <a href="/cadastro" class="btn btn-register">Cadastre-se</a>
             <% } %>
     </div>
-    <div class="hamburger hidden" id="hamburger">
-      ☰
-    </div>
   </header>
 
-  <!-- Hero -->
   <section class="hero" id="home">
     <div class="overlay"></div>
     <div class="hero-content">
@@ -55,7 +50,6 @@
     </div>
   </section>
 
-  <!-- Outras seções -->
   <section id="sobre" class="sobre">
   <h2>Por que usar o Dedicandos?</h2>
   <p>
@@ -76,19 +70,19 @@
       <div class="plano-card destaque">
         <h3>Básico</h3>
         <p>Ideal para começar</p>
-        <span class="preco">R$19/mês</span>
+        <span class="preco">R$19,99/mês</span>
         <button class="btn">Assinar</button>
       </div>
       <div class="plano-card destaque">
         <h3>Premium</h3>
         <p>O mais popular</p>
-        <span class="preco">R$49/mês</span>
+        <span class="preco">R$49,99/mês</span>
         <button class="btn">Assinar</button>
       </div>
       <div class="plano-card destaque">
         <h3>Empresarial</h3>
         <p>Para grandes equipes</p>
-        <span class="preco">R$99/mês</span>
+        <span class="preco">R$99,99/mês</span>
         <button class="btn">Assinar</button>
       </div>
     </div>
@@ -98,19 +92,22 @@
     <h2>Equipe</h2>
     <div class="team-container">
       <div class="team-member">
-        <img src="../static/images/matheus-icon.jpeg" alt="Matheus Dos Santos Reis">
+        <img src="../static/images/matheus-icon.jpeg" alt="Matheus Dos Santos Reis" class="icon">
         <p class="name">Matheus Dos Santos Reis</p>
         <p class="role">
           Me chamo Matheus, gosto muito de infraestrutura e cyber segurança.<br>
           Nesse site, realizei a parte de escopo e desenvolvimento do backend.
         </p>
-        <a class="github" href="https://github.com/matheuss-dsr">Github</a>
-        <a class="github" href="https://www.instagram.com/reissm_/">Instagram</a>
-        <a class="github" href="https://www.linkedin.com/in/matheus-dos-santos-189115246/">LinkedIn</a>
+        <div class="socials">
+          <a href="https://github.com/matheuss-dsr"><img src="../static/images/github-icon.png" alt="GitHub"></a>
+          <a href="https://www.instagram.com/reissm_/"><img src="../static/images/instagram-icon.png" alt="Instagram"></a>
+          <a href="https://www.linkedin.com/in/matheus-dos-santos-189115246/"><img src="../static/images/linkedin-icon.png" alt="LinkedIn"></a>
+        </div>
       </div>
 
+
       <div class="team-member">
-        <img src="../static/images/gustavo-icon.jpg" alt="Gustavo Gomes Da Silva">
+        <img src="../static/images/gustavo-icon.jpg" alt="Gustavo Gomes Da Silva" class="icon">
         <p class="name">Gustavo Gomes Da Silva</p>
         <p class="role">
           Me chamo Gustavo, gosto muito de desenvolvimento web.<br>
@@ -122,6 +119,7 @@
 
   <footer>
     <p>MR&GG</p>
+    <p>&copy; 2025 - Todos os direitos reservados</p>
   </footer>
 
 </html>
