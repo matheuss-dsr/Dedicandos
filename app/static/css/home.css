@@ -1,90 +1,136 @@
 :root {
-  --color-bg: #eef0f8;
+  --color-bg: #f3f5fc;
   --color-text: #333;
   --color-sidebar-bg: #0f123d;
   --color-sidebar-text: #fff;
   --color-sidebar-active: #1a3d7c;
   --color-sidebar-hover: #162d5f;
   --color-logout-btn: #1da1f2;
-  --color-topbar-bg: #fff;
-  --color-topbar-shadow: rgba(0, 0, 0, 0.1);
-  --color-avatar-border: #2c3e50;
-  --color-card-bg: #fff;
-  --color-card-shadow: rgba(0, 0, 0, 0.1);
-  --color-section-bg: #f4f7fb;
-  --color-section-hover: #e2e6f0;
+  --color-topbar-bg: #ffffff;
+  --color-topbar-shadow: rgba(0, 0, 0, 0.08);
+  --color-avatar-border: #1a3d7c;
+  --color-card-bg: #ffffff;
+  --color-card-shadow: rgba(0,0,0,0.08);
+  --color-section-bg: #f7f9fe;
+  --color-section-hover: #eef2fb;
   --color-primary: #1a3d7c;
+  --color-accent: #4f7cff;
+  --radius: 12px;
+  --transition: 0.25s ease;
 }
 
 .saved-tests {
   background-color: var(--color-card-bg);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px var(--color-card-shadow);
+  padding: 25px 30px;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px var(--color-card-shadow);
+  animation: fadeIn 0.4s ease;
 }
 
 .saved-tests h2 {
   color: var(--color-primary);
-  margin-bottom: 15px;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  font-weight: 600;
 }
 
 .saved-tests ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.saved-tests ul li {
-  padding: 10px 15px;
+.provas-lista li {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px 18px;
   background-color: var(--color-section-bg);
-  border-radius: 8px;
-  margin-bottom: 10px;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  transition: var(--transition);
+  border-left: 4px solid var(--color-primary);
 }
 
-.saved-tests ul li:hover {
+.provas-lista li:hover {
   background-color: var(--color-section-hover);
+  transform: translateX(4px);
+}
+
+.prova-link {
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: var(--color-primary);
+  transition: var(--transition);
+}
+
+.prova-link:hover {
+  text-decoration: underline;
+  color: var(--color-accent);
+}
+
+.date {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.btn-delete {
+  background-color: #e74c3c;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  float: right;
+  margin-top: 8px;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
 }
 
 .tutorial-box {
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.08);
-  padding: 25px 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-  margin-top: 20px;
-  animation: fadeIn 0.4s ease;
+  background: var(--color-card-bg);
+  padding: 30px;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 14px var(--color-card-shadow);
+  border-left: 6px solid var(--color-accent);
+  animation: fadeIn 0.3s ease;
 }
 
 .tutorial-box h2 {
-  margin-top: 0;
   font-size: 1.6rem;
-  color: var(--color-dark-red);
+  color: var(--color-primary);
+  font-weight: 600;
   margin-bottom: 10px;
 }
 
 .tutorial-box p {
   font-size: 1rem;
-  color: #333;
+  color: var(--color-text);
   line-height: 1.6;
-  margin-bottom: 12px;
 }
 
 .tutorial-box ul {
-  padding-left: 20px;
-  margin-top: 10px;
+  margin-top: 15px;
+  padding-left: 22px;
 }
 
 .tutorial-box ul li {
   margin-bottom: 10px;
-  font-size: 0.95rem;
+  font-size: 1rem;
   position: relative;
+  font-weight: 500;
 }
 
 .tutorial-box ul li::before {
   content: "✔";
+  position: absolute;
+  left: -22px;
+  top: 2px;
   color: var(--color-accent);
   font-weight: bold;
-  position: absolute;
-  left: -20px;
 }
 
 @keyframes fadeIn {
@@ -93,11 +139,15 @@
 }
 
 @media (max-width: 768px) {
+  .saved-tests {
+    padding: 20px;
+  }
+
   .tutorial-box {
     padding: 20px;
   }
-  
-  .tutorial-box h2 {
-    font-size: 1.4rem;
+
+  .provas-lista li {
+    padding: 14px;
   }
 }

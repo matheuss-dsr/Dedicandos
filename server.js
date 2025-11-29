@@ -37,19 +37,20 @@ server.decorate("checkEmailVerified", async (req, reply) => {
   req.user = userFromDb;
 });
 
-
-
 server.addHook('preHandler', async (req, reply) => {
   try {
-    if (req.cookies.token) {
-      const decoded = await req.jwtVerify();
+    const token = req.cookies.token;
+
+    if (token) {
+      const decoded = await reply.server.jwt.verify(token);
       req.user = decoded;
     } else {
       req.user = null;
     }
-  } catch {
+  } catch (err) {
     req.user = null;
   }
+
   reply.locals.user = req.user;
 });
 
@@ -112,11 +113,6 @@ server.get('/logout', (req, reply) => {
 })
 
 // ---------------- ROTAS DE PROVAS ----------------
-server.get(
-  '/prova/:prova_id',
-  { preHandler: [server.authenticate, server.checkEmailVerified] },
-  (req, reply) => provaController.exibirProva(req, reply, database)
-);
 
 server.post(
   '/prova/:prova_id/delete',
@@ -156,9 +152,6 @@ server.post(
   { preHandler: [server.authenticate, server.checkEmailVerified] },
   (req, reply) => provaController.salvarProva(req, reply, database)
 );
-
-
-
 
 // ---------------- ROTAS USUÁRIOS ----------------
 server.get('/users', { preHandler: [server.authenticate, server.checkEmailVerified] }, async (req, reply) => {

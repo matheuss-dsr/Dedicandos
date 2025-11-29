@@ -44,7 +44,6 @@
                 </select>
                 <label for="quantity">Quantidade de Questões</label>
                 <input type="number" id="quantity" name="quantity" min="1" max="45" value="<%= quantity || 10 %>" required>
-
                 <label for="disciplina">Disciplina</label>
                 <select id="disciplina" name="disciplina">
                     <option value="linguagens" <%=disciplina==='linguagens' ? 'selected' : '' %>>Linguagens e Códigos</option>
@@ -58,29 +57,46 @@
             <% if (questoesOriginais && questoesOriginais.length> 0) { %>
             <form action="/prova/salvar-prova" method="POST" class="form-gerar-prova">
                 <h2>Salvar Prova Gerada</h2>
+                <input type="hidden" name="apiUrl" value="<%= apiUrlUsada || '' %>">
+                <input type="hidden" name="ano" value="<%= ano %>">
+                <input type="hidden" name="disciplina" value="<%= disciplina %>">
+                <input type="hidden" name="quantidade" value="<%= quantity %>">
                 <label for="nome-arquivo">Nome do Arquivo:</label>
-                <input type="text" id="nome-arquivo" name="nomeArquivo" placeholder="Ex: Simulado_ENEM_2022" required>
+                <input type="text" id="nome-arquivo" name="nomeArquivo" placeholder="Ex: Simulado_ENEM_2023" required>
+
 
                 <div class="questoes-lista">
                     <h3>Selecione as Questões para o Arquivo:</h3>
-                    <% questoesOriginais.forEach((q, idx)=> { %>
-                        <% const questaoIndex=q.number || (idx + 1); %>
+
+                    <% questoesOriginais.forEach((q, idx) => { %>
+                        <% const questaoIndex = q.number || (idx + 1); %>
+
                         <div class="questao-item">
-                            <input type="checkbox" name="questoesSelecionadas" value="<%= idx %>" id="q_<%= questaoIndex %>" class="custom-checkbox">
+                            <input 
+                                type="checkbox" 
+                                name="questoesSelecionadas" 
+                                value="<%= idx %>" 
+                                id="q_<%= questaoIndex %>" 
+                                class="custom-checkbox"
+                            >
                             <label for="q_<%= questaoIndex %>" class="checkmark">
                                 Q#<%= questaoIndex %>: <%= q.title %> (<%= q.disciplina || 'Desconhecida' %>)
                             </label>
                         </div>
                     <% }) %>
+
                     <h3>Algumas podem ter sido puladas por falta de informações</h3>
                 </div>
-
-                <input type="hidden" name="todasQuestoes" value='<%= JSON.stringify(questoesOriginais) %>'>
+                <input 
+                    type="hidden" 
+                    name="todasQuestoes" 
+                    value='<%- JSON.stringify(questoesOriginais) %>'
+                >
 
                 <div class="botoes">
                     <button type="submit" name="tipoArquivo" value="pdf" class="btn btn-pdf">Salvar em PDF</button>
                     <button type="submit" name="tipoArquivo" value="docx" class="btn btn-docx">Salvar em DOCX</button>
-                    <button type="submit" name="tipoArquivo" value="database" class="btn btn-database">Salvar na Nuvem</button>
+                    <button type="submit" name="tipoArquivo" value="nuvem" id="btnSalvarNuvem" class="btn-salvar-nuvem">Salvar todas questões</button>
                 </div>
             </form>
             <% } %>
@@ -94,9 +110,6 @@
                         <div class="questao">
                             <h4>Questão #<%= questaoIndex %>: <%= q.title %>
                             </h4>
-                            <p><strong>Disciplina:</strong>
-                                <%= q.disciplina || 'Desconhecida' %>
-                            </p>
                             <p><%- q.enunciadoHTML %></p>
 
                             <% if (q.alternativesIntroduction) { %>
@@ -139,8 +152,33 @@
 
   ajustarSidebar();
   window.addEventListener('resize', ajustarSidebar);
+  
 </script>
+<script>
+document.getElementById("btnSalvarNuvem").addEventListener("click", async () => {
 
+    const form = document.getElementById("formSalvarProva");
+    const formData = new FormData(form);
+
+    formData.append("tipoArquivo", "nuvem");
+
+    const response = await fetch("/prova/salvar-prova", {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+        });
+
+
+
+    const result = await response.json();
+
+    if (result.success) {
+        alert("Prova salva na nuvem com sucesso!");
+    } else {
+        alert(result.error || "Erro ao salvar prova.");
+    }
+});
+</script>
 </body>
 
 </html>

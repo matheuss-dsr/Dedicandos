@@ -18,10 +18,12 @@
     <a href="/home" class="active">Início</a>
     <a href="/perfil">Meu Perfil</a>
     <a href="/prova/gerar/form">Gerar Prova</a>
-    <% if (user && user.role==='admin' ) { %>
+
+    <% if (user && user.role === 'admin') { %>
       <a href="/users">Gerenciar Usuários</a>
-      <% } %>
-        <a href="/logout" class="logout-btn">Sair</a>
+    <% } %>
+
+    <a href="/logout" class="logout-btn">Sair</a>
   </nav>
 
   <div class="main">
@@ -34,37 +36,47 @@
     <main class="dashboard-content">
       <h1>Suas Provas Salvas</h1>
 
+      <% if (typeof success !== 'undefined' && success) { %>
+        <p class="alert success"><%= success %></p>
+      <% } %>
+
       <section class="saved-tests">
-        <% if (provas && provas.length> 0) { %>
+        <% if (provas && provas.length > 0) { %>
           <ul class="provas-lista">
-            <% provas.forEach(prova=> { %>
+            <% provas.forEach(prova => { %>
               <li class="prova-item">
-                <a href="/prova/<%= prova.id_prova %>" class="prova-link">
+                <a href="/prova/gerar/form?id_prova=<%= prova.id_prova %>" class="prova-link">
                   <%= prova.titulo %>
                 </a>
                 <span class="date">
-                  (<%= new Intl.DateTimeFormat('pt-BR').format(new Date(prova.data_criacao)) %>)
+                  (<%= new Intl.DateTimeFormat('pt-BR').format(new Date(prova.data_registro)) %>)
                 </span>
+                <form action="/prova/<%= prova.id_prova %>/delete" method="POST">
+                  <button class="btn-delete">Excluir</button>
+                </form>
               </li>
-              <% }) %>
+            <% }) %>
           </ul>
-          <% } else { %>
-            <div class="tutorial-box">
-              <h2>Como usar a plataforma</h2>
-              <p>Aqui vai um guia rápido para você começar:</p>
 
-              <ul>
-                <li>Clique no menu lateral em <strong>“Gerar Prova”</strong>.</li>
-                <li>Escolha um ano, a disciplina e a quantidade de questões.</li>
-                <li>Clique em <strong>Gerar</strong> e aguarde as questões aparecerem.</li>
-                <li>Depois, você pode salvar sua prova para acessá-la aqui.</li>
-                <li>Seu histórico ficará sempre visível nesta página.</li>
-              </ul>
 
-              <p>Pronto! Agora teste gerar sua primeira prova 🚀</p>
-            </div>
+        <% } else { %>
 
-            <% } %>
+          <div class="tutorial-box">
+            <h2>Como usar a plataforma</h2>
+            <p>Aqui vai um guia rápido para você começar:</p>
+
+            <ul>
+              <li>Clique no menu lateral em <strong>“Gerar Prova”</strong>.</li>
+              <li>Escolha um ano, a disciplina e a quantidade de questões.</li>
+              <li>Clique em <strong>Gerar</strong> e aguarde as questões aparecerem.</li>
+              <li>Depois, você pode salvar sua seleção de questões para acessá-las aqui.</li>
+              <li>Seu histórico ficará sempre visível nesta página.</li>
+            </ul>
+
+            <p>Pronto! Agora teste gerar sua primeira prova 🚀</p>
+          </div>
+
+        <% } %>
       </section>
     </main>
   </div>
@@ -89,6 +101,6 @@
     ajustarSidebar();
     window.addEventListener('resize', ajustarSidebar);
   </script>
-</body>
 
+</body>
 </html>

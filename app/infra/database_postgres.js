@@ -167,21 +167,6 @@ export class DatabasePostgres {
     };
   }
 
-  async updateProva(id_prova, { titulo, disciplina, ativo }) {
-    const fields = [];
-    const params = [];
-    let i = 1;
-
-    if (titulo) fields.push(`titulo = $${i++}`), params.push(titulo);
-    if (disciplina) fields.push(`disciplina = $${i++}`), params.push(disciplina);
-    if (typeof ativo === "boolean") fields.push(`ativo = $${i++}`), params.push(ativo);
-
-    if (!fields.length) return;
-
-    const sql = `UPDATE provas SET ${fields.join(", ")} WHERE id_prova = $${i}`;
-    params.push(id_prova);
-    await this.query(sql, params);
-  }
 
   async deleteProva(id_prova) {
     await this.query(
@@ -220,58 +205,30 @@ export class DatabasePostgres {
       numero: q.number
     };
   }
+    async salvarURLRequisitada(id_usuario, api_url, ano, disciplina, quantidade) {
+    const query = `
+      INSERT INTO provas
+        (id_usuario, api_url, ano, disciplina, quantidade)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `;
 
-  async salvarProva({ titulo, id_usuario, ano, disciplina, questoes_selecionadas }) {
-      const indicesSelecionados = Array.isArray(questoes_selecionadas)
-        ? questoes_selecionadas.map(Number)
-        : questoes_selecionadas
-        ? [Number(questoes_selecionadas)]
-        : [];
+    const values = [id_usuario, api_url, ano, disciplina, quantidade];
 
-      if (!titulo || indicesSelecionados.length === 0) {
-        throw new Error("Título e pelo menos uma questão são obrigatórios.");
-      }
+    const result = await this.pool.query(query, values);
+    return result.rows[0];
+  }
+    async alterarStatusURL(id, novoStatus) {
+    const query = `
+      UPDATE provas_urls_requisitadas
+      SET status = $1
+      WHERE id = $2
+      RETURNING *;
+    `;
 
-      const client = await this.pool.connect();
-      try {
-        await client.query("BEGIN");
+    const values = [novoStatus, id];
+    const result = await this.pool.query(query, values);
 
-        const insertProvaQuery = `
-          INSERT INTO provas
-            (titulo, id_usuario, ano, quantidade_questoes, disciplina)
-          VALUES
-            ($1, $2, $3, $4, $5)
-          RETURNING id_prova;
-        `;
-        const resultProva = await client.query(insertProvaQuery, [
-          titulo,
-          id_usuario,
-          parseInt(ano),
-          indicesSelecionados.length,
-          disciplina || "Todas",
-        ]);
-        const id_prova = resultProva.rows[0].id_prova;
-
-        const insertQuestaoQuery = `
-          INSERT INTO questoes_prova
-            (id_prova, enem_year, enem_index)
-          VALUES
-            ($1, $2, $3);
-        `;
-
-        const inserts = indicesSelecionados.map((index) =>
-          client.query(insertQuestaoQuery, [id_prova, parseInt(ano), index])
-        );
-
-        await Promise.all(inserts);
-        await client.query("COMMIT");
-
-        return id_prova;
-      } catch (err) {
-        await client.query("ROLLBACK");
-        throw err;
-      } finally {
-        client.release();
-      }
-    }
+    return result.rows[0];
+  }
 }
