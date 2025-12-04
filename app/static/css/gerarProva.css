@@ -287,7 +287,7 @@ body.dark .questao {
 
     .topbar .avatar {
         width: 60px;
-        height: auto;
+        height: 60px;
     }
 
     .main {
@@ -325,6 +325,7 @@ body.dark .questao {
 
     .topbar .avatar {
         width: 50px;
+        height: 50px;
     }
 
     form {
@@ -352,6 +353,7 @@ body.dark .questao {
 
     .topbar .avatar {
         width: 40px;
+        height: 40px;
     }
 
     nav.sidebar {
