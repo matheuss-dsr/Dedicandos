@@ -46,14 +46,11 @@ async function fetchImagemBuffer(url) {
 }
 
 function estimarAlturaQuestao(doc, q) {
-  // Garante strings
   const tituloStr = `Questão #${q.index}: ${q.title || "Questão"}`;
   const enunciadoStr = limparHTML(q.enunciadoHTML || q.enunciado || "");
   const alternativasTexto = (q.alternativas || [])
     .map((a) => `${a.letra}) ${limparHTML(a.texto || "")}`)
     .join("\n");
-
-  // width apropriada baseada na largura da página
   const pageInnerWidth =
     doc.page.width - doc.page.margins.left - doc.page.margins.right;
 
@@ -89,7 +86,7 @@ function estimarAlturaQuestao(doc, q) {
     altura += 60;
   }
 
-  altura += 50; // espaço extra para separador
+  altura += 50;
   return altura;
 }
 
@@ -127,7 +124,7 @@ async function gerarPDFBuffer(questoes, tituloProva) {
         );
         doc.moveDown(0.5);
 
-        // Enunciado (texto limpo)
+        // Enunciado
         const enunciado = limparHTML(q.enunciadoHTML || q.enunciado || "");
         doc.font("Helvetica").fontSize(12).text(enunciado, {
           indent: 20,
@@ -136,8 +133,6 @@ async function gerarPDFBuffer(questoes, tituloProva) {
             doc.page.width - doc.page.margins.left - doc.page.margins.right - 40,
         });
         doc.moveDown(0.5);
-
-        // Imagens dentro do enunciado (se houver)
         const imgRegex = /!\[.*?\]\((.*?)\)/g;
         const matches = [...((q.enunciado || "").matchAll(imgRegex) || [])];
         for (const match of matches) {
@@ -166,8 +161,6 @@ async function gerarPDFBuffer(questoes, tituloProva) {
             doc.page.width - doc.page.margins.left - doc.page.margins.right - 80,
         });
         doc.moveDown(1);
-
-        // Linha separadora
         const startX = doc.x;
         const lineEndX = doc.page.width - doc.page.margins.right;
         doc.moveTo(startX, doc.y).lineTo(lineEndX, doc.y).stroke();
