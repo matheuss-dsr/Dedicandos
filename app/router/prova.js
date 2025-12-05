@@ -7,14 +7,14 @@ import { DatabasePostgres } from "../infra/database_postgres.js";
 
 const database = new DatabasePostgres();
 
-function getValid_provaanos() {
+function anosValidos() {
   const anos = [];
   for (let i = 2023; i >= 2009; i--) anos.push(i);
   return anos;
 }
 
 function limparHTML(html) {
-  const root = parse(html);
+  const root = parse(html || "");
   return root.text;
 }
 
@@ -22,10 +22,10 @@ function processQuestion(q, converter) {
   const enunciadoTexto = q.context || q.text || "";
   const enunciadoHTML = converter.makeHtml(enunciadoTexto);
 
-  const alternativas = q.alternatives.map((alt) => ({
+  const alternativas = (q.alternatives || []).map((alt) => ({
     letra: alt.letter,
     texto: converter.makeHtml(alt.text || ""),
-    correta: alt.isCorrect,
+    correta: !!alt.isCorrect,
   }));
 
   return {
@@ -46,27 +46,50 @@ async function fetchImagemBuffer(url) {
 }
 
 function estimarAlturaQuestao(doc, q) {
-  let altura = 0;
-  altura += doc.heightOfString(`Questão #${q.index}: ${q.title}`, {
-    wid_provath: doc.page.wid_provath - 100,
-    fontSize: 14,
-  });
-  const enunciado = limparHTML(q.enunciadoHTML || q.enunciado);
-  altura += doc.heightOfString(enunciado, {
-    wid_provath: doc.page.wid_provath - 140,
-    fontSize: 12,
-  });
-  const imgRegex = /!\[.*?\]\((.*?)\)/g;
-  const numImagens = (q.enunciado.match(imgRegex) || []).length;
-  altura += numImagens * (300 + 20);
-  const alternativasTexto = q.alternativas
-    .map((a) => `${a.letra}) ${limparHTML(a.texto)}`)
+  // Garante strings
+  const tituloStr = `Questão #${q.index}: ${q.title || "Questão"}`;
+  const enunciadoStr = limparHTML(q.enunciadoHTML || q.enunciado || "");
+  const alternativasTexto = (q.alternativas || [])
+    .map((a) => `${a.letra}) ${limparHTML(a.texto || "")}`)
     .join("\n");
-  altura += doc.heightOfString(alternativasTexto, {
-    wid_provath: doc.page.wid_provath - 180,
-    fontSize: 12,
-  });
-  altura += 50;
+
+  // width apropriada baseada na largura da página
+  const pageInnerWidth =
+    doc.page.width - doc.page.margins.left - doc.page.margins.right;
+
+  let altura = 0;
+  try {
+    altura += doc.heightOfString(tituloStr, {
+      width: Math.max(50, pageInnerWidth - 100),
+      size: 14,
+    });
+  } catch {
+    altura += 20;
+  }
+
+  try {
+    altura += doc.heightOfString(enunciadoStr, {
+      width: Math.max(50, pageInnerWidth - 140),
+      size: 12,
+    });
+  } catch {
+    altura += 40;
+  }
+
+  const imgRegex = /!\[.*?\]\((.*?)\)/g;
+  const numImagens = ((q.enunciado || "").match(imgRegex) || []).length;
+  altura += numImagens * (300 + 20); // espaço por imagem
+
+  try {
+    altura += doc.heightOfString(alternativasTexto, {
+      width: Math.max(50, pageInnerWidth - 180),
+      size: 12,
+    });
+  } catch {
+    altura += 60;
+  }
+
+  altura += 50; // espaço extra para separador
   return altura;
 }
 
@@ -79,44 +102,75 @@ async function gerarPDFBuffer(questoes, tituloProva) {
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", (err) => reject(err));
 
-      doc.fontSize(20).text(tituloProva, { align: "center" });
+      // Cabeçalho
+      doc.font("Helvetica-Bold").fontSize(20).text(tituloProva, {
+        align: "center",
+      });
       doc.moveDown();
 
       for (let id_provax = 0; id_provax < questoes.length; id_provax++) {
         const q = questoes[id_provax];
+
         const alturaQuestao = estimarAlturaQuestao(doc, q);
         const espacoDisponivel =
           doc.page.height - doc.page.margins.bottom - doc.y;
+
         if (id_provax > 0 && alturaQuestao > espacoDisponivel) doc.addPage();
 
-        doc.fontSize(14).text(`Questão #${q.index}: ${q.title}`, { bold: true });
+        // Título da questão
+        doc.font("Helvetica-Bold").fontSize(14).text(
+          `Questão #${q.index}: ${q.title}`,
+          {
+            width:
+              doc.page.width - doc.page.margins.left - doc.page.margins.right,
+          }
+        );
         doc.moveDown(0.5);
 
-        const enunciado = limparHTML(q.enunciadoHTML || q.enunciado);
-        doc.fontSize(12).text(enunciado, { indent: 20, align: "justify" });
+        // Enunciado (texto limpo)
+        const enunciado = limparHTML(q.enunciadoHTML || q.enunciado || "");
+        doc.font("Helvetica").fontSize(12).text(enunciado, {
+          indent: 20,
+          align: "justify",
+          width:
+            doc.page.width - doc.page.margins.left - doc.page.margins.right - 40,
+        });
         doc.moveDown(0.5);
 
+        // Imagens dentro do enunciado (se houver)
         const imgRegex = /!\[.*?\]\((.*?)\)/g;
-        const matches = [...(q.enunciado.matchAll(imgRegex))];
+        const matches = [...((q.enunciado || "").matchAll(imgRegex) || [])];
         for (const match of matches) {
           const url = match[1];
           try {
             const imgBuffer = await fetchImagemBuffer(url);
             doc.moveDown(0.5);
-            doc.image(imgBuffer, { wid_provath: 300, align: "center" });
+            // ajusta a imagem para caber
+            doc.image(imgBuffer, {
+              width: Math.min(300, doc.page.width - 100),
+            });
             doc.moveDown(0.5);
-          } catch {}
+          } catch (err) {
+            // se não conseguiu baixar imagem, apenas ignora
+            // console.warn("Não foi possível inserir imagem:", err.message);
+          }
         }
 
-        const alternativasTexto = q.alternativas
-          .map((a) => `${a.letra}) ${limparHTML(a.texto)}`)
+        // Alternativas
+        const alternativasTexto = (q.alternativas || [])
+          .map((a) => `${a.letra}) ${limparHTML(a.texto || "")}`)
           .join("\n");
-        doc.fontSize(12).text(alternativasTexto, { indent: 40 });
+        doc.font("Helvetica").fontSize(12).text(alternativasTexto, {
+          indent: 40,
+          width:
+            doc.page.width - doc.page.margins.left - doc.page.margins.right - 80,
+        });
         doc.moveDown(1);
-        doc
-          .moveTo(doc.x, doc.y)
-          .lineTo(doc.page.wid_provath - doc.page.margins.right, doc.y)
-          .stroke();
+
+        // Linha separadora
+        const startX = doc.x;
+        const lineEndX = doc.page.width - doc.page.margins.right;
+        doc.moveTo(startX, doc.y).lineTo(lineEndX, doc.y).stroke();
         doc.moveDown(1);
       }
 
@@ -157,8 +211,8 @@ async function gerarDOCXBuffer(questoes, tituloProva, infoAluno) {
 
           ...questoes.flatMap((q, id_provax) => {
             const enunciadoLimpo = limparHTML(q.enunciadoHTML || q.enunciado);
-            const alternativasTexto = q.alternativas
-              .map((a) => `${a.letra}) ${limparHTML(a.texto)}`)
+            const alternativasTexto = (q.alternativas || [])
+              .map((a) => `${a.letra}) ${limparHTML(a.texto || "")}`)
               .join("\n");
 
             return [
@@ -240,47 +294,47 @@ export async function salvarProva(req, reply) {
     }
 
     if (tipoArquivo === "nuvem") {
-    const fileName = nomeArquivo.toString().trim().replace(/\s+/g, "_");
-    const apiURL = req.body.apiUrl?.trim();
-    const ano = Number(req.body.ano);
-    const disciplina = req.body.disciplina?.trim();
-    const quantidade = Number(req.body.quantidade) || 0;
+      const fileName = nomeArquivo.toString().trim().replace(/\s+/g, "_");
+      const apiURL = req.body.apiUrl?.trim();
+      const ano = Number(req.body.ano);
+      const disciplina = req.body.disciplina?.trim();
+      const quantidade = Number(req.body.quantidade) || 0;
 
-    if (!apiURL || !ano || !disciplina || quantidade <= 0) {
+      if (!apiURL || !ano || !disciplina || quantidade <= 0) {
         return reply.code(400).send({ error: "Dados insuficientes para salvar na nuvem." });
-    }
+      }
 
-    const apiUrlCorrigida = apiURL.replace(/limit=\d+/i, `limit=${quantidade}`);
-    const disciplinaDigitada = disciplina.trim();
-    const apiUrl = apiUrlCorrigida.trim();
+      const apiUrlCorrigida = apiURL.replace(/limit=\d+/i, `limit=${quantidade}`);
+      const disciplinaDigitada = disciplina.trim();
+      const apiUrl = apiUrlCorrigida.trim();
 
-    try {
+      try {
         await database.query(
-            `INSERT INTO provas (id_usuario, titulo, api_url, ano, disciplina, quantidade)
+          `INSERT INTO provas (id_usuario, titulo, api_url, ano, disciplina, quantidade)
              VALUES ($1, $2, $3, $4, $5, $6)`,
-            [id_usuario, fileName, apiUrl, ano, disciplinaDigitada, quantidade]
+          [id_usuario, fileName, apiUrl, ano, disciplinaDigitada, quantidade]
         );
 
-        const anos = getValid_provaanos();
+        const anos = anosValidos();
         const disciplinas = ["natureza", "humanas", "linguagens", "matematica"];
 
         return reply.view("provas/gerar_prova.ejs", {
-            success: "Prova salva na nuvem com sucesso!",
-            error: null,
-            user: req.user,
-            anos,
-            disciplinas,
-            ano,
-            quantity: quantidade,
-            disciplina: disciplinaDigitada,
-            questoesOriginais: questoesNormalizadas,
-            apiUrlUsada: apiUrl
+          success: "Prova salva na nuvem com sucesso!",
+          error: null,
+          user: req.user,
+          anos,
+          disciplinas,
+          ano,
+          quantity: quantidade,
+          disciplina: disciplinaDigitada,
+          questoesOriginais: questoesNormalizadas,
+          apiUrlUsada: apiUrl
         });
-    } catch (err) {
+      } catch (err) {
         console.error("Erro ao salvar prova na nuvem:", err);
         return reply.code(500).send({ error: "Erro ao salvar prova na nuvem." });
+      }
     }
-}
 
     return reply.code(400).send({ error: "Tipo de arquivo inválido." });
   } catch (error) {
@@ -291,7 +345,7 @@ export async function salvarProva(req, reply) {
 
 
 export async function mostrarFormularioGerarProva(req, reply) {
-  const anos = getValid_provaanos();
+  const anos = anosValidos();
   const disciplinas = ["natureza", "humanas", "linguagens", "matematica"];
 
   let { ano, disciplina, quantity, apiUrl, id_prova } = req.query;
@@ -448,7 +502,7 @@ export async function listarQuestoesENEM(req, reply) {
     }
 
     let { ano, disciplina, quantity } = req.query;
-    const anos = getValid_provaanos();
+    const anos = anosValidos();
     const converter = new showdown.Converter();
 
     ano = parseInt(ano);
@@ -515,10 +569,10 @@ export async function listarQuestoesENEM(req, reply) {
 
       const blocoFiltrado = data.questions.filter((q) => {
         const ctx = q.context || q.text || "";
-        const alternativasInvalid_provaas =
+        const alternativasInvalidas =
           !q.alternatives || !q.alternatives.every((alt) => alt.text);
         const imagemQuebrada = ctx.includes(BROKEN_IMAGE);
-        if (alternativasInvalid_provaas || imagemQuebrada) {
+        if (alternativasInvalidas || imagemQuebrada) {
           return false;
         }
         return true;
@@ -533,7 +587,7 @@ export async function listarQuestoesENEM(req, reply) {
 
     const questoesOriginais = selecionadas.map((q, i) => {
       const proc = processQuestion(q, converter);
-      proc.index = i;
+      proc.index = i + 1;
       return proc;
     });
 
@@ -562,7 +616,7 @@ export async function listarQuestoesENEM(req, reply) {
     });
 
   } catch (err) {
-    const anos = getValid_provaanos();
+    const anos = anosValidos();
     return reply.view("provas/gerar_prova.ejs", {
       user: req.user,
       anos,
